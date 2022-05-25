@@ -1,2 +1,2 @@
 # endgame2
-Haskell verision
+Haskell version

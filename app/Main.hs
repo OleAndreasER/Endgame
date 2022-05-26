@@ -1,6 +1,5 @@
 module Main where
 
-import Arguments (helloWorld)
+import Arguments
 
-main :: IO ()
-main = helloWorld
+main = listArguments

@@ -2,4 +2,4 @@ module Main where
 
 import Arguments
 
-main = listArguments
+main = answerArguments

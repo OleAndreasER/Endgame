@@ -1,15 +1,14 @@
 module Arguments where
 
 import Data.Char 
+import FileHandling (nextLog)
 
 handleArguments :: [String] -> IO ()
-handleArguments ["next"] = putStrLn testLog
+handleArguments ["next"] = putStrLn nextLog
 
-handleArguments ["list", logs] = if all isDigit logs then list else handleArguments ["x"]
-    where list = putStrLn $ concat $ replicate n "Squats\n"
-          n    = read logs
+handleArguments ["list", amountOfLogs] = putStrLn $ listOfLatestLogs amountOfLogs
 
-handleArguments ["add"] = putStrLn $ "Added:" ++ testLog
+handleArguments ["add"] = putStrLn $ "Added:" ++ nextLog
 
 handleArguments ["stats"] = putStrLn "Squat 3RM: 300kg"
 
@@ -17,10 +16,16 @@ handleArguments ["bw"] = putStrLn "Your bodyweight is now 100kg (real man)"
 
 handleArguments ["help"] = putStrLn "try next, list n, add, stats, bw"
 
-handleArguments _ = putStrLn "Not a real argument. Try 'endgame2 help'"
+handleArguments _ = putStrLn invalidArgumentResponse
 
-testLog :: String
-testLog = "\n05/26/22:\n  PR Deadlift: 152.5kg 1/4\n  Volume Press: 48.75kg 2/3\n  Volume Chins: 16.25kg 2/5"
+invalidArgumentResponse = "Not a real argument. Try 'endgame2 help'"
 
-addLog :: String -> IO ()
-addLog = appendFile "logs.txt"
+strIsInteger :: String -> Bool
+strIsInteger = all isDigit
+
+listOfLatestLogs :: String -> String
+listOfLatestLogs amountOfLogs
+    | strIsInteger amountOfLogs = list
+    | otherwise                 = invalidArgumentResponse
+    where list = concat $ replicate n "Squats\n"
+          n    = read amountOfLogs

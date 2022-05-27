@@ -1,5 +1,8 @@
 module Main where
 
-import Arguments
+import System.Environment
+import Arguments (handleArguments)
 
-main = answerArguments
+main = do
+    arguments <- getArgs
+    handleArguments arguments

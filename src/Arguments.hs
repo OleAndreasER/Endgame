@@ -18,7 +18,7 @@ handleArguments ["stats"] =
     putStrLn "Squat 3RM: 300kg"
 
 handleArguments ["program"] = do
-    program <- readProgram "standard-half-days.txt"
+    program <- readProgram "standard-everyday.txt"
     print program
 
 handleArguments ["bw"] =

@@ -36,7 +36,7 @@ sets str =
 
 setsBlock :: String -> [Set]
 setsBlock str =
-    take setCount $ repeat $ Set reps percent sessionType
+    replicate setCount $ Set reps percent sessionType
     where [setCountStr, repsStr, percentOrPRStr] = splitOn "x" str
           sessionType = if percentOrPRStr == "PR" then PR else Work
           percent = if percentOrPRStr == "PR" then 100.0 else read percentOrPRStr

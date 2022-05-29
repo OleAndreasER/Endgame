@@ -1,0 +1,9 @@
+|Press-Bench
+|Squat-Squat-Deadlift
+|Chin-Row
+-Press:1x3xPR:2x5x85
+-Bench:1x3xPR:2x5x85
+-Squat:1x3xPR:2x5x85
+-Deadlift:1x3xPR:1x5x87
+-Chin:1x3xPR:2x5x87
+-Row:1x3xPR:2x5x87

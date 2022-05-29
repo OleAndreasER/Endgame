@@ -1,7 +1,7 @@
 module Arguments where
 
 import Data.Char 
-import FileHandling (nextLog, addLog)
+import FileHandling (nextLog, addLog, readProgram)
 
 handleArguments :: [String] -> IO ()
 handleArguments ["next"] =
@@ -16,6 +16,10 @@ handleArguments ["add"] = do
 
 handleArguments ["stats"] =
     putStrLn "Squat 3RM: 300kg"
+
+handleArguments ["program"] = do
+    program <- readProgram "standard-half-days.txt"
+    print program
 
 handleArguments ["bw"] =
     putStrLn "Your bodyweight is now 100kg (real man)"

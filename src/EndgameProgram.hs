@@ -20,19 +20,3 @@ data LiftTypeCycle = LiftTypeCycle [String]
 --              Work [(5 87 Work), (5 87 Work), (5 87 Work)] Work]
 data LiftCycle = LiftCycle String [LiftSession]
     deriving (Show)
-
-exProgram = Program [LiftTypeCycle ["Press", "Bench"],
-                     LiftTypeCycle ["Squat", "Deadlift"],
-                     LiftTypeCycle ["Chin", "Row"]]
-                    [LiftCycle "Press"    [LiftSession PR [Set 3 100 PR, Set 5 87 Work],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]],
-                     LiftCycle "Bench"    [LiftSession PR [Set 3 100 PR, Set 5 87 Work],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]],   
-                     LiftCycle "Squat"    [LiftSession PR [Set 3 100 PR, Set 5 87 Work],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]],   
-                     LiftCycle "Deadlift" [LiftSession PR [Set 3 100 PR],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work]],
-                     LiftCycle "Chin"     [LiftSession PR [Set 3 100 PR, Set 5 87 Work, Set 5 87 Work],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]],
-                     LiftCycle "Row"      [LiftSession PR [Set 3 100 PR, Set 5 87 Work, Set 5 87 Work],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]]

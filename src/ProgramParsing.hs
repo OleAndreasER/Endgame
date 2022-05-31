@@ -1,4 +1,4 @@
-module ProgramParsing where
+module ProgramParsing (programFromFileStr) where
 
 import EndgameProgram
 import Data.List.Split (splitOn)

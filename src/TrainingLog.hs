@@ -15,4 +15,7 @@ data LiftSession = LiftSession {
     sessionType :: SetType
 }
 
---data Log = Log Date [LiftSession]
+data Log = Log {
+    date :: String,
+    liftSessions :: [LiftSession]
+}

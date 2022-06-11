@@ -1,18 +1,29 @@
 module LogParsing where
 
 import TrainingLog
+import Data.List.Split (splitOn)
 
 logsFromFileStr :: String -> [Log]
 logsFromFileStr str = map parseLog $ lines str
 
 parseLog :: String -> Log
 parseLog str = Log {
-    date = parseDate str,
-    liftSessions = parseLiftSessions str
-}
+    date = dateStr,
+    liftSessions = parseLiftSessions $ liftSessionsStr
+}   where (dateStr:liftSessionsStr) = splitOn ";" str
 
-parseDate :: String -> String
-parseDate = undefined
+parseLiftSessions :: [String] -> [LiftSession]
+parseLiftSessions = map parseLiftSession
 
-parseLiftSessions :: String -> [LiftSession]
-parseLiftSessions = undefined
+parseLiftSession :: String -> LiftSession
+parseLiftSession str = LiftSession {
+    lift = liftStr,
+    sessionType = parseSessionType sessionTypeStr,
+    sets = parseSets setsStr 
+}   where [liftStr, sessionTypeStr, setsStr] = splitOn "," str 
+
+parseSessionType :: String -> SetType
+parseSessionType = read
+
+parseSets :: String -> [Set]
+parseSets str = undefined 

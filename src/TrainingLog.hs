@@ -1,7 +1,7 @@
 module TrainingLog where 
 
 data SetType = Work | PR Bool
-    deriving (Show)
+    deriving (Show, Read)
 
 data Set = Set {
     reps :: Integer,

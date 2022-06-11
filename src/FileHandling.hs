@@ -1,23 +1,25 @@
 module FileHandling where
 
 import System.Directory (createDirectoryIfMissing)
-import ProgramParsing (programFromFileStr)
+import Data.Binary
 import EndgameProgram (Program)
+import TrainingLog (Log)
+
 
 addLog :: String -> IO ()
 addLog = appendFile "endgame-profiles/first-profile/logs.txt"
 
 nextLog :: String
-nextLog = testLog
+nextLog = testLog2
 
-testLog :: String
-testLog = "\n05/26/22:\n  PR Deadlift: 152.5kg 1/4\n  Volume Press: 48.75kg 2/3\n  Volume Chins: 16.25kg 2/5"
+testLog2 :: String
+testLog2 = "\n05/26/22:\n  PR Deadlift: 152.5kg 1/4\n  Volume Press: 48.75kg 2/3\n  Volume Chins: 16.25kg 2/5"
+
+readLog :: IO Log
+readLog = decodeFile "endgame-profiles/first-profile/logs.txt"
 
 readProgram :: String -> IO Program
-readProgram programName = do
-    fileStr <- readFile ("endgame-programs/" ++ programName)
-    return $ programFromFileStr fileStr
-
+readProgram programName = decodeFile ("endgame-programs/" ++ programName)
 
 --A profile contains training logs and stats. 
 createProfile :: String -> IO ()

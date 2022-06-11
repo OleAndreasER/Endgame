@@ -1,11 +1,12 @@
 module Arguments where
 
 import Data.Char 
-import FileHandling (nextLog, addLog, readProgram)
+import FileHandling (nextLog, addLog, readProgram, readLog)
 
 handleArguments :: [String] -> IO ()
-handleArguments ["next"] =
-    putStrLn nextLog
+handleArguments ["next"] = do
+    log <- readLog
+    print log
 
 handleArguments ["list", amountOfLogs] =
     putStrLn $ listOfLatestLogs amountOfLogs
@@ -18,7 +19,7 @@ handleArguments ["stats"] =
     putStrLn "Squat 3RM: 300kg"
 
 handleArguments ["program"] = do
-    program <- readProgram "standard-everyday.txt"
+    program <- readProgram "standard-everyotherday.txt"
     print program
 
 handleArguments ["bw"] =

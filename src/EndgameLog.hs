@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module TrainingLog where 
+module EndgameLog where 
+
 import GHC.Generics (Generic)
 import Data.Binary
 

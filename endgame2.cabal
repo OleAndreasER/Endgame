@@ -30,7 +30,8 @@ executable endgame2
     other-modules:    Arguments,
                       FileHandling,
                       EndgameProgram,
-                      TrainingLog
+                      EndgameLog,
+                      EndgameStats
 
 
     -- LANGUAGE extensions used by modules in this package.

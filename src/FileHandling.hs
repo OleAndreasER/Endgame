@@ -3,7 +3,7 @@ module FileHandling where
 import System.Directory (createDirectoryIfMissing)
 import Data.Binary
 import EndgameProgram (Program)
-import TrainingLog (Log)
+import EndgameLog (Log)
 
 
 addLog :: String -> IO ()

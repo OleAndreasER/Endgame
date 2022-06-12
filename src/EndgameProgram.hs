@@ -3,6 +3,7 @@
 module EndgameProgram where
 import GHC.Generics (Generic)
 import Data.Binary
+import EndgameGeneralTypes (Reps, Percent, Lift)
 
 data Program = Program [LiftGroupCycle] [LiftCycle]
     deriving (Show, Generic)
@@ -16,24 +17,22 @@ data SetType = PR | Work
 instance Binary SetType
 
 
-data Set = Set {
-    reps :: Integer,
-    percent :: Float,
-    setType :: SetType
-}   deriving (Show, Generic)
+data Set = Set Reps Percent SetType
+    deriving (Show, Generic)
 
 instance Binary Set
 
 
+
 --[Squat, Deadlift]
-data LiftGroupCycle = LiftGroupCycle [String]
+data LiftGroupCycle = LiftGroupCycle [Lift]
     deriving (Show, Generic)
 
 instance Binary LiftGroupCycle
 
 
 data LiftCycle = LiftCycle {
-    lift :: String,
+    lift :: Lift,
     prSession :: [Set],
     workSessionCycle :: [[Set]] -- [[]] because you might want more kinds of work sessions.
 }   deriving (Show, Generic)

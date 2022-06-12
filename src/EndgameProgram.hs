@@ -4,7 +4,7 @@ module EndgameProgram where
 import GHC.Generics (Generic)
 import Data.Binary
 
-data Program = Program [LiftTypeCycle] [LiftCycle]
+data Program = Program [LiftGroupCycle] [LiftCycle]
     deriving (Show, Generic)
 
 instance Binary Program
@@ -16,46 +16,51 @@ data SetType = PR | Work
 instance Binary SetType
 
 
-data Set = Set Integer Float SetType
-    deriving (Show, Generic)
+data Set = Set {
+    reps :: Integer,
+    percent :: Float,
+    setType :: SetType
+}   deriving (Show, Generic)
 
 instance Binary Set
 
 
-data LiftSession = LiftSession SetType [Set] 
-    deriving (Show, Generic)
-
-instance Binary LiftSession
-
-
 --[Squat, Deadlift]
-data LiftTypeCycle = LiftTypeCycle [String]
+data LiftGroupCycle = LiftGroupCycle [String]
     deriving (Show, Generic)
 
-instance Binary LiftTypeCycle
+instance Binary LiftGroupCycle
 
 
---Squat cycle: [PR [(3 100 PR), (5 87 Work)],
---              Work [(5 87 Work), (5 87 Work), (5 87 Work)] Work]
-data LiftCycle = LiftCycle String [LiftSession]
-    deriving (Show, Generic)
+data LiftCycle = LiftCycle {
+    lift :: String,
+    prSession :: [Set],
+    workSessionCycle :: [[Set]] -- [[]] because you might want more kinds of work sessions.
+}   deriving (Show, Generic)
 
 instance Binary LiftCycle
 
-
---everyotherday
-exProgram = Program [LiftTypeCycle ["Press", "Bench"],
-                     LiftTypeCycle ["Squat", "Deadlift"],
-                     LiftTypeCycle ["Chin", "Row"]]
-                    [LiftCycle "Press"    [LiftSession PR [Set 3 100 PR, Set 5 87 Work],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]],
-                     LiftCycle "Bench"    [LiftSession PR [Set 3 100 PR, Set 5 87 Work],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]],   
-                     LiftCycle "Squat"    [LiftSession PR [Set 3 100 PR, Set 5 87 Work],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]],   
-                     LiftCycle "Deadlift" [LiftSession PR [Set 3 100 PR],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work]],
-                     LiftCycle "Chin"     [LiftSession PR [Set 3 100 PR, Set 5 87 Work, Set 5 87 Work],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]],
-                     LiftCycle "Row"      [LiftSession PR [Set 3 100 PR, Set 5 87 Work, Set 5 87 Work],
-                                           LiftSession Work [Set 5 87 Work, Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]]
+everyotherday :: Program
+everyotherday = Program 
+    [LiftGroupCycle ["Press", "Bench"],
+     LiftGroupCycle ["Squat", "Deadlift"],
+     LiftGroupCycle ["Chin", "Row"]]
+     
+    [LiftCycle {lift = "Press",
+                prSession = [Set 3 100 PR, Set 5 87 Work],
+                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
+     LiftCycle {lift = "Bench",
+                prSession = [Set 3 100 PR, Set 5 87 Work],
+                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
+     LiftCycle {lift = "Squat",
+                prSession = [Set 3 100 PR, Set 5 87 Work],
+                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
+     LiftCycle {lift = "Deadlift",
+                prSession = [Set 3 100 PR],
+                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work]]},
+     LiftCycle {lift = "Chin",
+                prSession = [Set 3 100 PR, Set 5 87 Work, Set 5 87 Work],
+                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
+     LiftCycle {lift = "Row",
+                prSession = [Set 3 100 PR, Set 5 87 Work, Set 5 87 Work],
+                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]}]

@@ -3,17 +3,14 @@ module FileHandling where
 import System.Directory (createDirectoryIfMissing)
 import Data.Binary
 import EndgameProgram (Program)
-import EndgameLog (Log)
+import EndgameLog (Log, testLog)
 
 
+--temp
 addLog :: String -> IO ()
-addLog = appendFile "endgame-profiles/first-profile/logs.txt"
+addLog _ = encodeFile "endgame-profiles/first-profile/logs.txt" testLog
 
-nextLog :: String
-nextLog = testLog2
-
-testLog2 :: String
-testLog2 = "\n05/26/22:\n  PR Deadlift: 152.5kg 1/4\n  Volume Press: 48.75kg 2/3\n  Volume Chins: 16.25kg 2/5"
+nextLog = "hhh"
 
 readLog :: IO Log
 readLog = decodeFile "endgame-profiles/first-profile/logs.txt"

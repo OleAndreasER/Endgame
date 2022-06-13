@@ -14,7 +14,16 @@ data Stats = Stats [LiftStats] Bodyweight
 instance Binary Stats
 
 
-data LiftStats = LiftStats Lift Weight 
+data CyclePosition = CyclePosition Integer Integer 
+    deriving (Generic)
+
+instance Binary CyclePosition
+
+type LiftCyclePosition = CyclePosition
+type LiftGroupCyclePosition = CyclePosition
+
+
+data LiftStats = LiftStats Lift Weight LiftCyclePosition
     deriving (Generic)
 
 instance Binary LiftStats

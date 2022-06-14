@@ -7,13 +7,13 @@ import EndgameLog (Log, testLog)
 
 
 --temp
-addLog :: String -> IO ()
-addLog _ = encodeFile "endgame-profiles/first-profile/logs.txt" testLog
+addLog :: Log -> IO ()
+addLog log = do
+    logs <- readLogs
+    encodeFile "endgame-profiles/first-profile/logs.txt" (log:logs)
 
-nextLog = "hhh"
-
-readLog :: IO Log
-readLog = decodeFile "endgame-profiles/first-profile/logs.txt"
+readLogs :: IO [Log]
+readLogs = decodeFile "endgame-profiles/first-profile/logs.txt"
 
 readProgram :: String -> IO Program
 readProgram programName = decodeFile ("endgame-programs/" ++ programName)

@@ -1,20 +1,21 @@
 module Arguments where
 
 import Data.Char 
-import FileHandling (nextLog, addLog, readProgram, readLog)
+import FileHandling (addLog, readProgram, readLogs)
 import CLIFormating (formatLog)
+import EndgameLog (testLog)
 
 handleArguments :: [String] -> IO ()
 handleArguments ["next"] = do
-    log <- readLog
-    putStrLn $ formatLog log
+    logs <- readLogs
+    putStrLn $ formatLog $ head logs
 
 handleArguments ["list", amountOfLogs] =
     putStrLn $ listOfLatestLogs amountOfLogs
 
 handleArguments ["add"] = do
-    addLog nextLog
-    putStrLn $ "Added:" ++ nextLog
+    addLog testLog
+    putStrLn $ "Added:" ++ (formatLog testLog)
 
 handleArguments ["stats"] =
     putStrLn "Squat 3RM: 300kg"

@@ -3,15 +3,18 @@ module Arguments where
 import Data.Char 
 import FileHandling (addLog, readProgram, readLogs)
 import CLIFormating (formatLog)
-import EndgameLog (testLog)
+import EndgameLog (testLog, Log)
 
 handleArguments :: [String] -> IO ()
 handleArguments ["next"] = do
     logs <- readLogs
     putStrLn $ formatLog $ head logs
 
-handleArguments ["list", amountOfLogs] =
-    putStrLn $ listOfLatestLogs amountOfLogs
+handleArguments ["list", n] = do
+    logs <- readLogs
+    putStrLn $ listOfLogs (read n) logs
+
+handleArguments ["list"] = handleArguments ["list", "1"]
 
 handleArguments ["add"] = do
     addLog testLog
@@ -35,14 +38,8 @@ handleArguments _ =
 
 invalidArgumentResponse = "Not a real argument. Try 'endgame2 help'"
 
---For "list n" argument
-listOfLatestLogs :: String -> String
-listOfLatestLogs amountOfLogs
-    | strIsInteger amountOfLogs = list
-    | otherwise                 = invalidArgumentResponse
-    where list = concat $ replicate n "Squats\n"
-          n    = read amountOfLogs
 
-strIsInteger :: String -> Bool
-strIsInteger = all isDigit
--- 
+listOfLogs :: Int -> [Log] -> String
+listOfLogs n logs = 
+    unlines $ map formatLog (take m logs)
+        where m = max n (length logs)

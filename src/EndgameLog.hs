@@ -7,13 +7,13 @@ import Data.Binary
 import EndgameGeneralTypes (Lift, Reps, Weight)
 
 data SetType = Work | PR Bool
-    deriving (Generic, Show)
+    deriving (Generic, Show, Eq)
     
 instance Binary SetType
 
 
 data Set = Set Reps Weight SetType
-    deriving (Generic, Show)
+    deriving (Generic, Show, Eq)
 
 instance Binary Set
 
@@ -43,6 +43,6 @@ testLog = Log
         [Set 3 200 (PR False),
          Set 5 170 Work],
      LiftSession "Row"
-        [Set 3 75 Work,
-         Set 3 75 Work,
-         Set 3 75 Work]]
+        [Set 5 75 Work,
+         Set 5 75 Work,
+         Set 5 75 Work]]

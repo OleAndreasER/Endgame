@@ -2,11 +2,12 @@ module Arguments where
 
 import Data.Char 
 import FileHandling (nextLog, addLog, readProgram, readLog)
+import CLIFormating (formatLog)
 
 handleArguments :: [String] -> IO ()
 handleArguments ["next"] = do
     log <- readLog
-    print log
+    putStrLn $ formatLog log
 
 handleArguments ["list", amountOfLogs] =
     putStrLn $ listOfLatestLogs amountOfLogs

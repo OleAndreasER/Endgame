@@ -1,27 +1,39 @@
 module CLIFormating where
 import EndgameLog
+import Data.List (group)
 
 formatLog :: Log -> String
-formatLog log = (date log) ++ (formatLiftSessions $ liftSessions log)
+formatLog log = 
+   (date log) ++ "\n" ++ (formatLiftSessions $ liftSessions log)
 
 formatLiftSessions :: [LiftSession] -> String
 formatLiftSessions liftSessions = 
     unlines
     $ map ("    " ++)
+    $ foldr (++) []
     $ map formatLiftSession
     $ liftSessions
 
-formatLiftSession :: LiftSession -> String
+formatLiftSession :: LiftSession -> [String]
 formatLiftSession liftSession = 
-    unlines
-    $ map ("    " ++)
-    $ map (lift liftSession ++)
-    $ map formatSet
+    map ((lift liftSession ++ " ") ++)
+    $ map formatSetGroups
+    $ group
     $ sets liftSession
 
-formatSet :: Set -> String
-formatSet set = PRStr ++ " " ++ set 
+formatSetGroups :: [Set] -> String
+formatSetGroups sets =
+    setTypeStr++" "++setsStr++"x"++repsStr++" "++weightStr++"kg"++failureStr
+    where Set reps weight setType = head sets
+          setTypeStr = head $ words $ show setType
+          setsStr = show $ length sets
+          repsStr = show reps
+          weightStr = show weight
+          failureStr = failure setType
 
+failure :: SetType -> String
+failure (PR False) = " (FAIL)"
+failure _ = ""
 
 
 --"06/05/2022:

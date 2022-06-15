@@ -6,7 +6,6 @@ import EndgameProgram (Program)
 import EndgameLog (Log, testLog)
 
 
---temp
 addLog :: Log -> IO ()
 addLog log = do
     logs <- readLogs

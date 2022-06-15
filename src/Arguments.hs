@@ -6,40 +6,48 @@ import CLIFormating (formatLog)
 import EndgameLog (testLog, Log)
 
 handleArguments :: [String] -> IO ()
+
+--TODO
 handleArguments ["next"] = do
     logs <- readLogs
     putStrLn $ formatLog $ head logs
 
-handleArguments ["list", n] = do
+handleArguments ["list", logCount] = do
     logs <- readLogs
-    putStrLn $ listOfLogs (read n) logs
+    putStrLn $ latestLogs logCount $ map formatLog logs
 
 handleArguments ["list"] = handleArguments ["list", "1"]
 
+--TODO: testLog -> nextLog
 handleArguments ["add"] = do
     addLog testLog
     putStrLn $ "Added:" ++ (formatLog testLog)
 
+--TODO: format stats
 handleArguments ["stats"] =
     putStrLn "Squat 3RM: 300kg"
 
+--TODO: format program
 handleArguments ["program"] = do
     program <- readProgram "standard-everyotherday.txt"
     print program
 
+--TODO
 handleArguments ["bw"] =
     putStrLn "Your bodyweight is now 100kg (real man)"
 
+--TODO
 handleArguments ["help"] =
     putStrLn "try next, list n, add, stats, bw"
 
 handleArguments _ =
     putStrLn invalidArgumentResponse
 
-invalidArgumentResponse = "Not a real argument. Try 'endgame2 help'"
+invalidArgumentResponse = "Try 'endgame2 help'"
 
 
-listOfLogs :: Int -> [Log] -> String
-listOfLogs n logs = 
-    unlines $ map formatLog (take m logs)
-        where m = max n (length logs)
+latestLogs :: String -> [String] -> String
+latestLogs n logs
+    | all isDigit n = unlines $ take m logs
+    | otherwise     = invalidArgumentResponse
+    where m = min (read n) (length logs)

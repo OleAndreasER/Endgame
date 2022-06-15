@@ -3,24 +3,24 @@ module Arguments where
 import Data.Char 
 import FileHandling (addLog, readProgram, readLogs)
 import CLIFormating (formatLog)
-import EndgameLog (testLog, Log)
+import EndgameLog (testLog)
 
 handleArguments :: [String] -> IO ()
 
 --TODO
 handleArguments ["next"] = do
-    logs <- readLogs
+    logs <- readLogs "first-profile"
     putStrLn $ formatLog $ head logs
 
 handleArguments ["list", logCount] = do
-    logs <- readLogs
+    logs <- readLogs "first-profile"
     putStrLn $ latestLogs logCount $ map formatLog logs
 
 handleArguments ["list"] = handleArguments ["list", "1"]
 
 --TODO: testLog -> nextLog
 handleArguments ["add"] = do
-    addLog testLog
+    addLog "first-profile" testLog
     putStrLn $ "Added:" ++ (formatLog testLog)
 
 --TODO: format stats

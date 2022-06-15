@@ -6,18 +6,19 @@ import EndgameProgram (Program)
 import EndgameLog (Log, testLog)
 
 
-addLog :: Log -> IO ()
-addLog log = do
-    logs <- readLogs
-    encodeFile "endgame-profiles/first-profile/logs.txt" (log:logs)
+addLog :: String -> Log -> IO ()
+addLog profile log = do
+    logs <- readLogs profile
+    encodeFile ("endgame-profiles/"++profile++"/logs.txt") (log:logs)
 
-readLogs :: IO [Log]
-readLogs = decodeFile "endgame-profiles/first-profile/logs.txt"
+readLogs :: String -> IO [Log]
+readLogs profile = decodeFile ("endgame-profiles/"++profile++"/logs.txt")
 
 readProgram :: String -> IO Program
 readProgram programName = decodeFile ("endgame-programs/" ++ programName)
 
 --A profile contains training logs and stats. 
 createProfile :: String -> IO ()
-createProfile profileName =
-    createDirectoryIfMissing True ("endgame-profiles/" ++ profileName)
+createProfile profile =
+    createDirectoryIfMissing True ("endgame-profiles/" ++ profile)
+

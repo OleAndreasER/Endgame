@@ -9,13 +9,13 @@ import EndgameLog (testLog)
 handleArguments :: [String] -> IO ()
 
 --TODO
-handleArguments ["next"] = do
-    logs <- readLogs "first-profile"
-    putStrLn $ formatLog $ head logs
+handleArguments ["next"] =
+    readLogs "first-profile" >>=
+    putStrLn . formatLog . head
 
-handleArguments ["list", logCount] = do
-    logs <- readLogs "first-profile"
-    putStrLn $ latestLogs logCount $ map formatLog logs
+handleArguments ["list", logCount] =
+    readLogs "first-profile" >>=
+    putStrLn . latestLogs logCount . map formatLog
 
 handleArguments ["list"] = handleArguments ["list", "1"]
 
@@ -28,10 +28,9 @@ handleArguments ["add"] = do
 handleArguments ["stats"] =
     putStrLn "Squat 3RM: 300kg"
 
---TODO: format program
-handleArguments ["program"] = do
-    program <- readProgram "standard-everyotherday.txt"
-    putStrLn $ formatProgram program
+handleArguments ["program"] =
+    readProgram "standard-everyotherday.txt" >>=
+    putStrLn . formatProgram
 
 --TODO
 handleArguments ["bw"] =

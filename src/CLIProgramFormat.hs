@@ -1,4 +1,4 @@
-module CLIProgramFormat where
+module CLIProgramFormat (formatProgram) where
 
 import EndgameProgram
 import EndgameGeneralTypes (Percent)
@@ -33,13 +33,27 @@ formatSetGroup sets =
 
 formatSession :: [Set] -> String
 formatSession sets =
-    intercalate "\n          "
+    (++) " - "
+    $ intercalate "\n           "
     $ map formatSetGroup
     $ group sets
 
 formatSessionCycle :: [[Set]] -> String
-formatSessionCycle = undefined
-    
+formatSessionCycle cycle =
+    intercalate "\n        "
+    $ map formatSession cycle
+
+formatLiftCycle :: LiftCycle -> String
+formatLiftCycle cycle =
+    unlines [liftStr, prStr, workStr]
+    where liftStr = lift cycle
+          prStr = "    PR  " ++ (formatSession $ prSession cycle)
+          workStr = "    Work" ++ (formatSessionCycle $ workSessionCycle cycle)
+
+formatProgram :: Program -> String
+formatProgram (Program liftGroupCycles liftCycles) = 
+    (++) (formatLiftGroupCycles liftGroupCycles++"\n")
+    (concat $ map formatLiftCycle liftCycles)
 
 
 {- 
@@ -53,6 +67,7 @@ Press
     PR   - 1x3xPR
            1x5x87% 
     Work - 3x5x87%
+           1x5x87% 
          - 3x7x80%  [This is not in everyotherday]
 Bench
     PR   - 1x3xPR

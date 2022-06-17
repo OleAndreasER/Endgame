@@ -3,6 +3,7 @@ module Arguments where
 import Data.Char 
 import FileHandling (addLog, readProgram, readLogs)
 import CLILogFormat (formatLog)
+import CLIProgramFormat (formatProgram)
 import EndgameLog (testLog)
 
 handleArguments :: [String] -> IO ()
@@ -30,7 +31,7 @@ handleArguments ["stats"] =
 --TODO: format program
 handleArguments ["program"] = do
     program <- readProgram "standard-everyotherday.txt"
-    print program
+    putStrLn $ formatProgram program
 
 --TODO
 handleArguments ["bw"] =

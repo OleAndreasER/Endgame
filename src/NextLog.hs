@@ -8,4 +8,11 @@ nextLog  :: [Log.Log]
          -> Stats
          -> Program.Program
          -> (Log.Log, Stats)
-nextLog = undefined
+
+nextLog logs stats program =
+    (Log.Log 
+        { Log.date = ""
+        , Log.liftSessions = undefined
+        }
+    , Stats undefined undefined
+    )

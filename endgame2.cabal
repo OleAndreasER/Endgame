@@ -35,7 +35,8 @@ executable endgame2
                       EndgameGeneralTypes,
                       EndgameProgram,
                       EndgameLog,
-                      EndgameStats
+                      EndgameStats,
+                      NextLog
 
 
     -- LANGUAGE extensions used by modules in this package.

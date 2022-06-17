@@ -12,13 +12,13 @@ instance Binary Program
 
 
 data SetType = PR | Work
-    deriving (Show, Enum, Generic)
+    deriving (Show, Eq, Generic)
 
 instance Binary SetType
 
 
 data Set = Set Reps Percent SetType
-    deriving (Show, Generic)
+    deriving (Show, Eq, Generic)
 
 instance Binary Set
 
@@ -34,7 +34,7 @@ instance Binary LiftGroupCycle
 data LiftCycle = LiftCycle {
     lift :: Lift,
     prSession :: [Set],
-    workSessionCycle :: [[Set]] -- [[]] because you might want more kinds of work sessions.
+    workSessionCycle :: [[Set]] -- [[Set]] because you might want more kinds of work sessions.
 }   deriving (Show, Generic)
 
 instance Binary LiftCycle

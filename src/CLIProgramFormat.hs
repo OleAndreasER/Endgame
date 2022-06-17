@@ -1,6 +1,8 @@
 module CLIProgramFormat where
 
 import EndgameProgram
+import EndgameGeneralTypes (Percent)
+import Data.List (group, intercalate)
 
 formatLiftGroupCycle :: LiftGroupCycle -> String
 formatLiftGroupCycle (LiftGroupCycle lifts) =
@@ -14,6 +16,30 @@ formatLiftGroupCycles cycles =
     $ unlines 
     $ map formatLiftGroupCycle cycles
 
+--5x87.0%
+formatSet :: Set -> String
+formatSet (Set reps percent setType) =
+    (show reps) ++"x" ++ formatPercent setType percent
+
+formatPercent :: SetType -> Percent -> String
+formatPercent PR _ = "PR"
+formatPercent _ percent = show percent ++ "%"
+
+formatSetGroup :: [Set] -> String 
+formatSetGroup sets = 
+    (++) ((show $ length sets)++"x")
+    $ formatSet
+    $ head sets
+
+formatSession :: [Set] -> String
+formatSession sets =
+    intercalate "\n          "
+    $ map formatSetGroup
+    $ group sets
+
+formatSessionCycle :: [[Set]] -> String
+formatSessionCycle = undefined
+    
 
 
 {- 

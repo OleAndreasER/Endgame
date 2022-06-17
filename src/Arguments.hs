@@ -2,7 +2,7 @@ module Arguments where
 
 import Data.Char 
 import FileHandling (addLog, readProgram, readLogs)
-import CLIFormating (formatLog)
+import CLILogFormat (formatLog)
 import EndgameLog (testLog)
 
 handleArguments :: [String] -> IO ()

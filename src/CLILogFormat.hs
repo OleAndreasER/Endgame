@@ -1,4 +1,4 @@
-module CLIFormating where
+module CLILogFormat (formatLog) where
 import EndgameLog
 import Data.List (group)
 
@@ -38,9 +38,11 @@ failure (PR False) = " (FAIL)"
 failure _          = ""
 
 
---"06/05/2022:
---    Bench PR 1x3 100kg
---    Bench Work 1x5 87kg 
---    Squat PR 1x3 200kg (FAIL)
---    Squat Work 1x5 170kg
---    Row Work 3x5 75kg
+{-
+06/05/2022:
+    Bench PR 1x3 100kg
+    Bench Work 1x5 87kg 
+    Squat PR 1x3 200kg (FAIL)
+    Squat Work 1x5 170kg
+    Row Work 3x5 75kg
+-}

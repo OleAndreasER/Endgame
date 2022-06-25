@@ -2,29 +2,25 @@
 
 module EndgameStats where
 
-import EndgameGeneralTypes (Lift, Weight)
+import EndgameGeneralTypes (Lift, Weight, CyclePosition)
 import Data.Binary
 import GHC.Generics (Generic)
 
 type Bodyweight = Float
 
-data Stats = Stats [LiftStats] Bodyweight
-    deriving (Generic)
+data Stats = Stats 
+    { lifts :: [LiftStats]
+    , bodyweight :: Bodyweight
+    } deriving (Generic, Show, Eq, Read)
 
 instance Binary Stats
 
 
-data CyclePosition = CyclePosition Integer Integer 
-    deriving (Generic)
-
-instance Binary CyclePosition
-
-type LiftCyclePosition = CyclePosition
-type LiftGroupCyclePosition = CyclePosition
-
-
-data LiftStats = LiftStats Lift Weight LiftCyclePosition
-    deriving (Generic)
+data LiftStats = LiftStats
+    { lift :: Lift
+    , pr :: Weight
+    , cyclePosition :: CyclePosition
+    } deriving (Generic, Show, Eq, Read)
 
 instance Binary LiftStats
     

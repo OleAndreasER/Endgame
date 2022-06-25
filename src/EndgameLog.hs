@@ -4,9 +4,11 @@ module EndgameLog where
 
 import GHC.Generics (Generic)
 import Data.Binary
-import EndgameGeneralTypes (Lift, Reps, Weight)
+import EndgameGeneralTypes (Lift, Reps, Weight, CyclePosition)
 
-data SetType = Work | PR Bool
+data SetType
+    = Work 
+    | PR Bool
     deriving (Generic, Show, Eq)
     
 instance Binary SetType
@@ -18,21 +20,22 @@ data Set = Set Reps Weight SetType
 instance Binary Set
 
 
-data LiftSession = LiftSession {
-    lift :: Lift,
-    sets :: [Set]
-}   deriving (Generic, Show)
+data LiftSession = LiftSession 
+    { lift :: Lift
+    , liftGroupCyclePosition :: CyclePosition
+    , liftCyclePosition :: CyclePosition
+    , sets :: [Set]
+    } deriving (Generic, Show)
 
 instance Binary LiftSession
 
 
-data Log = Log {
-    date :: String,
-    liftSessions :: [LiftSession]
-}   deriving (Generic, Show)
+data Log = Log 
+    { date :: String
+    , liftSessions :: [LiftSession]
+    } deriving (Generic, Show)
 
 instance Binary Log
-
 
 testLog = Log 
     "06/05/2022"

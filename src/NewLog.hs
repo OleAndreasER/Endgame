@@ -15,19 +15,18 @@ log date (Program.Program liftGroupCycles liftCycles) stats =
     Log.Log 
         { Log.date = date
         , Log.liftSessions = 
-            map helper
-            $ map liftInPosition
+            map (\lift -> Log.LiftSession
+                { Log.lift = lift
+                , Log.sets = undefined 
+                })
+            $ map (uncurry $ liftInPosition)
             $ zip (liftGroupCycles)
             $ liftGroupPositions stats
         }
 
 
-liftInPosition :: (Program.LiftGroupCycle, CyclePosition)
+liftInPosition :: Program.LiftGroupCycle
+               -> CyclePosition
                -> Lift
-liftInPosition (cycle, cyclePosition) =  
+liftInPosition cycle cyclePosition =  
     cycle !! (position cyclePosition)
-
-
-
-helper :: Lift -> Log.LiftSession
-helper = undefined

@@ -9,13 +9,13 @@ import EndgameGeneralTypes (Lift, Reps, Weight)
 data SetType
     = Work 
     | PR Bool
-    deriving (Generic, Show, Eq)
+    deriving (Generic, Show, Read, Eq)
     
 instance Binary SetType
 
 
 data Set = Set Reps Weight SetType
-    deriving (Generic, Show, Eq)
+    deriving (Generic, Show, Read, Eq)
 
 instance Binary Set
 
@@ -23,7 +23,7 @@ instance Binary Set
 data LiftSession = LiftSession 
     { lift :: Lift
     , sets :: [Set]
-    } deriving (Generic, Show)
+    } deriving (Generic, Show, Read, Eq)
 
 instance Binary LiftSession
 
@@ -31,7 +31,7 @@ instance Binary LiftSession
 data Log = Log 
     { date :: String
     , liftSessions :: [LiftSession]
-    } deriving (Generic, Show)
+    } deriving (Generic, Show, Read, Eq)
 
 instance Binary Log
 

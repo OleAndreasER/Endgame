@@ -18,7 +18,8 @@ instance Binary CyclePosition
 
 
 data Stats = Stats 
-    { lifts :: [LiftStats]
+    { liftGroupPositions :: [CyclePosition]
+    , lifts :: [LiftStats]
     , bodyweight :: Bodyweight
     } deriving (Generic, Show, Eq, Read)
 

@@ -4,7 +4,7 @@ module EndgameLog where
 
 import GHC.Generics (Generic)
 import Data.Binary
-import EndgameGeneralTypes (Lift, Reps, Weight, CyclePosition)
+import EndgameGeneralTypes (Lift, Reps, Weight)
 
 data SetType
     = Work 
@@ -22,8 +22,6 @@ instance Binary Set
 
 data LiftSession = LiftSession 
     { lift :: Lift
-    , liftGroupCyclePosition :: CyclePosition
-    , liftCyclePosition :: CyclePosition
     , sets :: [Set]
     } deriving (Generic, Show)
 

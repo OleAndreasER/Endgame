@@ -5,7 +5,7 @@ import EndgameGeneralTypes (Percent)
 import Data.List (group, intercalate)
 
 formatLiftGroupCycle :: LiftGroupCycle -> String
-formatLiftGroupCycle (LiftGroupCycle lifts) =
+formatLiftGroupCycle lifts =
     unwords
     (map ("-> " ++) lifts)
     ++ " ->" 

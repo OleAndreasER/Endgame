@@ -25,12 +25,8 @@ instance Binary Set
 
 
 --[Squat, Deadlift]
-data LiftGroupCycle = LiftGroupCycle [Lift]
-    deriving (Show, Generic)
-
-instance Binary LiftGroupCycle
-
-
+type LiftGroupCycle = [Lift]
+   
 data LiftCycle = LiftCycle {
     lift :: Lift,
     prSession :: [Set],
@@ -44,9 +40,9 @@ instance Binary LiftCycle
 
 everyotherday :: Program
 everyotherday = Program 
-    [LiftGroupCycle ["Press", "Bench"],
-     LiftGroupCycle ["Squat", "Squat", "Deadlift"],
-     LiftGroupCycle ["Chin", "Row"]]
+    [["Press", "Bench"],
+     ["Squat", "Squat", "Deadlift"],
+     ["Chin", "Row"]]
      
     [LiftCycle {lift = "Press",
                 prSession = [Set 3 100 PR, Set 5 87 Work],
@@ -69,9 +65,9 @@ everyotherday = Program
 
 everyday :: Program
 everyday = Program 
-    [LiftGroupCycle ["Press", "Bench"],
-     LiftGroupCycle ["Squat", "Squat", "Deadlift"],
-     LiftGroupCycle ["Chin", "Row"]]
+    [["Press", "Bench"],
+     ["Squat", "Squat", "Deadlift"],
+     ["Chin", "Row"]]
      
     [LiftCycle {lift = "Press",
                 prSession = [Set 3 100 PR],

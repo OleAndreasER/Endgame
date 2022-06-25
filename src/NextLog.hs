@@ -4,11 +4,10 @@ import qualified EndgameLog as Log
 import qualified EndgameProgram as Program
 import EndgameStats 
 
-nextLog :: [Log.Log]
+nextLog :: Program.Program
         -> Stats
-        -> Program.Program
         -> (Log.Log, Stats)
 
-nextLog [] stats program =
+nextLog program stats = undefined
 
 

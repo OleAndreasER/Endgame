@@ -27,11 +27,11 @@ instance Binary Set
 --[Squat, Deadlift]
 type LiftGroupCycle = [Lift]
    
-data LiftCycle = LiftCycle {
-    lift :: Lift,
-    prSession :: [Set],
-    workSessionCycle :: [[Set]] -- [[Set]] because you might want more kinds of work sessions.
-}   deriving (Show, Generic)
+data LiftCycle = LiftCycle 
+    { lift :: Lift
+    , prSession :: [Set]
+    , workSessionCycle :: [[Set]] -- [[Set]] because you might want more kinds of work sessions.
+    } deriving (Show, Generic)
 
 instance Binary LiftCycle
 

@@ -1,16 +1,20 @@
-module NewLog where 
+module NewLog (getLog) where 
 
 import qualified EndgameLog as Log
 import qualified EndgameProgram as Program
 import EndgameGeneralTypes (Lift, Weight)
 import EndgameStats 
 
+{- getLog gets the current log from Stats,
+   as specified by the Program. 
+   It does not give the next log.
+-}
 
-log :: String
-    -> Program.Program
-    -> Stats
-    -> Log.Log
-log date (Program.Program liftGroupCycles liftCycles) stats = 
+getLog :: String
+       -> Program.Program
+       -> Stats
+       -> Log.Log
+getLog date (Program.Program liftGroupCycles liftCycles) stats = 
     Log.Log 
         { Log.date = date
         , Log.liftSessions = 

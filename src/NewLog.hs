@@ -10,7 +10,6 @@ log :: String
     -> Program.Program
     -> Stats
     -> Log.Log
-
 log date (Program.Program liftGroupCycles liftCycles) stats = 
     Log.Log 
         { Log.date = date
@@ -31,9 +30,8 @@ liftSession liftCycles stats lift =
         , Log.sets = map (logSet pr') session
         }
     where pr' = pr $ statsOfLift stats lift
-          session = 
-            sessionOfLiftStats (cycleOfLift liftCycles lift)
-                               (statsOfLift stats lift)
+          session = sessionOfLiftStats (cycleOfLift liftCycles lift)
+                                       (statsOfLift stats lift)
 
 
 liftInPosition :: Program.LiftGroupCycle
@@ -62,10 +60,17 @@ statsOfLift stats lift' =
     $ filter (\ls -> lift ls == lift')
     $ lifts stats
 
+
 cycleOfLift :: [Program.LiftCycle] -> Lift -> Program.LiftCycle
-cycleOfLift cycles lift' =
+cycleOfLift cycles lift =
     head
-    $ filter (\cycle -> Program.lift cycle == lift') cycles 
+    $ filter (\cycle -> Program.lift cycle == lift) cycles 
+
 
 sessionOfLiftStats :: Program.LiftCycle -> LiftStats -> [Program.Set]
-sessionOfLiftStats cycle stats = undefined
+sessionOfLiftStats liftCycle' stats = sessions !! position'
+    where position' = position $ liftCycle stats   
+          sessions = Program.prSession liftCycle' : (cycle $ Program.workSessionCycle liftCycle')
+
+roundToMultiple :: Float -> Float
+roundToMultiple = undefined

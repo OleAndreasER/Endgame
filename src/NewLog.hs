@@ -27,9 +27,9 @@ liftSession :: [Program.LiftCycle]
 liftSession liftCycles stats lift = 
     Log.LiftSession
         { Log.lift = lift
-        , Log.sets = map (logSet pr') session
+        , Log.sets = map (logSet liftStats') session
         }
-    where pr' = pr $ statsOfLift stats lift
+    where liftStats' = statsOfLift stats lift
           session = sessionOfLiftStats (cycleOfLift liftCycles lift)
                                        (statsOfLift stats lift)
 
@@ -41,12 +41,18 @@ liftInPosition cycle cyclePosition =
     cycle !! (position cyclePosition)
 
 
-logSet :: Weight
-       -> Program.Set
-       -> Log.Set
-logSet pr (Program.Set reps percent setType) =  
-    Log.Set reps weight (logSetType setType)
-    where weight = pr * percent / 100 
+logSet :: LiftStats -> Program.Set -> Log.Set
+logSet liftStats' (Program.Set reps percent setType) =  
+    Log.Set reps roundedWeight (logSetType setType)
+    where pr' = pr liftStats'
+          multiple = progression liftStats'
+          weight' = pr' * percent / 100 
+          roundedWeight = roundToMultiple weight' multiple
+
+
+roundToMultiple :: Float -> Float -> Float
+roundToMultiple n multiple = multiple * multiples
+    where multiples = fromIntegral $ round (n / multiple) :: Float
 
 
 logSetType :: Program.SetType -> Log.SetType
@@ -71,6 +77,3 @@ sessionOfLiftStats :: Program.LiftCycle -> LiftStats -> [Program.Set]
 sessionOfLiftStats liftCycle' stats = sessions !! position'
     where position' = position $ liftCycle stats   
           sessions = Program.prSession liftCycle' : (cycle $ Program.workSessionCycle liftCycle')
-
-roundToMultiple :: Float -> Float
-roundToMultiple = undefined

@@ -1,4 +1,4 @@
-module NewLog (getLog) where 
+module GetLog (getLog) where 
 
 import qualified EndgameLog as Log
 import qualified EndgameProgram as Program

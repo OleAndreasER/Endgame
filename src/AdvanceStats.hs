@@ -1,4 +1,4 @@
-module AdvanceStats where
+module AdvanceStats (advanceStats) where
 
 import EndgameStats
 import EndgameLog

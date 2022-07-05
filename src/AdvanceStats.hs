@@ -10,10 +10,16 @@ advanceStats stats log = stats
         map advanceCyclePosition 
         $ liftGroupPositions stats
     , lifts = 
-        map (uncurry $ advanceLift)
-        $ liftSessionStatsPairs
-        (liftSessions log)
-        (lifts stats) }
+        (++) (otherLifts (liftSessions log) (lifts stats))
+        $ map (uncurry $ advanceLift)
+        $ liftSessionStatsPairs (liftSessions log) (lifts stats) }
+
+
+otherLifts :: [LiftSession] -> [LiftStats] -> [LiftStats]
+otherLifts sessions stats = 
+    filter (\stat -> not $ any
+           (\session -> EndgameStats.lift stat == EndgameLog.lift session) sessions)
+    stats
 
 
 advanceCyclePosition :: CyclePosition -> CyclePosition
@@ -36,10 +42,12 @@ advanceLift session stats = stats
     , liftCycle = updateLiftCycle sessionResult $ liftCycle stats }
     where (Set _ _ sessionResult) = head $ sets session
 
+
 prChange :: SetType -> Weight -> Weight
 prChange (PR True) progression  = progression
 prChange (PR False) progression = -2 * progression
 prChange Work _                 = 0
+
 
 updateLiftCycle :: SetType -> CyclePosition -> CyclePosition
 updateLiftCycle (PR False) cyclePosition = 

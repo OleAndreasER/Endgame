@@ -10,10 +10,11 @@ import AdvanceStats
 
 handleArguments :: [String] -> IO ()
 
---TODO
-handleArguments ["next"] =
-    readLogs "profile" >>=
-    putStrLn . formatLog . head
+handleArguments ["next"] = do
+    stats <- readStats "profile"
+    program <- readProgram "profile"
+    let log = getLog "date" program stats
+    putStrLn $ formatLog log
 
 handleArguments ["list", logCount] =
     readLogs "profile" >>=
@@ -21,13 +22,14 @@ handleArguments ["list", logCount] =
 
 handleArguments ["list"] = handleArguments ["list", "1"]
 
---TODO: testLog -> nextLog
 handleArguments ["add"] = do
     stats <- readStats "profile"
     program <- readProgram "profile"
     let log = getLog "date" program stats
+
     addLog "profile" log
     putStrLn $ "Added:\n" ++ formatLog log
+    
     setStats "profile" $ advanceStats stats log
     
 

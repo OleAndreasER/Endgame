@@ -4,7 +4,7 @@ import System.Directory (createDirectoryIfMissing)
 import Data.Binary
 import EndgameProgram (Program)
 import EndgameLog (Log, testLog)
-import EndgameStats (Stats)
+import EndgameStats (Stats, testStats)
 
 
 addLog :: String -> Log -> IO ()
@@ -25,14 +25,20 @@ readLogs profile =
     decodeFile ("endgame-profiles/"++profile++"/logs.txt")
 
 readProgram :: String -> IO Program
-readProgram programName =
-    decodeFile ("endgame-programs/"++programName)
+readProgram profile =
+    decodeFile ("endgame-profiles/"++profile++"/program.txt")
+
+readStandardProgram :: String -> IO Program
+readStandardProgram programName =
+    decodeFile ("endgame-programs/"++programName++".txt")
 
 --A profile contains training logs, stats and program. 
 createProfile :: String -> String -> IO ()
 createProfile profile programName = do
     createDirectoryIfMissing True directory
-    program <- readProgram programName
-    encodeFile (directory ++ "/program.txt") program
+    program <- readStandardProgram programName
+    encodeFile (directory++"/program.txt") program
+    encodeFile (directory++"/logs.txt") ([] :: [Log])
+    encodeFile (directory++"/stats.txt") testStats
     where directory = "endgame-profiles/" ++ profile
 

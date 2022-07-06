@@ -1,28 +1,35 @@
 module Arguments where
 
 import Data.Char 
-import FileHandling (addLog, readProgram, readLogs)
+import FileHandling
 import CLILogFormat (formatLog)
 import CLIProgramFormat (formatProgram)
 import EndgameLog (testLog)
+import GetLog
+import AdvanceStats
 
 handleArguments :: [String] -> IO ()
 
 --TODO
 handleArguments ["next"] =
-    readLogs "first-profile" >>=
+    readLogs "profile" >>=
     putStrLn . formatLog . head
 
 handleArguments ["list", logCount] =
-    readLogs "first-profile" >>=
+    readLogs "profile" >>=
     putStrLn . latestLogs logCount . map formatLog
 
 handleArguments ["list"] = handleArguments ["list", "1"]
 
 --TODO: testLog -> nextLog
 handleArguments ["add"] = do
-    addLog "first-profile" testLog
-    putStrLn $ "Added:" ++ (formatLog testLog)
+    stats <- readStats "profile"
+    program <- readProgram "profile"
+    let log = getLog "date" program stats
+    addLog "profile" log
+    putStrLn $ "Added:\n" ++ formatLog log
+    setStats "profile" $ advanceStats stats log
+    
 
 --TODO: format stats
 handleArguments ["stats"] =

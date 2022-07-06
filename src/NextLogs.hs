@@ -6,10 +6,9 @@ import EndgameLog
 import EndgameProgram
 import EndgameStats
 
-
 --Endless list of future logs.
-nextLogs :: Stats -> Program -> String -> [Log]
-nextLogs stats program label =
-    log : (nextLogs nextStats program label)
-    where log = getLog label program stats
+nextLogs :: Stats -> Program -> Int -> [Log]
+nextLogs stats program i =
+    log : (nextLogs nextStats program (i+1))
+    where log = getLog ((show i)++".") program stats
           nextStats = advanceStats stats log

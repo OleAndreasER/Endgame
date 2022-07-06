@@ -5,6 +5,7 @@ import FileHandling
 import CLILogFormat (formatLog)
 import CLIProgramFormat (formatProgram)
 import EndgameLog (testLog)
+import EndgameStats (bodyweight)
 import GetLog
 import AdvanceStats
 import NextLogs
@@ -14,14 +15,15 @@ handleArguments :: [String] -> IO ()
 handleArguments ["next"] = do
     stats <- readStats "profile"
     program <- readProgram "profile"
-    let log = getLog "date" program stats
+    let log = getLog "Next:" program stats
     putStrLn $ formatLog log
+
 
 handleArguments ["next", logCount] 
     | all isDigit logCount = do
         stats <- readStats "profile"
         program <- readProgram "profile"
-        let logs = take (read logCount) $ nextLogs stats program "-date"
+        let logs = take (read logCount) $ nextLogs stats program 1
         putStrLn $ unlines $ reverse $ map formatLog logs
     | otherwise = putStrLn invalidArgumentResponse
     
@@ -30,7 +32,9 @@ handleArguments ["list", logCount] =
     readLogs "profile" >>=
     putStrLn . latestLogs logCount . map formatLog
 
+
 handleArguments ["list"] = handleArguments ["list", "1"]
+
 
 handleArguments ["add"] = do
     stats <- readStats "profile"
@@ -51,9 +55,9 @@ handleArguments ["program"] =
     readProgram "standard-everyotherday.txt" >>=
     putStrLn . formatProgram
 
---TODO
 handleArguments ["bw"] =
-    putStrLn "Your bodyweight is now 100kg (real man)"
+    readStats "profile" >>=
+    putStrLn . (++ "kg") . show . bodyweight 
 
 --TODO
 handleArguments ["help"] =

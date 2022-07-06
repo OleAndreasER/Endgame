@@ -8,8 +8,8 @@ import EndgameStats
 
 
 --Endless list of future logs.
-nextLogs :: Log -> Stats -> Program -> [Log]
-nextLogs log stats program =
-    nextLog : (nextLogs nextLog nextStats program)
-    where nextStats = advanceStats stats log
-          nextLog = getLog "(Future date)" program nextStats
+nextLogs :: Stats -> Program -> String -> [Log]
+nextLogs stats program label =
+    log : (nextLogs nextStats program label)
+    where log = getLog label program stats
+          nextStats = advanceStats stats log

@@ -7,6 +7,7 @@ import CLIProgramFormat (formatProgram)
 import EndgameLog (testLog)
 import GetLog
 import AdvanceStats
+import NextLogs
 
 handleArguments :: [String] -> IO ()
 
@@ -15,6 +16,15 @@ handleArguments ["next"] = do
     program <- readProgram "profile"
     let log = getLog "date" program stats
     putStrLn $ formatLog log
+
+handleArguments ["next", logCount] 
+    | all isDigit logCount = do
+        stats <- readStats "profile"
+        program <- readProgram "profile"
+        let logs = take (read logCount) $ nextLogs stats program "-date"
+        putStrLn $ unlines $ reverse $ map formatLog logs
+    | otherwise = putStrLn invalidArgumentResponse
+    
 
 handleArguments ["list", logCount] =
     readLogs "profile" >>=

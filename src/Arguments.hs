@@ -3,6 +3,7 @@ module Arguments where
 import Data.Char 
 import FileHandling
 import CLILogFormat (formatLog)
+import CLIStatsFormat (formatStats)
 import CLIProgramFormat (formatProgram)
 import EndgameLog (testLog)
 import EndgameStats (bodyweight)
@@ -47,9 +48,9 @@ handleArguments ["add"] = do
     setStats "profile" $ advanceStats stats log
     
 
---TODO: format stats
-handleArguments ["stats"] =
-    putStrLn "Squat 3RM: 300kg"
+handleArguments ["lifts"] =
+    readStats "profile" >>=
+    putStrLn . formatStats
 
 handleArguments ["program"] =
     readProgram "standard-everyotherday.txt" >>=

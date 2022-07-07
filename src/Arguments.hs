@@ -52,8 +52,9 @@ handleArguments ["lifts"] =
     readStats "profile" >>=
     putStrLn . formatStats
 
+
 handleArguments ["program"] =
-    readProgram "standard-everyotherday.txt" >>=
+    readProgram "profile" >>=
     putStrLn . formatProgram
 
 handleArguments ["bw"] =

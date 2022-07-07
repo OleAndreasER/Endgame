@@ -31,6 +31,7 @@ data LiftStats = LiftStats
     , progression :: Weight --Progression increment
     , pr :: Weight
     , liftCycle :: CyclePosition
+    , isBodyweight :: Bool
     } deriving (Generic, Show, Eq, Read)
 
 instance Binary LiftStats
@@ -42,11 +43,11 @@ testStats = Stats
         , CyclePosition 1 3
         , CyclePosition 1 2 ]
     , lifts =
-        [ LiftStats "Press" 1.25 57.5 (CyclePosition 2 3) 
-        , LiftStats "Bench" 1.25 96.25 (CyclePosition 2 5)
-        , LiftStats "Squat" 2.5 145 (CyclePosition 1 5)
-        , LiftStats "Deadlift" 2.5 152.5 (CyclePosition 3 5)
-        , LiftStats "Chin" 1.25 105 (CyclePosition 4 5)
-        , LiftStats "Row" 1.25 91.25 (CyclePosition 0 5) ]
+        [ LiftStats "Press" 1.25 57.5 (CyclePosition 2 3) False
+        , LiftStats "Bench" 1.25 96.25 (CyclePosition 2 5) False
+        , LiftStats "Squat" 2.5 145 (CyclePosition 1 5) False
+        , LiftStats "Deadlift" 2.5 152.5 (CyclePosition 3 5) False
+        , LiftStats "Chin" 1.25 105 (CyclePosition 4 5) True
+        , LiftStats "Row" 1.25 91.25 (CyclePosition 0 5) False ]
     , bodyweight = 72.7
     }

@@ -8,7 +8,7 @@ formatStats stats =
     ++(unlines $ map formatLift $ lifts stats)
 
 formatLift :: LiftStats -> String
-formatLift (LiftStats lift _ pr liftCycle) =
+formatLift (LiftStats lift _ pr liftCycle _) =
     lift++": "++(show pr)++"kg "++(formatLiftCyclePosition liftCycle)
 
 

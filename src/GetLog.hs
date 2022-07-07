@@ -31,7 +31,7 @@ liftSession :: [Program.LiftCycle]
 liftSession liftCycles stats lift = 
     Log.LiftSession
         { Log.lift = lift
-        , Log.sets = map (logSet liftStats') session
+        , Log.sets = map (logSet liftStats' (bodyweight stats)) session
         }
     where liftStats' = statsOfLift stats lift
           session = sessionOfLiftStats (cycleOfLift liftCycles lift)
@@ -45,12 +45,16 @@ liftInPosition cycle cyclePosition =
     cycle !! (position cyclePosition)
 
 
-logSet :: LiftStats -> Program.Set -> Log.Set
-logSet liftStats' (Program.Set reps percent setType) =  
+logSet :: LiftStats -> Bodyweight -> Program.Set -> Log.Set
+logSet liftStats' bodyweight (Program.Set reps percent setType) =  
     Log.Set reps roundedWeight (logSetType setType)
     where pr' = pr liftStats'
           multiple = progression liftStats'
-          weight' = pr' * percent / 100 
+          maybeBodyweight =
+            if isBodyweight liftStats' 
+                then bodyweight
+                else 0
+          weight' = pr' * percent / 100 - maybeBodyweight 
           roundedWeight = roundToMultiple weight' multiple
 
 

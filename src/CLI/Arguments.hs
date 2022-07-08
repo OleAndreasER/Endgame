@@ -21,17 +21,17 @@ handleArguments ["next"] = do
     putStrLn $ formatLog log
 
 
-handleArguments ["next", logCount] 
-    | all isDigit logCount = do
+handleArguments ["next", logCountStr] =
+    onlyOnInt logCountStr (\logCount -> do
         stats <- readStats
         program <- readProgram
-        let logs = take (read logCount) $ nextLogs stats program 1
-        putStrLn $ unlines $ reverse $ map formatLog logs
-    | otherwise = putStrLn invalidArgumentResponse
+        let logs = take logCount $ nextLogs stats program 1
+        putStrLn $ unlines $ reverse $ map formatLog logs)
     
 
-handleArguments ["list", logCount] =
-    readLogs >>= putStrLn . latestLogs logCount . map formatLog
+handleArguments ["list", logCountStr] =
+    onlyOnInt logCountStr (\logCount -> readLogs >>= 
+    putStrLn . latestLogs logCount . map formatLog)
 
 handleArguments ["list"] = handleArguments ["list", "1"]
 
@@ -58,13 +58,10 @@ handleArguments ["bw"] =
     readStats >>= putStrLn . (++ "kg") . show . bodyweight 
 
 handleArguments ["bw", bodyweightStr] =
-    case readMaybe bodyweightStr :: Maybe Float of 
-        Nothing -> putStrLn invalidArgumentResponse
-        Just bw -> do
-            stats <- readStats
-            setStats $ stats {bodyweight = bw}
-    
-    
+    onlyOnFloat bodyweightStr (\bw -> do
+        stats <- readStats
+        setStats $ stats {bodyweight = bw}
+        putStrLn ("Bodyweight: "++bodyweightStr++"kg"))
    
 
 handleArguments ["profile", "new"] =
@@ -101,9 +98,16 @@ handleArguments _ =
 
 invalidArgumentResponse = "Try 'endgame help'"
 
+onlyOnFloat :: String -> (Float -> IO ()) -> IO ()
+onlyOnFloat str f = case readMaybe str :: Maybe Float of
+    Nothing -> putStrLn invalidArgumentResponse 
+    Just x  -> f x
 
-latestLogs :: String -> [String] -> String
-latestLogs n logs
-    | all isDigit n = unlines $ take m logs
-    | otherwise     = invalidArgumentResponse
-    where m = min (read n) (length logs)
+onlyOnInt :: String -> (Int -> IO ()) -> IO ()
+onlyOnInt str f = case readMaybe str :: Maybe Int of
+    Nothing -> putStrLn invalidArgumentResponse 
+    Just x  -> f x
+
+latestLogs :: Int -> [String] -> String
+latestLogs n logs = unlines $ take m logs
+    where m = min n $ length logs

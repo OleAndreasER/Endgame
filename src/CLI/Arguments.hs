@@ -22,7 +22,7 @@ handleArguments ["next"] = do
 
 
 handleArguments ["next", logCountStr] =
-    onlyOnInt logCountStr (\logCount -> do
+    handleIfInt logCountStr (\logCount -> do
         stats <- readStats
         program <- readProgram
         let logs = take logCount $ nextLogs stats program 1
@@ -30,7 +30,7 @@ handleArguments ["next", logCountStr] =
     
 
 handleArguments ["list", logCountStr] =
-    onlyOnInt logCountStr (\logCount -> readLogs >>= 
+    handleIfInt logCountStr (\logCount -> readLogs >>= 
     putStrLn . latestLogs logCount . map formatLog)
 
 handleArguments ["list"] = handleArguments ["list", "1"]
@@ -58,17 +58,19 @@ handleArguments ["bw"] =
     readStats >>= putStrLn . (++ "kg") . show . bodyweight 
 
 handleArguments ["bw", bodyweightStr] =
-    onlyOnFloat bodyweightStr (\bw -> do
+    handleIfFloat bodyweightStr (\bw -> do
         stats <- readStats
         setStats $ stats {bodyweight = bw}
         putStrLn ("Bodyweight: "++bodyweightStr++"kg"))
    
 
+--TODO
 handleArguments ["profile", "new"] =
     putStrLn invalidArgumentResponse
 
-handleArguments ["profile", profile] =
-    putStrLn invalidArgumentResponse
+handleArguments ["profile", profile] = do
+    setProfile profile
+    putStrLn ("Profile: "++profile)
 
 
 
@@ -98,13 +100,13 @@ handleArguments _ =
 
 invalidArgumentResponse = "Try 'endgame help'"
 
-onlyOnFloat :: String -> (Float -> IO ()) -> IO ()
-onlyOnFloat str f = case readMaybe str :: Maybe Float of
+handleIfFloat :: String -> (Float -> IO ()) -> IO ()
+handleIfFloat str f = case readMaybe str :: Maybe Float of
     Nothing -> putStrLn invalidArgumentResponse 
     Just x  -> f x
 
-onlyOnInt :: String -> (Int -> IO ()) -> IO ()
-onlyOnInt str f = case readMaybe str :: Maybe Int of
+handleIfInt :: String -> (Int -> IO ()) -> IO ()
+handleIfInt str f = case readMaybe str :: Maybe Int of
     Nothing -> putStrLn invalidArgumentResponse 
     Just x  -> f x
 

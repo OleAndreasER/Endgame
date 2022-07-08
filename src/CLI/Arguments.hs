@@ -10,6 +10,7 @@ import Types.EndgameStats (bodyweight)
 import GetLog
 import AdvanceStats
 import NextLogs
+import Text.Read (readMaybe)
 
 handleArguments :: [String] -> IO ()
 
@@ -56,6 +57,24 @@ handleArguments ["program"] =
 handleArguments ["bw"] =
     readStats >>= putStrLn . (++ "kg") . show . bodyweight 
 
+handleArguments ["bw", bodyweightStr] =
+    case readMaybe bodyweightStr :: Maybe Float of 
+        Nothing -> putStrLn invalidArgumentResponse
+        Just bw -> do
+            stats <- readStats
+            setStats $ stats {bodyweight = bw}
+    
+    
+   
+
+handleArguments ["profile", "new"] =
+    putStrLn invalidArgumentResponse
+
+handleArguments ["profile", profile] =
+    putStrLn invalidArgumentResponse
+
+
+
 handleArguments ["help"] =
     putStrLn "Get started by creating a profile:\n\
              \  endgame profile new\n\n\
@@ -80,7 +99,7 @@ handleArguments ["help"] =
 handleArguments _ =
     putStrLn invalidArgumentResponse
 
-invalidArgumentResponse = "Try 'endgame2 help'"
+invalidArgumentResponse = "Try 'endgame help'"
 
 
 latestLogs :: String -> [String] -> String

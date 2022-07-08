@@ -5,6 +5,7 @@ import Data.Binary
 import Types.EndgameProgram (Program)
 import Types.EndgameLog (Log, testLog)
 import Types.EndgameStats (Stats, testStats)
+import FirstStatsOfProgram
 
 readFromProfile :: Binary a => String -> IO a
 readFromProfile file = do
@@ -46,7 +47,7 @@ createProfile profile programName = do
     program <- readStandardProgram programName
     encodeFile (directory++"/program.txt") program
     encodeFile (directory++"/logs.txt") ([] :: [Log])
-    encodeFile (directory++"/stats.txt") testStats
+    encodeFile (directory++"/stats.txt") $ firstStatsOfProgram program
     where directory = "endgame-profiles/" ++ profile
 
 setProfile :: String -> IO ()

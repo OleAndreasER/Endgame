@@ -1,7 +1,7 @@
 module Main where
 
 import System.Environment
-import Arguments (handleArguments)
+import CLI.Arguments (handleArguments)
 
 main :: IO ()
 main = do

@@ -1,4 +1,4 @@
-module Arguments where
+module CLI.Arguments where
 
 import Data.Char 
 import FileHandling
@@ -56,9 +56,26 @@ handleArguments ["program"] =
 handleArguments ["bw"] =
     readStats >>= putStrLn . (++ "kg") . show . bodyweight 
 
---TODO
 handleArguments ["help"] =
-    putStrLn "try next, list n, add, stats, bw"
+    putStrLn "Get started by creating a profile:\n\
+             \  endgame profile new\n\n\
+             \Switch profile:\n\
+             \  endgame profile {name}\n\n\
+             \View your first workout:\n\
+             \  endgame next\n\
+             \  endgame next {amount}\n\n\
+             \Add it to your logs:\n\
+             \  endgame add\n\n\
+             \View your latest log:\n\
+             \  endgame list\n\
+             \  endgame list {amount}\n\n\
+             \View your lifts' stats:\n\
+             \  endgame lifts\n\n\
+             \View your program:\n\
+             \  endgame program\n\n\
+             \View or set your bodyweight:\n\
+             \  endgame bw\n\
+             \  endgame bw {new bodyweight}"
 
 handleArguments _ =
     putStrLn invalidArgumentResponse

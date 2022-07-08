@@ -27,8 +27,7 @@ executable endgame2
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules:    Arguments,
-                      FileHandling,
+    other-modules:    CLI.Arguments,
                       CLI.LogFormat,
                       CLI.ProgramFormat,
                       CLI.StatsFormat,
@@ -36,6 +35,7 @@ executable endgame2
                       Types.EndgameProgram,
                       Types.EndgameLog,
                       Types.EndgameStats,
+                      FileHandling,
                       GetLog,
                       AdvanceStats,
                       NextLogs,

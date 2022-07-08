@@ -14,52 +14,47 @@ import NextLogs
 handleArguments :: [String] -> IO ()
 
 handleArguments ["next"] = do
-    stats <- readStats "profile"
-    program <- readProgram "profile"
+    stats <- readStats
+    program <- readProgram
     let log = getLog "Next:" program stats
     putStrLn $ formatLog log
 
 
 handleArguments ["next", logCount] 
     | all isDigit logCount = do
-        stats <- readStats "profile"
-        program <- readProgram "profile"
+        stats <- readStats
+        program <- readProgram
         let logs = take (read logCount) $ nextLogs stats program 1
         putStrLn $ unlines $ reverse $ map formatLog logs
     | otherwise = putStrLn invalidArgumentResponse
     
 
 handleArguments ["list", logCount] =
-    readLogs "profile" >>=
-    putStrLn . latestLogs logCount . map formatLog
-
+    readLogs >>= putStrLn . latestLogs logCount . map formatLog
 
 handleArguments ["list"] = handleArguments ["list", "1"]
 
 
 handleArguments ["add"] = do
-    stats <- readStats "profile"
-    program <- readProgram "profile"
+    stats <- readStats
+    program <- readProgram
     let log = getLog "date" program stats
 
-    addLog "profile" log
+    addLog log
     putStrLn $ "Added:\n" ++ formatLog log
     
-    setStats "profile" $ advanceStats stats log
+    setStats $ advanceStats stats log
     
 
 handleArguments ["lifts"] =
-    readStats "profile" >>=
-    putStrLn . formatStats
+    readStats >>= putStrLn . formatStats
 
 
 handleArguments ["program"] =
-    readProgram "profile" >>=
-    putStrLn . formatProgram
+    readProgram >>= putStrLn . formatProgram
 
 handleArguments ["bw"] =
-    readStats "profile" >>=
-    putStrLn . (++ "kg") . show . bodyweight 
+    readStats >>= putStrLn . (++ "kg") . show . bodyweight 
 
 --TODO
 handleArguments ["help"] =

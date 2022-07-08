@@ -6,27 +6,32 @@ import EndgameProgram (Program)
 import EndgameLog (Log, testLog)
 import EndgameStats (Stats, testStats)
 
+readFromProfile file = do
+    profile <- getProfile
+    decodeFile ("endgame-profiles/" ++ profile ++ "/" ++ file)
 
-addLog :: String -> Log -> IO ()
-addLog profile log = do
-    logs <- readLogs profile
-    encodeFile ("endgame-profiles/"++profile++"/logs.txt") (log:logs)
+setInProfile :: Binary a => String -> a -> IO ()
+setInProfile file x = do
+    profile <- getProfile  
+    encodeFile ("endgame-profiles/" ++ profile ++ "/" ++ file) x
 
-setStats :: String -> Stats -> IO ()
-setStats profile stats =
-    encodeFile ("endgame-profiles/"++profile++"/stats.txt") stats
+addLog :: Log -> IO ()
+addLog log = do
+    logs <- readLogs
+    setInProfile "logs.txt" (log:logs)
 
-readStats :: String -> IO Stats
-readStats profile =
-    decodeFile ("endgame-profiles/"++profile++"/stats.txt")
+setStats :: Stats -> IO ()
+setStats = setInProfile "stats.txt"
 
-readLogs :: String -> IO [Log]
-readLogs profile =
-    decodeFile ("endgame-profiles/"++profile++"/logs.txt")
+readStats :: IO Stats
+readStats = readFromProfile "stats.txt"
 
-readProgram :: String -> IO Program
-readProgram profile =
-    decodeFile ("endgame-profiles/"++profile++"/program.txt")
+readLogs :: IO [Log]
+readLogs = readFromProfile "logs.txt"
+
+readProgram :: IO Program
+readProgram = readFromProfile "program.txt"
+
 
 readStandardProgram :: String -> IO Program
 readStandardProgram programName =
@@ -42,3 +47,8 @@ createProfile profile programName = do
     encodeFile (directory++"/stats.txt") testStats
     where directory = "endgame-profiles/" ++ profile
 
+setProfile :: String -> IO ()
+setProfile = writeFile "profile.txt"
+    
+getProfile :: IO String
+getProfile = readFile "profile.txt"

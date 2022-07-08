@@ -1,6 +1,6 @@
-module CLIStatsFormat (formatStats) where
+module CLI.StatsFormat (formatStats) where
 
-import EndgameStats
+import Types.EndgameStats
 
 formatStats :: Stats -> String
 formatStats stats =

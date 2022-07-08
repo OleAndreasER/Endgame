@@ -1,9 +1,9 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module EndgameProgram where
+module Types.EndgameProgram where
 import GHC.Generics (Generic)
 import Data.Binary
-import EndgameGeneralTypes (Reps, Percent, Lift)
+import Types.EndgameGeneralTypes (Reps, Percent, Lift)
 
 data Program = Program [LiftGroupCycle] [LiftCycle]
     deriving (Show, Generic)

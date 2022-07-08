@@ -2,11 +2,11 @@ module Arguments where
 
 import Data.Char 
 import FileHandling
-import CLILogFormat (formatLog)
-import CLIStatsFormat (formatStats)
-import CLIProgramFormat (formatProgram)
-import EndgameLog (testLog)
-import EndgameStats (bodyweight)
+import CLI.LogFormat (formatLog)
+import CLI.StatsFormat (formatStats)
+import CLI.ProgramFormat (formatProgram)
+import Types.EndgameLog (testLog)
+import Types.EndgameStats (bodyweight)
 import GetLog
 import AdvanceStats
 import NextLogs

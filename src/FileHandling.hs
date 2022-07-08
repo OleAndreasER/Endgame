@@ -2,9 +2,9 @@ module FileHandling where
 
 import System.Directory (createDirectoryIfMissing)
 import Data.Binary
-import EndgameProgram (Program)
-import EndgameLog (Log, testLog)
-import EndgameStats (Stats, testStats)
+import Types.EndgameProgram (Program)
+import Types.EndgameLog (Log, testLog)
+import Types.EndgameStats (Stats, testStats)
 
 readFromProfile :: Binary a => String -> IO a
 readFromProfile file = do

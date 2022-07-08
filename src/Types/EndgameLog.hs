@@ -1,10 +1,10 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module EndgameLog where 
+module Types.EndgameLog where 
 
 import GHC.Generics (Generic)
 import Data.Binary
-import EndgameGeneralTypes (Lift, Reps, Weight)
+import Types.EndgameGeneralTypes (Lift, Reps, Weight)
 
 data SetType
     = Work 

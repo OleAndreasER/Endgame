@@ -1,5 +1,5 @@
-module CLILogFormat (formatLog) where
-import EndgameLog
+module CLI.LogFormat (formatLog) where
+import Types.EndgameLog
 import Data.List (group)
 
 formatLog :: Log -> String

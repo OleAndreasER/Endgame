@@ -1,8 +1,10 @@
 module AdvanceStats (advanceStats) where
 
-import EndgameStats
-import EndgameLog
-import EndgameGeneralTypes (Weight)
+import qualified Types.EndgameStats as EndgameStats (length, lift)
+import Types.EndgameStats
+import qualified Types.EndgameLog as EndgameLog (lift)
+import Types.EndgameLog
+import Types.EndgameGeneralTypes (Weight)
 
 advanceStats :: Stats -> Log -> Stats
 advanceStats stats log = stats

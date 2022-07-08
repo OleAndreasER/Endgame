@@ -1,9 +1,9 @@
 module GetLog (getLog) where 
 
-import qualified EndgameLog as Log
-import qualified EndgameProgram as Program
-import EndgameGeneralTypes (Lift, Weight)
-import EndgameStats 
+import qualified Types.EndgameLog as Log
+import qualified Types.EndgameProgram as Program
+import Types.EndgameGeneralTypes (Lift, Weight)
+import Types.EndgameStats 
 
 {- getLog gets the current log from Stats,
    as specified by the Program. 

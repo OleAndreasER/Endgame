@@ -2,9 +2,9 @@ module NextLogs where
 
 import GetLog
 import AdvanceStats
-import EndgameLog
-import EndgameProgram
-import EndgameStats
+import Types.EndgameLog
+import Types.EndgameProgram
+import Types.EndgameStats
 
 --Endless list of future logs.
 nextLogs :: Stats -> Program -> Int -> [Log]

@@ -40,7 +40,7 @@ instance Binary LiftCycle
 
 everyotherday :: Program
 everyotherday = Program 
-    [["Press", "Bench"],
+    [["Press", "Press", "Bench"],
      ["Squat", "Squat", "Deadlift"],
      ["Chin", "Row"]]
      

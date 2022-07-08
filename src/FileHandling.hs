@@ -6,6 +6,7 @@ import EndgameProgram (Program)
 import EndgameLog (Log, testLog)
 import EndgameStats (Stats, testStats)
 
+readFromProfile :: Binary a => String -> IO a
 readFromProfile file = do
     profile <- getProfile
     decodeFile ("endgame-profiles/" ++ profile ++ "/" ++ file)
@@ -22,6 +23,7 @@ addLog log = do
 
 setStats :: Stats -> IO ()
 setStats = setInProfile "stats.txt"
+
 
 readStats :: IO Stats
 readStats = readFromProfile "stats.txt"

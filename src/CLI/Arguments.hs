@@ -22,7 +22,9 @@ handleArguments ["next"] = do
 
 
 handleArguments ["next", logCountStr] =
-    handleIfInt logCountStr (\logCount -> do
+    handleIfInt logCountStr 
+    $ handleIf (> 0) 
+    (\logCount -> do
         stats <- readStats
         program <- readProgram
         let logs = take logCount $ nextLogs stats program 1
@@ -30,7 +32,9 @@ handleArguments ["next", logCountStr] =
     
 
 handleArguments ["list", logCountStr] =
-    handleIfInt logCountStr (\logCount -> readLogs >>= 
+    handleIfInt logCountStr 
+    $ handleIf (> 0)
+    (\logCount -> readLogs >>= 
     putStrLn . latestLogs logCount . map formatLog)
 
 handleArguments ["list"] = handleArguments ["list", "1"]
@@ -46,19 +50,16 @@ handleArguments ["add"] = do
     
     setStats $ advanceStats stats log
     
+handleArguments ["lifts"] = readStats >>= putStrLn . formatStats
 
-handleArguments ["lifts"] =
-    readStats >>= putStrLn . formatStats
+handleArguments ["program"] = readProgram >>= putStrLn . formatProgram
 
-
-handleArguments ["program"] =
-    readProgram >>= putStrLn . formatProgram
-
-handleArguments ["bw"] =
-    readStats >>= putStrLn . (++ "kg") . show . bodyweight 
+handleArguments ["bw"] = readStats >>= putStrLn . (++ "kg") . show . bodyweight 
 
 handleArguments ["bw", bodyweightStr] =
-    handleIfFloat bodyweightStr (\bw -> do
+    handleIfFloat bodyweightStr 
+    $ handleIf (>= 0)
+    (\bw -> do
         stats <- readStats
         setStats $ stats {bodyweight = bw}
         putStrLn ("Bodyweight: "++bodyweightStr++"kg"))
@@ -72,8 +73,10 @@ handleArguments ["profile", profile] = do
     setProfile profile
     putStrLn ("Profile: "++profile)
 
-handleArguments ["log", nStr] =
-   handleIfInt nStr $ withLog $ putStrLn . formatLog
+handleArguments ["log", nStr] = 
+    handleIfInt nStr 
+    $ handleIf (> 0)
+    $ withLog $ putStrLn . formatLog
 
 
 handleArguments ["help"] =
@@ -97,8 +100,7 @@ handleArguments ["help"] =
              \  endgame bw\n\
              \  endgame bw {new bodyweight}"
 
-handleArguments _ =
-    putStrLn invalidArgumentResponse
+handleArguments _ = putStrLn invalidArgumentResponse
 
 invalidArgumentResponse = "Try 'endgame help'"
 
@@ -111,6 +113,10 @@ handleIfInt :: String -> (Int -> IO ()) -> IO ()
 handleIfInt str f = case readMaybe str :: Maybe Int of
     Nothing -> putStrLn invalidArgumentResponse 
     Just x  -> f x
+
+handleIf :: (a -> Bool) -> (a -> IO ()) -> a -> IO ()
+handleIf predicate f x | predicate x = f x 
+                       | otherwise   = putStrLn invalidArgumentResponse
 
 latestLogs :: Int -> [String] -> String
 latestLogs n logs = unlines $ reverse $ take m logs

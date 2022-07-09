@@ -5,7 +5,7 @@ import FileHandling
 import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
-import Types.EndgameLog (testLog)
+import Types.EndgameLog (Log, testLog)
 import Types.EndgameStats (bodyweight)
 import GetLog
 import AdvanceStats
@@ -72,6 +72,8 @@ handleArguments ["profile", profile] = do
     setProfile profile
     putStrLn ("Profile: "++profile)
 
+handleArguments ["log", nStr] =
+   handleIfInt nStr $ withLog $ putStrLn . formatLog
 
 
 handleArguments ["help"] =
@@ -111,5 +113,12 @@ handleIfInt str f = case readMaybe str :: Maybe Int of
     Just x  -> f x
 
 latestLogs :: Int -> [String] -> String
-latestLogs n logs = unlines $ take m logs
+latestLogs n logs = unlines $ reverse $ take m logs
     where m = min n $ length logs
+
+withLog :: (Log -> IO ()) -> Int -> IO ()
+withLog f n = do
+    logs <- readLogs    
+    if n > length logs || n == 0
+        then putStrLn ("There are only "++(show $ length logs)++" logs")
+        else f $ logs !! (n-1)

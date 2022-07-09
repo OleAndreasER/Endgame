@@ -5,7 +5,7 @@ import FileHandling
 import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
-import Types.EndgameLog (Log, testLog)
+import Types.EndgameLog (Log, testLog, did)
 import Types.EndgameStats (bodyweight)
 import GetLog
 import AdvanceStats
@@ -78,6 +78,14 @@ handleArguments ["log", nStr] =
     $ handleIf (> 0)
     $ withLog $ putStrLn . formatLog
 
+handleArguments ["log"] = handleArguments ["log", "1"]
+
+handleArguments ["log", nStr, "fail", lift] =
+    handleIfInt nStr
+    $ handleIf (> 0)
+    $ withLog 
+    $ messagedHandleIf (did lift) ("You didn't do "++lift)
+    $ putStrLn . formatLog
 
 handleArguments ["help"] =
     putStrLn "Get started by creating a profile:\n\
@@ -115,8 +123,12 @@ handleIfInt str f = case readMaybe str :: Maybe Int of
     Just x  -> f x
 
 handleIf :: (a -> Bool) -> (a -> IO ()) -> a -> IO ()
-handleIf predicate f x | predicate x = f x 
-                       | otherwise   = putStrLn invalidArgumentResponse
+handleIf predicate = messagedHandleIf predicate invalidArgumentResponse
+
+messagedHandleIf :: (a -> Bool) -> String -> (a -> IO ()) -> a -> IO ()
+messagedHandleIf predicate msg f x
+    | predicate x = f x 
+    | otherwise   = putStrLn msg
 
 latestLogs :: Int -> [String] -> String
 latestLogs n logs = unlines $ reverse $ take m logs

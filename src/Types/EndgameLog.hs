@@ -47,3 +47,9 @@ testLog = Log
         [Set 5 75 Work,
          Set 5 75 Work,
          Set 5 75 Work]]
+
+
+did :: Lift -> Log -> Bool
+did target log =
+    any (\session -> lift session == target)
+    $ liftSessions log 

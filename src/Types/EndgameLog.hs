@@ -53,3 +53,15 @@ did :: Lift -> Log -> Bool
 did target log =
     any (\session -> lift session == target)
     $ liftSessions log 
+
+failSet :: Set -> Set
+failSet (Set reps weight setType) = 
+    Set reps weight $ case setType of 
+        Work         -> Work
+        PR succeeded -> PR (not succeeded)
+    
+failLift :: Lift -> Log -> Log
+failLift lift' log =
+    let maybeFail session | lift session == lift' = let sets' = sets session in session { sets = (failSet $ head sets') : tail sets'}
+                          | otherwise = session
+    in log {liftSessions = map maybeFail $ liftSessions log}

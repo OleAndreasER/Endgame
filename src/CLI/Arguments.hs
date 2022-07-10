@@ -5,7 +5,7 @@ import FileHandling
 import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
-import Types.EndgameLog (Log, testLog, did)
+import Types.EndgameLog (Log, testLog, did, failLift)
 import Types.EndgameStats (bodyweight)
 import GetLog
 import AdvanceStats
@@ -84,8 +84,9 @@ handleArguments ["log", nStr, "fail", lift] =
     handleIfInt nStr
     $ handleIf (> 0)
     $ withLog 
-    $ messagedHandleIf (did lift) ("You didn't do "++lift)
-    $ putStrLn . formatLog
+    $ messagedHandleIf (did lift) ("You didn't do "++lift) 
+    $ putStrLn . formatLog . (failLift lift) 
+    
 
 handleArguments ["help"] =
     putStrLn "Get started by creating a profile:\n\
@@ -137,6 +138,6 @@ latestLogs n logs = unlines $ reverse $ take m logs
 withLog :: (Log -> IO ()) -> Int -> IO ()
 withLog f n = do
     logs <- readLogs    
-    if n > length logs || n == 0
+    if n > length logs
         then putStrLn ("There are only "++(show $ length logs)++" logs")
         else f $ logs !! (n-1)

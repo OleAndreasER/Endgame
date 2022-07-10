@@ -25,6 +25,9 @@ addLog log = do
 setStats :: Stats -> IO ()
 setStats = setInProfile "stats.txt"
 
+setLogs :: [Log] -> IO ()
+setLogs = setInProfile "logs.txt"
+
 
 readStats :: IO Stats
 readStats = readFromProfile "stats.txt"

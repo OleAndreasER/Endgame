@@ -6,7 +6,7 @@ import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
 import Types.EndgameLog (Log, testLog, did, failLift)
-import Types.EndgameStats (bodyweight)
+import Types.EndgameStats (bodyweight, addWork)
 import GetLog
 import AdvanceStats
 import NextLogs
@@ -84,8 +84,12 @@ handleArguments ["log", nStr, "fail", lift] =
     handleIfInt nStr
     $ handleIf (> 0)
     $ withLog 
-    $ messagedHandleIf (did lift) ("You didn't do "++lift) 
-    $ putStrLn . formatLog . (failLift lift) 
+    $ messagedHandleIf (did lift) ("You didn't do "++lift) (\log -> do
+        logs <- readLogs
+        setLogs $ toElem log (failLift lift) logs 
+        stats <- readStats
+        setStats $ addWork lift stats
+        putStrLn . formatLog . failLift lift $ log)
     
 
 handleArguments ["help"] =
@@ -141,3 +145,9 @@ withLog f n = do
     if n > length logs
         then putStrLn ("There are only "++(show $ length logs)++" logs")
         else f $ logs !! (n-1)
+
+--Applies f to the first instance of y in list
+toElem :: Eq a => a -> (a -> a) -> [a] -> [a]
+toElem y f (x:xs)
+    | y == x    = f x : xs
+    | otherwise = x : toElem y f xs

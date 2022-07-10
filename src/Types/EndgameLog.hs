@@ -60,6 +60,7 @@ failSet (Set reps weight setType) =
         Work         -> Work
         PR succeeded -> PR (not succeeded)
     
+--Needs formating
 failLift :: Lift -> Log -> Log
 failLift lift' log =
     let maybeFail session | lift session == lift' = let sets' = sets session in session { sets = (failSet $ head sets') : tail sets'}

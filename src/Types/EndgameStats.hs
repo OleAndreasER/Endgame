@@ -51,3 +51,6 @@ testStats = Stats
         , LiftStats "Row" 1.25 91.25 (CyclePosition 0 3) False ]
     , bodyweight = 72.7
     }
+
+addWork :: Lift -> Stats -> Stats
+addWork lift stats = undefined

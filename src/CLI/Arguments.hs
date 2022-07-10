@@ -85,10 +85,8 @@ handleArguments ["log", nStr, "fail", lift] =
     $ handleIf (> 0)
     $ withLog 
     $ messagedHandleIf (did lift) ("You didn't do "++lift) (\log -> do
-        logs <- readLogs
-        setLogs $ toElem log (failLift lift) logs 
-        stats <- readStats
-        setStats $ addWork lift stats
+        readLogs >>= setLogs . (toElem log $ failLift lift)
+        readStats >>= setStats . addWork lift -- fix
         putStrLn . formatLog . failLift lift $ log)
     
 

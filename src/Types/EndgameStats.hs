@@ -53,4 +53,14 @@ testStats = Stats
     }
 
 addWork :: Lift -> Stats -> Stats
-addWork lift stats = undefined
+addWork lift' stats = 
+    let maybeAddWork liftStats | lift liftStats == lift' = addWorkToLift liftStats
+                               | otherwise = liftStats
+    in stats { lifts = map maybeAddWork $ lifts stats }
+
+addWorkToLift :: LiftStats -> LiftStats
+addWorkToLift liftStats = liftStats
+    { liftCycle = increment $ liftCycle liftStats }
+
+increment :: CyclePosition -> CyclePosition
+increment (CyclePosition pos len) = CyclePosition (pos+1) (len+1)

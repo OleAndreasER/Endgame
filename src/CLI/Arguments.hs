@@ -6,7 +6,7 @@ import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
 import Types.EndgameLog (Log, testLog, did, failLift)
-import Types.EndgameStats (LiftStats, bodyweight, addWork, setPR, toLiftStats, setProgression, liftIsInStats, setCycle)
+import Types.EndgameStats (LiftStats, bodyweight, addWork, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight)
 import GetLog
 import AdvanceStats
 import NextLogs
@@ -65,8 +65,11 @@ handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
     $ handleIf (> 0) (\pos ->
     handleIfInt lenStr
     $ handleIf (> 0)
-    $ messagedHandleIf (>= pos) ("Cycle position out of bounds") (\len -> updateLifts lift (setCycle (pos-1) len)))
+    $ messagedHandleIf (>= pos) ("Cycle position out of bounds")
+    (\len -> updateLifts lift (setCycle (pos-1) len)))
 
+handleArguments ["lifts", "toggle-bodyweight", lift] =
+    updateLifts lift toggleBodyweight
 
 handleArguments ["program"] = readProgram >>= putStrLn . formatProgram
 

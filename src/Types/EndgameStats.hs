@@ -74,6 +74,10 @@ setCycle :: Int -> Int -> LiftStats -> LiftStats
 setCycle pos len liftStats = 
     liftStats { liftCycle = CyclePosition pos len }
 
+toggleBodyweight :: LiftStats -> LiftStats
+toggleBodyweight liftStats =
+    liftStats { isBodyweight = not $ isBodyweight liftStats }
+
 
 toLiftStats :: (LiftStats -> LiftStats) -> Lift -> Stats -> Stats
 toLiftStats f lift' stats =

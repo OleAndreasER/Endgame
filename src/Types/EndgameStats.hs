@@ -79,5 +79,5 @@ toLiftStats f lift' stats =
 
 liftIsInStats :: Lift -> Stats -> Bool
 liftIsInStats lift' stats =
-    any (\liftStats -> lift liftStats == lift')
+    any ((== lift') . lift)
     $ lifts stats

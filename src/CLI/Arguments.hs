@@ -161,7 +161,7 @@ withLog f n = do
         then putStrLn ("There are only "++(show $ length logs)++" logs")
         else f $ logs !! (n-1)
 
---Applies f to the first instance of y in list
+--Applies f to the first instance of y in a list
 toElem :: Eq a => a -> (a -> a) -> [a] -> [a]
 toElem y f (x:xs)
     | y == x    = f x : xs

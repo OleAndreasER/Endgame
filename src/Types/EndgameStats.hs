@@ -70,6 +70,10 @@ setProgression :: Weight -> LiftStats -> LiftStats
 setProgression newProgression liftStats =
     liftStats { progression = newProgression }
 
+setCycle :: Int -> Int -> LiftStats -> LiftStats
+setCycle pos len liftStats = 
+    liftStats { liftCycle = CyclePosition pos len }
+
 
 toLiftStats :: (LiftStats -> LiftStats) -> Lift -> Stats -> Stats
 toLiftStats f lift' stats =

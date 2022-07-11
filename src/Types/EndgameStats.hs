@@ -66,6 +66,9 @@ setPR :: Weight -> LiftStats -> LiftStats
 setPR newPr liftStats =
     liftStats { pr = newPr }
 
+setProgression :: Weight -> LiftStats -> LiftStats
+setProgression newProgression liftStats =
+    liftStats { progression = newProgression }
 
 
 toLiftStats :: (LiftStats -> LiftStats) -> Lift -> Stats -> Stats

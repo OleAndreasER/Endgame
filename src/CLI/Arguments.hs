@@ -52,6 +52,9 @@ handleArguments ["add"] = do
     
 handleArguments ["lifts"] = readStats >>= putStrLn . formatStats
 
+handleArguments ["lifts", "pr", lift, weightStr] =
+    undefined
+
 handleArguments ["program"] = readProgram >>= putStrLn . formatProgram
 
 handleArguments ["bw"] = readStats >>= putStrLn . (++ "kg") . show . bodyweight 

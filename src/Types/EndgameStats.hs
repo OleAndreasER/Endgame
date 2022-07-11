@@ -62,6 +62,12 @@ addWorkToLift liftStats = liftStats
 increment :: CyclePosition -> CyclePosition
 increment (CyclePosition pos len) = CyclePosition (pos+1) (len+1)
 
+setPR :: Weight -> LiftStats -> LiftStats
+setPR newPr liftStats =
+    liftStats { pr = newPr }
+
+
+
 toLiftStats :: (LiftStats -> LiftStats) -> Lift -> Stats -> Stats
 toLiftStats f lift' stats =
     let maybeF liftStats | lift liftStats == lift' = f liftStats

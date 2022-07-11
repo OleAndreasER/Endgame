@@ -6,7 +6,7 @@ import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
 import Types.EndgameLog (Log, testLog, did, failLift)
-import Types.EndgameStats (bodyweight, addWork)
+import Types.EndgameStats (bodyweight, addWork, setPR, toLiftStats)
 import GetLog
 import AdvanceStats
 import NextLogs
@@ -53,7 +53,10 @@ handleArguments ["add"] = do
 handleArguments ["lifts"] = readStats >>= putStrLn . formatStats
 
 handleArguments ["lifts", "pr", lift, weightStr] =
-    undefined
+    handleIfFloat weightStr
+    $ handleIf (>= 0) (\weight -> do
+        readStats >>= setStats . (toLiftStats (setPR weight) lift)
+        readStats >>= putStrLn . formatStats)
 
 handleArguments ["program"] = readProgram >>= putStrLn . formatProgram
 

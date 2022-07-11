@@ -6,7 +6,7 @@ import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
 import Types.EndgameLog (Log, testLog, did, failLift)
-import Types.EndgameStats (LiftStats, bodyweight, addWork, setPR, toLiftStats, setProgression)
+import Types.EndgameStats (LiftStats, bodyweight, addWork, setPR, toLiftStats, setProgression, liftIsInStats)
 import GetLog
 import AdvanceStats
 import NextLogs
@@ -60,6 +60,14 @@ handleArguments ["lifts", "progression", lift, weightStr] =
     handleIfFloat weightStr
     $ handleIf (>= 0) (\weight -> updateLifts lift (setProgression weight))
     
+handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
+    handleIfInt posStr
+    $ handleIf (> 0) (\pos ->
+    handleIfInt lenStr
+    $ handleIf (> 0)
+    $ messagedHandleIf (>= pos) ("Cycle position out of bounds") (\len ->
+        putStrLn "hello world"))
+
 
 handleArguments ["program"] = readProgram >>= putStrLn . formatProgram
 
@@ -160,6 +168,8 @@ toElem y f (x:xs)
     | otherwise = x : toElem y f xs
 
 updateLifts :: String -> (LiftStats -> LiftStats) -> IO ()
-updateLifts lift f = do 
+updateLifts lift f =
+    readStats >>=
+    messagedHandleIf (liftIsInStats lift) ("You don't do "++lift++".") (\_ -> do 
         readStats >>= setStats . (toLiftStats f lift)
-        readStats >>= putStrLn . formatStats
+        readStats >>= putStrLn . formatStats)

@@ -76,3 +76,8 @@ toLiftStats f lift' stats =
     let maybeF liftStats | lift liftStats == lift' = f liftStats
                          | otherwise               = liftStats
     in stats { lifts = map maybeF $ lifts stats}
+
+liftIsInStats :: Lift -> Stats -> Bool
+liftIsInStats lift' stats =
+    any (\liftStats -> lift liftStats == lift')
+    $ lifts stats

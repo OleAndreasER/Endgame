@@ -6,7 +6,7 @@ import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
 import Types.EndgameLog (Log, testLog, did, failLift)
-import Types.EndgameStats (bodyweight, addWork, setPR, toLiftStats, setProgression)
+import Types.EndgameStats (LiftStats, bodyweight, addWork, setPR, toLiftStats, setProgression)
 import GetLog
 import AdvanceStats
 import NextLogs
@@ -54,16 +54,11 @@ handleArguments ["lifts"] = readStats >>= putStrLn . formatStats
 
 handleArguments ["lifts", "pr", lift, weightStr] =
     handleIfFloat weightStr
-    $ handleIf (>= 0) (\weight -> do
-        readStats >>= setStats . (toLiftStats (setPR weight) lift)
-        readStats >>= putStrLn . formatStats)
+    $ handleIf (>= 0) (\weight -> updateLifts lift (setPR weight))
 
 handleArguments ["lifts", "progression", lift, weightStr] =
     handleIfFloat weightStr
-    $ handleIf (>= 0) (\weight -> do
-        readStats >>= setStats . (toLiftStats (setProgression weight) lift)
-        readStats >>= putStrLn . formatStats)
-
+    $ handleIf (>= 0) (\weight -> updateLifts lift (setProgression weight))
     
 
 handleArguments ["program"] = readProgram >>= putStrLn . formatProgram
@@ -163,3 +158,8 @@ toElem :: Eq a => a -> (a -> a) -> [a] -> [a]
 toElem y f (x:xs)
     | y == x    = f x : xs
     | otherwise = x : toElem y f xs
+
+updateLifts :: String -> (LiftStats -> LiftStats) -> IO ()
+updateLifts lift f = do 
+        readStats >>= setStats . (toLiftStats f lift)
+        readStats >>= putStrLn . formatStats

@@ -46,7 +46,7 @@ liftInPosition cycle cyclePosition =
 
 
 logSet :: LiftStats -> Bodyweight -> Program.Set -> Log.Set
-logSet liftStats' bodyweight (Program.Set reps percent setType) =  
+logSet liftStats' bodyweight (Program.Set reps percent setType) =
     Log.Set reps roundedWeight (logSetType setType)
     where pr' = pr liftStats'
           multiple = progression liftStats'

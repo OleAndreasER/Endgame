@@ -4,7 +4,7 @@ import Types.EndgameStats
 
 formatStats :: Stats -> String
 formatStats stats =
-    "Bodyweight: "++(show $ bodyweight stats)++"\n"
+    "Bodyweight: "++(show $ bodyweight stats)++"kg\n"
     ++(unlines $ map formatLift $ lifts stats)
 
 formatLift :: LiftStats -> String

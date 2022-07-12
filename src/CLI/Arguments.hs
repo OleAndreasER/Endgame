@@ -31,13 +31,13 @@ handleArguments ["next", logCountStr] =
         putStrLn $ unlines $ reverse $ map formatLog logs)
     
 
-handleArguments ["list", logCountStr] =
+handleArguments ["logs", logCountStr] =
     handleIfInt logCountStr 
     $ handleIf (> 0)
     (\logCount -> readLogs >>= 
     putStrLn . latestLogs logCount . map formatLog)
 
-handleArguments ["list"] = handleArguments ["list", "1"]
+handleArguments ["logs"] = handleArguments ["logs", "1"]
 
 
 handleArguments ["add"] = do
@@ -77,16 +77,14 @@ handleArguments ["bw"] = readStats >>= putStrLn . (++ "kg") . show . bodyweight
 
 handleArguments ["bw", bodyweightStr] =
     handleIfFloat bodyweightStr 
-    $ handleIf (>= 0)
-    (\bw -> do
-        stats <- readStats
-        setStats $ stats {bodyweight = bw}
+    $ handleIf (>= 0) (\bw -> do
+        readStats >>= setStats . (\stats -> stats {bodyweight = bw})
         putStrLn ("Bodyweight: "++bodyweightStr++"kg"))
    
 
 --TODO
 handleArguments ["profile", "new"] =
-    putStrLn invalidArgumentResponse
+    createProfile "profile" "everyotherday"
 
 handleArguments ["profile", profile] = do
     setProfile profile

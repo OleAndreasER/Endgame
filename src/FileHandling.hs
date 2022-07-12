@@ -1,21 +1,27 @@
 module FileHandling where
 
-import System.Directory (createDirectoryIfMissing)
+import System.Directory (createDirectoryIfMissing, getAppUserDataDirectory)
 import Data.Binary
 import Types.EndgameProgram (Program)
 import Types.EndgameLog (Log, testLog)
 import Types.EndgameStats (Stats, testStats)
 import FirstStatsOfProgram
 
+
+appPath :: IO FilePath
+appPath = getAppUserDataDirectory "endgame"
+
 readFromProfile :: Binary a => String -> IO a
 readFromProfile file = do
     profile <- getProfile
-    decodeFile ("endgame-profiles/" ++ profile ++ "/" ++ file)
+    appPath' <- appPath
+    decodeFile (appPath'++"/profiles/"++profile++"/"++file)
 
 setInProfile :: Binary a => String -> a -> IO ()
 setInProfile file x = do
     profile <- getProfile  
-    encodeFile ("endgame-profiles/" ++ profile ++ "/" ++ file) x
+    appPath' <- appPath
+    encodeFile (appPath'++"/profiles/"++profile++"/"++file) x
 
 addLog :: Log -> IO ()
 addLog log = do
@@ -28,6 +34,9 @@ setStats = setInProfile "stats.txt"
 setLogs :: [Log] -> IO ()
 setLogs = setInProfile "logs.txt"
 
+setProgram :: Program -> IO ()
+setProgram = setInProfile "program.txt"
+
 
 readStats :: IO Stats
 readStats = readFromProfile "stats.txt"
@@ -39,22 +48,40 @@ readProgram :: IO Program
 readProgram = readFromProfile "program.txt"
 
 
+addProgram :: String -> Program -> IO ()
+addProgram name program = do 
+    appPath' <- appPath
+    encodeFile (appPath'++"/programs/"++name++".txt") program
+
 readStandardProgram :: String -> IO Program
-readStandardProgram programName =
-    decodeFile ("endgame-programs/"++programName++".txt")
+readStandardProgram programName = do
+    appPath' <- appPath
+    decodeFile (appPath'++"/programs/"++programName++".txt")
 
 --A profile contains training logs, stats and program. 
 createProfile :: String -> String -> IO ()
 createProfile profile programName = do
+    appPath' <- appPath
+    let directory = appPath'++"/profiles/"++profile
+
     createDirectoryIfMissing True directory
-    program <- readStandardProgram programName
-    encodeFile (directory++"/program.txt") program
-    encodeFile (directory++"/logs.txt") ([] :: [Log])
-    encodeFile (directory++"/stats.txt") $ firstStatsOfProgram program
-    where directory = "endgame-profiles/" ++ profile
+
+    program <- readStandardProgram programName --fix
+
+    setProgram program
+    setLogs ([] :: [Log])
+    setStats $ firstStatsOfProgram program
+
+
+
+    
 
 setProfile :: String -> IO ()
-setProfile = writeFile "profile.txt"
+setProfile profile = do 
+    appPath' <- appPath
+    writeFile (appPath'++"/profile.txt") profile
     
 getProfile :: IO String
-getProfile = readFile "profile.txt"
+getProfile = do 
+    appPath' <- appPath
+    readFile (appPath'++"/profile.txt")

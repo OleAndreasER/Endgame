@@ -8,10 +8,8 @@ import qualified Types.Program as Program
 
 firstStatsOfProgram :: Program -> Stats
 firstStatsOfProgram (Program liftGroupCycles liftCycles) = Stats
-    { liftGroupPositions =
-        map liftGroupPosition liftGroupCycles 
-    , lifts = 
-        map liftStats liftCycles
+    { liftGroupPositions = map liftGroupPosition liftGroupCycles 
+    , lifts = map liftStats liftCycles
     , bodyweight = 0 }
 
 

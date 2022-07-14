@@ -1,7 +1,7 @@
 module NextLogs where
 
-import GetLog
-import AdvanceStats
+import CurrentLog
+import AdvanceCycles
 import Types.Log
 import Types.Program
 import Types.Stats
@@ -10,5 +10,5 @@ import Types.Stats
 nextLogs :: Stats -> Program -> Int -> [Log]
 nextLogs stats program i =
     log : (nextLogs nextStats program (i+1))
-    where log       = getLog ((show i)++".") program stats
-          nextStats = advanceStats stats log
+    where log       = currentLog program stats ((show i)++".") 
+          nextStats = advanceCycles log stats

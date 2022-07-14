@@ -1,8 +1,7 @@
 {-# LANGUAGE NamedFieldPuns #-}
 module AdvanceCycles (advanceCycles) where
 
-import Types.Stats
-import qualified Types.Stats as Stats (length)
+import Types.Stats as Stats
 import Types.Log
 
 

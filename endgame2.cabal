@@ -38,10 +38,9 @@ executable endgame2
                       Types.Log,
                       Types.Stats,
                       FileHandling,
-                      GetLog,
-                      AdvanceStats,
                       NextLogs,
                       AdvanceCycles,
+                      CurrentLog,
                       FirstStatsOfProgram
 
 

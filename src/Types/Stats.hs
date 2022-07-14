@@ -88,3 +88,9 @@ liftIsInStats :: Lift -> Stats -> Bool
 liftIsInStats lift' stats =
     any ((== lift') . lift)
     $ lifts stats
+
+statsOfLift :: Stats -> Lift -> LiftStats
+statsOfLift stats lift' =
+    head
+    $ filter ((== lift') . lift)
+    $ lifts stats    

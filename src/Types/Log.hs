@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric
+           , NamedFieldPuns #-}
 
 module Types.Log where 
 
@@ -18,8 +19,11 @@ data SetType
     deriving (Generic, Show, Read, Eq)
 
 
-data Set = Set Reps Weight SetType
-    deriving (Generic, Show, Read, Eq)
+data Set = Set 
+    { reps :: Reps
+    , weight :: Weight
+    , setType :: SetType 
+    } deriving (Generic, Show, Read, Eq)
 
 
 data LiftSession = LiftSession 
@@ -29,7 +33,7 @@ data LiftSession = LiftSession
 
 
 data Log = Log 
-    { date :: String
+    { label :: String
     , liftSessions :: [LiftSession]
     } deriving (Generic, Show, Read, Eq)
 
@@ -59,9 +63,19 @@ failSet (Set reps weight setType) =
         Work         -> Work
         PR succeeded -> PR (not succeeded)
     
---Needs formating
+failSession :: LiftSession -> LiftSession
+failSession session = 
+    let sets' = sets session 
+    in session { sets = (failSet $ head sets') : tail sets' }
+
 failLift :: Lift -> Log -> Log
-failLift lift' log =
-    let maybeFail session | lift session == lift' = let sets' = sets session in session { sets = (failSet $ head sets') : tail sets'}
-                          | otherwise = session
-    in log {liftSessions = map maybeFail $ liftSessions log}
+failLift = toLift failSession
+
+toLift :: (LiftSession -> LiftSession) -> Lift -> Log -> Log
+toLift f lift' log = 
+    let maybeF session | lift session == lift' = f session
+                       | otherwise             = session
+    in log { liftSessions = map maybeF $ liftSessions log }
+
+doneLifts :: Log -> [Lift]
+doneLifts (Log { liftSessions }) = map lift liftSessions

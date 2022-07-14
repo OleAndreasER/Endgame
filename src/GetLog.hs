@@ -16,7 +16,7 @@ getLog :: String
        -> Log.Log
 getLog date (Program.Program liftGroupCycles liftCycles) stats = 
     Log.Log 
-        { Log.date = date
+        { Log.label = date
         , Log.liftSessions = 
             map (liftSession liftCycles stats)
             $ map (uncurry $ liftInPosition)

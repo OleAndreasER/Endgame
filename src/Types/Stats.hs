@@ -9,12 +9,14 @@ import GHC.Generics (Generic)
 type Bodyweight = Float
 
 
+instance Binary Stats
+instance Binary CyclePosition
+instance Binary LiftStats
+
 data CyclePosition = CyclePosition
     { position :: Int
     , length :: Int
     } deriving (Generic, Eq, Show, Read)
-
-instance Binary CyclePosition
 
 
 data Stats = Stats 
@@ -22,8 +24,6 @@ data Stats = Stats
     , lifts :: [LiftStats]
     , bodyweight :: Bodyweight
     } deriving (Generic, Show, Eq, Read)
-
-instance Binary Stats
 
 
 data LiftStats = LiftStats
@@ -34,7 +34,6 @@ data LiftStats = LiftStats
     , isBodyweight :: Bool
     } deriving (Generic, Show, Eq, Read)
 
-instance Binary LiftStats
 
 testStats :: Stats
 testStats = Stats

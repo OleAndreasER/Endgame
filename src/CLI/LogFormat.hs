@@ -4,7 +4,7 @@ import Data.List (group)
 
 formatLog :: Log -> String
 formatLog log = 
-   (date log) ++ "\n" ++ (formatLiftSessions $ liftSessions log)
+   (label log) ++ "\n" ++ (formatLiftSessions $ liftSessions log)
 
 formatLiftSessions :: [LiftSession] -> String
 formatLiftSessions liftSessions = 

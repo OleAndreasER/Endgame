@@ -41,6 +41,7 @@ executable endgame2
                       GetLog,
                       AdvanceStats,
                       NextLogs,
+                      AdvanceCycles,
                       FirstStatsOfProgram
 
 

@@ -5,8 +5,8 @@ import FileHandling
 import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
-import Types.EndgameLog (Log, testLog, did, failLift)
-import Types.EndgameStats (LiftStats, bodyweight, addWork, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight)
+import Types.Log (Log, testLog, did, failLift)
+import Types.Stats (LiftStats, bodyweight, addWork, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight)
 import GetLog
 import AdvanceStats
 import NextLogs

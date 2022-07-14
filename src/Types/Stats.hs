@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Types.EndgameStats where
+module Types.Stats where
 
-import Types.EndgameGeneralTypes (Lift, Weight)
+import Types.GeneralTypes (Lift, Weight)
 import Data.Binary
 import GHC.Generics (Generic)
 

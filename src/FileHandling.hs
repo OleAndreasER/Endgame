@@ -2,9 +2,9 @@ module FileHandling where
 
 import System.Directory (createDirectoryIfMissing, getAppUserDataDirectory)
 import Data.Binary
-import Types.EndgameProgram (Program)
-import Types.EndgameLog (Log, testLog)
-import Types.EndgameStats (Stats, testStats)
+import Types.Program (Program)
+import Types.Log (Log, testLog)
+import Types.Stats (Stats, testStats)
 import FirstStatsOfProgram
 
 

@@ -1,10 +1,10 @@
 module AdvanceStats (advanceStats) where
 
-import qualified Types.EndgameStats as EndgameStats (length, lift)
-import Types.EndgameStats
-import qualified Types.EndgameLog as EndgameLog (lift)
-import Types.EndgameLog
-import Types.EndgameGeneralTypes (Weight)
+import qualified Types.Stats as Stats (length, lift)
+import Types.Stats
+import qualified Types.Log as Log (lift)
+import Types.Log
+import Types.GeneralTypes (Weight)
 
 advanceStats :: Stats -> Log -> Stats
 advanceStats stats log = stats
@@ -20,14 +20,14 @@ advanceStats stats log = stats
 otherLifts :: [LiftSession] -> [LiftStats] -> [LiftStats]
 otherLifts sessions stats = 
     filter (\stat -> not $ any
-           (\session -> EndgameStats.lift stat == EndgameLog.lift session) sessions)
+           (\session -> Stats.lift stat == Log.lift session) sessions)
     stats
 
 
 advanceCyclePosition :: CyclePosition -> CyclePosition
 advanceCyclePosition (CyclePosition pos len) = CyclePosition
     { position = (pos + 1) `mod` len
-    , EndgameStats.length = len }
+    , Stats.length = len }
 
 
 liftSessionStatsPairs :: [LiftSession] -> [LiftStats] -> [(LiftSession, LiftStats)]
@@ -35,7 +35,7 @@ liftSessionStatsPairs sessions stats =
     [ (session, stat)
     | session <- sessions
     , stat    <- stats
-    , EndgameStats.lift stat == EndgameLog.lift session ] 
+    , Stats.lift stat == Log.lift session ] 
 
 
 advanceLift :: LiftSession -> LiftStats -> LiftStats
@@ -54,6 +54,6 @@ prChange Work _                 = 0
 updateLiftCycle :: SetType -> CyclePosition -> CyclePosition
 updateLiftCycle (PR False) cyclePosition = 
     advanceCyclePosition cyclePosition 
-        { EndgameStats.length = EndgameStats.length cyclePosition + 1 }
+        { Stats.length = Stats.length cyclePosition + 1 }
 
 updateLiftCycle _ cyclePosition = advanceCyclePosition cyclePosition

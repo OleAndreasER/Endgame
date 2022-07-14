@@ -1,6 +1,6 @@
 module Setup.Programs where
 
-import Types.EndgameProgram
+import Types.Program
 
 programs :: [(String, Program)]
 programs = 

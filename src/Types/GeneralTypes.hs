@@ -1,4 +1,4 @@
-module Types.EndgameGeneralTypes where
+module Types.GeneralTypes where
 
 
 type Reps = Integer

@@ -1,6 +1,6 @@
 module CLI.StatsFormat (formatStats) where
 
-import Types.EndgameStats
+import Types.Stats
 
 formatStats :: Stats -> String
 formatStats stats =

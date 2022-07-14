@@ -6,18 +6,20 @@ import GHC.Generics (Generic)
 import Data.Binary
 import Types.GeneralTypes (Lift, Reps, Weight)
 
+instance Binary SetType
+instance Binary Set
+instance Binary LiftSession
+instance Binary Log
+
+
 data SetType
     = Work 
     | PR Bool
     deriving (Generic, Show, Read, Eq)
-    
-instance Binary SetType
 
 
 data Set = Set Reps Weight SetType
     deriving (Generic, Show, Read, Eq)
-
-instance Binary Set
 
 
 data LiftSession = LiftSession 
@@ -25,15 +27,12 @@ data LiftSession = LiftSession
     , sets :: [Set]
     } deriving (Generic, Show, Read, Eq)
 
-instance Binary LiftSession
-
 
 data Log = Log 
     { date :: String
     , liftSessions :: [LiftSession]
     } deriving (Generic, Show, Read, Eq)
 
-instance Binary Log
 
 testLog = Log 
     "06/05/2022"

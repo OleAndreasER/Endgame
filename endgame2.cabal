@@ -33,7 +33,7 @@ executable endgame2
                       CLI.LogFormat,
                       CLI.ProgramFormat,
                       CLI.StatsFormat,
-                      Types.GeneralTypes,
+                      Types.General,
                       Types.Program,
                       Types.Log,
                       Types.Stats,

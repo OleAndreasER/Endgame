@@ -2,7 +2,7 @@
 
 module Types.Stats where
 
-import Types.GeneralTypes (Lift, Weight)
+import Types.General (Lift, Weight)
 import Data.Binary
 import GHC.Generics (Generic)
 

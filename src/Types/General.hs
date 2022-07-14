@@ -1,4 +1,4 @@
-module Types.GeneralTypes where
+module Types.General where
 
 
 type Reps = Integer

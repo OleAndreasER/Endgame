@@ -1,7 +1,7 @@
 module CLI.ProgramFormat (formatProgram) where
 
 import Types.Program
-import Types.GeneralTypes (Percent)
+import Types.General (Percent)
 import Data.List (group, intercalate)
 
 formatLiftGroupCycle :: LiftGroupCycle -> String

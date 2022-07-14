@@ -3,7 +3,7 @@
 module Types.Program where
 import GHC.Generics (Generic)
 import Data.Binary
-import Types.GeneralTypes (Reps, Percent, Lift)
+import Types.General (Reps, Percent, Lift)
 
 data Program = Program [LiftGroupCycle] [LiftCycle]
     deriving (Show, Generic)

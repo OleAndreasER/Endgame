@@ -2,7 +2,7 @@ module GetLog (getLog) where
 
 import qualified Types.Log as Log
 import qualified Types.Program as Program
-import Types.GeneralTypes (Lift, Weight)
+import Types.General (Lift, Weight)
 import Types.Stats 
 
 {- getLog gets the current log from Stats,

@@ -5,7 +5,7 @@ module Types.Log where
 
 import GHC.Generics (Generic)
 import Data.Binary
-import Types.GeneralTypes (Lift, Reps, Weight)
+import Types.General (Lift, Reps, Weight)
 
 instance Binary SetType
 instance Binary Set

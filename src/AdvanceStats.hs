@@ -4,7 +4,7 @@ import qualified Types.Stats as Stats (length, lift)
 import Types.Stats
 import qualified Types.Log as Log (lift)
 import Types.Log
-import Types.GeneralTypes (Weight)
+import Types.General (Weight)
 
 advanceStats :: Stats -> Log -> Stats
 advanceStats stats log = stats

@@ -1,4 +1,4 @@
-module NextLogs where
+module NextLogs (nextLogs) where
 
 import CurrentLog
 import AdvanceCycles
@@ -7,8 +7,12 @@ import Types.Program
 import Types.Stats
 
 --Endless list of future logs.
-nextLogs :: Stats -> Program -> Int -> [Log]
-nextLogs stats program i =
-    log : (nextLogs nextStats program (i+1))
+nextLogs' :: Int -> Stats -> Program -> [Log]
+nextLogs' i stats program =
+    log : (nextLogs' (i+1) nextStats program)
     where log       = currentLog program stats ((show i)++".") 
           nextStats = advanceCycles log stats
+
+nextLogs :: Stats -> Program -> [Log]
+nextLogs = nextLogs' 1
+

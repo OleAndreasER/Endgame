@@ -27,7 +27,7 @@ handleArguments ["next", logCountStr] =
     (\logCount -> do
         stats <- readStats
         program <- readProgram
-        let logs = take logCount $ nextLogs stats program 1
+        let logs = take logCount $ nextLogs stats program
         putStrLn $ unlines $ reverse $ map formatLog logs)
     
 
@@ -44,10 +44,8 @@ handleArguments ["add"] = do
     stats <- readStats
     program <- readProgram
     let log = currentLog program stats "date" 
-
     addLog log
     putStrLn $ "Added:\n" ++ formatLog log
-    
     setStats $ advanceCycles log stats
     
 handleArguments ["lifts"] = readStats >>= putStrLn . formatStats

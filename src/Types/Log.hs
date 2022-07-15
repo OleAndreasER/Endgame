@@ -79,3 +79,8 @@ toLift f lift' log =
 
 doneLifts :: Log -> [Lift]
 doneLifts (Log { liftSessions }) = map lift liftSessions
+
+hasPR :: LiftSession -> Bool
+hasPR liftSession = 
+    any ((== PR True) . setType)
+    $ sets liftSession 

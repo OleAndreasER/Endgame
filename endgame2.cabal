@@ -37,10 +37,12 @@ executable endgame2
                       Types.Program,
                       Types.Log,
                       Types.Stats,
-                      FileHandling,
-                      NextLogs,
-                      AdvanceCycles,
+                      Advance.Cycles,
+                      Advance.PRs,
+                      Advance.Stats,
                       CurrentLog,
+                      NextLogs,
+                      FileHandling,
                       FirstStatsOfProgram
 
 

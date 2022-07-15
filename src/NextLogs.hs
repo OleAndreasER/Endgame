@@ -1,7 +1,7 @@
 module NextLogs (nextLogs) where
 
 import CurrentLog
-import AdvanceCycles
+import Advance.Cycles
 import Types.Log
 import Types.Program
 import Types.Stats

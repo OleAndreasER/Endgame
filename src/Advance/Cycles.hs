@@ -1,5 +1,5 @@
 {-# LANGUAGE NamedFieldPuns #-}
-module AdvanceCycles (advanceCycles) where
+module Advance.Cycles (advanceCycles) where
 
 import Types.Stats as Stats
 import Types.Log

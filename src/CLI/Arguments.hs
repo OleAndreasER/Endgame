@@ -8,7 +8,7 @@ import CLI.ProgramFormat (formatProgram)
 import Types.Log (Log, testLog, did, failLift)
 import Types.Stats (LiftStats, bodyweight, addWork, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight)
 import CurrentLog 
-import AdvanceCycles
+import Advance.Cycles
 import NextLogs
 import Text.Read (readMaybe)
 

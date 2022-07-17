@@ -8,7 +8,7 @@ import CLI.ProgramFormat (formatProgram)
 import Types.Log (Log, testLog, did, failLift)
 import Types.Stats (LiftStats, bodyweight, addWork, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight)
 import CurrentLog 
-import Advance.Cycles
+import Advance.Stats
 import NextLogs
 import Text.Read (readMaybe)
 
@@ -46,7 +46,7 @@ handleArguments ["add"] = do
     let log = currentLog program stats "date" 
     addLog log
     putStrLn $ "Added:\n" ++ formatLog log
-    setStats $ advanceCycles log stats
+    setStats $ advanceStats log stats
     
 handleArguments ["lifts"] = readStats >>= putStrLn . formatStats
 

@@ -43,6 +43,7 @@ executable endgame2
                       CurrentLog,
                       NextLogs,
                       FileHandling,
+                      CLI.SetupStats,
                       FirstStatsOfProgram
 
 

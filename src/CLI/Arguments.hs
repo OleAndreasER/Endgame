@@ -65,7 +65,7 @@ handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
     $ handleIf (> 0) (\pos ->
     handleIfInt lenStr
     $ handleIf (> 0)
-    $ messagedHandleIf (>= pos) ("Cycle position out of bounds")
+    $ messagedHandleIf (>= pos) "Cycle position out of bounds"
     $ \len -> updateLifts lift (setCycle (pos-1) len))
 
 handleArguments ["lifts", "toggle-bodyweight", lift] =

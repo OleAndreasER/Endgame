@@ -17,25 +17,24 @@ handleArguments :: [String] -> IO ()
 handleArguments ["next"] = do
     stats <- readStats
     program <- readProgram
-    let log = currentLog program stats "Next:"
-    putStrLn $ formatLog log
+    putStrLn . formatLog $ currentLog program stats "Next:"
 
 
 handleArguments ["next", logCountStr] =
     handleIfInt logCountStr 
     $ handleIf (> 0) 
-    (\logCount -> do
-        stats <- readStats
-        program <- readProgram
-        let logs = take logCount $ nextLogs stats program
-        putStrLn $ unlines $ reverse $ map formatLog logs)
+    $ \logCount -> do
+    stats <- readStats
+    program <- readProgram
+    let logs = take logCount $ nextLogs stats program
+    putStrLn $ unlines $ reverse $ map formatLog logs
     
 
 handleArguments ["logs", logCountStr] =
     handleIfInt logCountStr 
     $ handleIf (> 0)
-    (\logCount -> readLogs >>= 
-    putStrLn . latestLogs logCount . map formatLog)
+    $ \logCount ->
+    readLogs >>= putStrLn . latestLogs logCount . map formatLog
 
 handleArguments ["logs"] = handleArguments ["logs", "1"]
 
@@ -48,15 +47,18 @@ handleArguments ["add"] = do
     putStrLn $ "Added:\n" ++ formatLog log
     setStats $ advanceStats log stats
     
+
 handleArguments ["lifts"] = readStats >>= putStrLn . formatStats
 
 handleArguments ["lifts", "pr", lift, weightStr] =
     handleIfFloat weightStr
-    $ handleIf (>= 0) (\weight -> updateLifts lift (setPR weight))
+    $ handleIf (>= 0)
+    $ \weight -> updateLifts lift $ setPR weight
 
 handleArguments ["lifts", "progression", lift, weightStr] =
     handleIfFloat weightStr
-    $ handleIf (>= 0) (\weight -> updateLifts lift (setProgression weight))
+    $ handleIf (>= 0) 
+    $ \weight -> updateLifts lift $ setProgression weight
     
 handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
     handleIfInt posStr
@@ -64,29 +66,33 @@ handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
     handleIfInt lenStr
     $ handleIf (> 0)
     $ messagedHandleIf (>= pos) ("Cycle position out of bounds")
-    (\len -> updateLifts lift (setCycle (pos-1) len)))
+    $ \len -> updateLifts lift (setCycle (pos-1) len))
 
 handleArguments ["lifts", "toggle-bodyweight", lift] =
     updateLifts lift toggleBodyweight
 
+
 handleArguments ["program"] = readProgram >>= putStrLn . formatProgram
+
 
 handleArguments ["bw"] = readStats >>= putStrLn . (++ "kg") . show . bodyweight 
 
+
 handleArguments ["bw", bodyweightStr] =
     handleIfFloat bodyweightStr 
-    $ handleIf (>= 0) (\bw -> do
-        readStats >>= setStats . (\stats -> stats {bodyweight = bw})
-        putStrLn ("Bodyweight: "++bodyweightStr++"kg"))
+    $ handleIf (>= 0) 
+    $ \bw -> do
+    readStats >>= setStats . \stats -> stats {bodyweight = bw}
+    putStrLn ("Bodyweight: "++bodyweightStr++"kg")
    
 
---TODO
 handleArguments ["profile", "new"] =
     createProfile "profile" "everyotherday"
 
 handleArguments ["profile", profile] = do
     setProfile profile
     putStrLn ("Profile: "++profile)
+
 
 handleArguments ["log", nStr] = 
     handleIfInt nStr 
@@ -99,10 +105,11 @@ handleArguments ["log", nStr, "fail", lift] =
     handleIfInt nStr
     $ handleIf (> 0)
     $ withLog 
-    $ messagedHandleIf (did lift) ("You didn't do "++lift) (\log -> do
-        readLogs >>= setLogs . (toElem log $ failLift lift)
-        readStats >>= setStats . addWork lift -- fix
-        putStrLn . formatLog . failLift lift $ log)
+    $ messagedHandleIf (did lift) ("You didn't do "++lift)
+    $ \log -> do
+    readLogs >>= setLogs . (toElem log $ failLift lift)
+    readStats >>= setStats . addWork lift -- fix
+    putStrLn . formatLog . failLift lift $ log
     
 
 handleArguments ["help"] =

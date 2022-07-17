@@ -13,7 +13,7 @@ import Types.Log
 -}
 
 advanceCycles :: Log -> Stats -> Stats
-advanceCycles log = advanceLiftGroups . (advanceLifts log)
+advanceCycles log = advanceLiftGroups . advanceLifts log
 
 advanceLifts :: Log -> Stats -> Stats
 advanceLifts log stats = 

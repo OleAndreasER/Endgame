@@ -1,4 +1,4 @@
-# Revision history for endgame2
+# Revision history for endgame
 
 ## 0.1.0.0 -- YYYY-mm-dd
 

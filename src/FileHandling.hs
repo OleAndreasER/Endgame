@@ -6,6 +6,7 @@ import Types.Program (Program)
 import Types.Log (Log, testLog)
 import Types.Stats (Stats, testStats)
 import FirstStatsOfProgram
+import CLI.SetupStats
 
 
 appPath :: IO FilePath
@@ -65,12 +66,14 @@ createProfile profile programName = do
     let directory = appPath'++"/profiles/"++profile
 
     createDirectoryIfMissing True directory
+    setProfile profile
 
     program <- readStandardProgram programName --fix
-
     setProgram program
     setLogs ([] :: [Log])
     setStats $ firstStatsOfProgram program
+    readStats >>= setupStats >>= setStats
+
 
 
 

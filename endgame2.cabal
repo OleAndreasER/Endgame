@@ -33,6 +33,8 @@ executable endgame2
                       CLI.LogFormat,
                       CLI.ProgramFormat,
                       CLI.StatsFormat,
+                      CLI.SetupStats,
+                      CLI.Input,
                       Types.General,
                       Types.Program,
                       Types.Log,
@@ -43,7 +45,6 @@ executable endgame2
                       CurrentLog,
                       NextLogs,
                       FileHandling,
-                      CLI.SetupStats,
                       FirstStatsOfProgram
 
 

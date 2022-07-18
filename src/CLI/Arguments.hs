@@ -65,7 +65,7 @@ handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
     $ handleIf (> 0) (\pos ->
     handleIfInt lenStr
     $ handleIf (> 0)
-    $ messagedHandleIf (>= pos) "Cycle position out of bounds"
+    $ handleIfMsg (>= pos) "Cycle position out of bounds"
     $ \len -> updateLifts lift (setCycle (pos-1) len))
 
 handleArguments ["lifts", "toggle-bodyweight", lift] =
@@ -86,8 +86,10 @@ handleArguments ["bw", bodyweightStr] =
     putStrLn ("Bodyweight: "++bodyweightStr++"kg")
    
 
-handleArguments ["profile", "new"] =
-    createProfile "profile" "everyotherday"
+handleArguments ["profile", "new"] = do
+    putStrLn "Profile name:"
+    name <- getLine
+    createProfile name "everyotherday"
 
 handleArguments ["profile", profile] = do
     setProfile profile
@@ -105,7 +107,7 @@ handleArguments ["log", nStr, "fail", lift] =
     handleIfInt nStr
     $ handleIf (> 0)
     $ withLog 
-    $ messagedHandleIf (did lift) ("You didn't do "++lift)
+    $ handleIfMsg (did lift) ("You didn't do "++lift)
     $ \log -> do
     readLogs >>= setLogs . (toElem log $ failLift lift)
     readStats >>= setStats . addWork lift -- fix
@@ -148,10 +150,10 @@ handleIfInt str f = case readMaybe str :: Maybe Int of
     Just x  -> f x
 
 handleIf :: (a -> Bool) -> (a -> IO ()) -> a -> IO ()
-handleIf predicate = messagedHandleIf predicate invalidArgumentResponse
+handleIf predicate = handleIfMsg predicate invalidArgumentResponse
 
-messagedHandleIf :: (a -> Bool) -> String -> (a -> IO ()) -> a -> IO ()
-messagedHandleIf predicate msg f x
+handleIfMsg :: (a -> Bool) -> String -> (a -> IO ()) -> a -> IO ()
+handleIfMsg predicate msg f x
     | predicate x = f x 
     | otherwise   = putStrLn msg
 
@@ -175,6 +177,6 @@ toElem y f (x:xs)
 updateLifts :: String -> (LiftStats -> LiftStats) -> IO ()
 updateLifts lift f =
     readStats >>=
-    messagedHandleIf (liftIsInStats lift) ("You don't do "++lift++".") (\_ -> do 
+    handleIfMsg (liftIsInStats lift) ("You don't do "++lift++".") (\_ -> do 
         readStats >>= setStats . (toLiftStats f lift)
         readStats >>= putStrLn . formatStats)

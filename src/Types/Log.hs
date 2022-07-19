@@ -6,6 +6,7 @@ module Types.Log where
 import GHC.Generics (Generic)
 import Data.Binary
 import Types.General (Lift, Reps, Weight)
+import Data.List (find)
 
 instance Binary SetType
 instance Binary Set
@@ -84,3 +85,17 @@ hasPR :: LiftSession -> Bool
 hasPR liftSession = 
     any ((== PR True) . setType)
     $ sets liftSession 
+
+
+liftSetType :: Lift -> Log -> Maybe SetType
+liftSetType lift' log =
+    sessionOfLift lift' log >>= firstSet >>= pure . setType
+
+sessionOfLift :: Lift -> Log -> Maybe LiftSession
+sessionOfLift lift' log =
+    find ((==lift') . lift) $ liftSessions log 
+
+firstSet :: LiftSession -> Maybe Set
+firstSet (LiftSession _ []) =   Nothing
+firstSet (LiftSession _ sets) = Just $ head sets
+

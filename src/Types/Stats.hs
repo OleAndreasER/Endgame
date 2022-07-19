@@ -51,15 +51,15 @@ testStats = Stats
     , bodyweight = 72.7
     }
 
-addWork :: Lift -> Stats -> Stats
-addWork = toLiftStats addWorkToLift
+addWork :: Int -> Lift -> Stats -> Stats
+addWork work = toLiftStats (addWorkToLift work)
 
-addWorkToLift :: LiftStats -> LiftStats
-addWorkToLift liftStats = liftStats
-    { liftCycle = increment $ liftCycle liftStats }
+addWorkToLift :: Int -> LiftStats -> LiftStats
+addWorkToLift work liftStats = liftStats
+    { liftCycle = addLength work $ liftCycle liftStats }
 
-increment :: CyclePosition -> CyclePosition
-increment (CyclePosition pos len) = CyclePosition (pos+1) (len+1)
+addLength :: Int -> CyclePosition -> CyclePosition
+addLength n (CyclePosition pos len) = CyclePosition pos (len+n)
 
 setPR :: Weight -> LiftStats -> LiftStats
 setPR newPr liftStats =

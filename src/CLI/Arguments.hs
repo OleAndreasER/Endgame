@@ -5,8 +5,9 @@ import FileHandling
 import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
-import Types.Log (Log, testLog, did, failLift)
-import Types.Stats (LiftStats, bodyweight, addWork, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight)
+import Types.Log as Log
+import Types.Stats as Stats (LiftStats, bodyweight, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight)
+import qualified Types.Stats as Stats (addWork)
 import CurrentLog 
 import Advance.Stats
 import NextLogs
@@ -110,8 +111,15 @@ handleArguments ["log", nStr, "fail", lift] =
     $ handleIfMsg (did lift) ("You didn't do "++lift)
     $ \log -> do
     readLogs >>= setLogs . (toElem log $ failLift lift)
-    readStats >>= setStats . addWork lift -- fix
-    putStrLn . formatLog . failLift lift $ log
+    let newLog = failLift lift log
+    putStrLn $ formatLog newLog
+
+    let setType = liftSetType lift newLog
+    case setType of
+        Nothing -> return ()
+        Just Work -> putStrLn "You can't fail a work set."
+        Just (PR True)  -> addWork (-1) lift
+        Just (PR False) -> addWork 1 lift
     
 
 handleArguments ["help"] =
@@ -180,3 +188,14 @@ updateLifts lift f =
     handleIfMsg (liftIsInStats lift) ("You don't do "++lift++".") (\_ -> do 
         readStats >>= setStats . (toLiftStats f lift)
         readStats >>= putStrLn . formatStats)
+
+addWork :: Int -> String -> IO ()
+addWork work lift = do
+    putStrLn workTxt
+    readStats >>= setStats . Stats.addWork work lift
+    where 
+        workTxt | work == 0 = ""
+                | work == 1  = "Added a work day to "++lift++"."
+                | work == -1 = "Removed a work day from "++lift++"."
+                | work > 1 = "Added "++show work++" work days to "++lift++"."
+                | work < -1 = "Removed "++show work++" work days from "++lift++"."

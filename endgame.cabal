@@ -41,7 +41,7 @@ executable endgame
                       Types.Stats,
                       Advance.Cycles,
                       Advance.PRs,
-                      Advance.Stats,
+                      Misc.Compose,
                       CurrentLog,
                       NextLogs,
                       FileHandling,

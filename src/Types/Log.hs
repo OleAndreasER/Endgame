@@ -7,6 +7,7 @@ import GHC.Generics (Generic)
 import Data.Binary
 import Types.General (Lift, Reps, Weight)
 import Data.List (find)
+import Data.Functor ((<&>))
 
 instance Binary SetType
 instance Binary Set
@@ -89,7 +90,8 @@ hasPR liftSession =
 
 liftSetType :: Lift -> Log -> Maybe SetType
 liftSetType lift' log =
-    sessionOfLift lift' log >>= firstSet >>= pure . setType
+    sessionOfLift lift' log >>= firstSet <&> setType
+    
 
 sessionOfLift :: Lift -> Log -> Maybe LiftSession
 sessionOfLift lift' log =

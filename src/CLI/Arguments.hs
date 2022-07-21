@@ -5,6 +5,7 @@ import FileHandling
 import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
+import Types.General as General (Weight)
 import Types.Log as Log
 import Types.Stats as Stats (LiftStats, bodyweight, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight)
 import qualified Types.Stats as Stats (addWork)
@@ -21,8 +22,7 @@ handleArguments ["next"] = do
 
 
 handleArguments ["next", logCountStr] =
-    handleIfInt logCountStr 
-    $ handleIf (> 0) 
+    ensurePositiveInt logCountStr
     $ \logCount -> do
     stats <- readStats
     program <- readProgram
@@ -31,8 +31,7 @@ handleArguments ["next", logCountStr] =
     
 
 handleArguments ["logs", logCountStr] =
-    handleIfInt logCountStr 
-    $ handleIf (> 0)
+    ensurePositiveInt logCountStr
     $ \logCount ->
     readLogs >>= putStrLn . latestLogs logCount . map formatLog
 
@@ -51,15 +50,14 @@ handleArguments ["add"] = do
 handleArguments ["lifts"] = readStats >>= putStrLn . formatStats
 
 handleArguments ["lifts", "pr", lift, weightStr] =
-    handleIfFloat weightStr
-    $ handleIf (>= 0)
+    ensureWeight weightStr
     $ \weight -> updateLifts lift $ setPR weight
 
 handleArguments ["lifts", "progression", lift, weightStr] =
-    handleIfFloat weightStr
-    $ handleIf (>= 0) 
+    ensureWeight weightStr
     $ \weight -> updateLifts lift $ setProgression weight
     
+--
 handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
     handleIfInt posStr
     $ handleIf (> 0) (\pos ->
@@ -79,8 +77,7 @@ handleArguments ["bw"] = readStats >>= putStrLn . (++ "kg") . show . bodyweight
 
 
 handleArguments ["bw", bodyweightStr] =
-    handleIfFloat bodyweightStr 
-    $ handleIf (>= 0) 
+    ensureWeight bodyweightStr
     $ \bw -> do
     readStats >>= setStats . \stats -> stats {bodyweight = bw}
     putStrLn ("Bodyweight: "++bodyweightStr++"kg")
@@ -97,15 +94,13 @@ handleArguments ["profile", profile] = do
 
 
 handleArguments ["log", nStr] = 
-    handleIfInt nStr 
-    $ handleIf (> 0)
+    ensurePositiveInt nStr
     $ withLog $ putStrLn . formatLog
 
 handleArguments ["log"] = handleArguments ["log", "1"]
 
 handleArguments ["log", nStr, "fail", lift] =
-    handleIfInt nStr
-    $ handleIf (> 0)
+    ensurePositiveInt nStr
     $ withLog 
     $ handleIfMsg (did lift) ("You didn't do "++lift)
     $ \log -> do
@@ -146,6 +141,7 @@ handleArguments _ = putStrLn invalidArgumentResponse
 
 invalidArgumentResponse = "Try 'endgame help'"
 
+--
 handleIfFloat :: String -> (Float -> IO ()) -> IO ()
 handleIfFloat str f = case readMaybe str :: Maybe Float of
     Nothing -> putStrLn invalidArgumentResponse 
@@ -163,6 +159,8 @@ handleIfMsg :: (a -> Bool) -> String -> (a -> IO ()) -> a -> IO ()
 handleIfMsg predicate msg f x
     | predicate x = f x 
     | otherwise   = putStrLn msg
+--
+
 
 latestLogs :: Int -> [String] -> String
 latestLogs n logs = unlines $ reverse $ take m logs
@@ -198,3 +196,37 @@ addWork work lift = do
                 | work == -1 = "Removed a work day from "++lift++"."
                 | work > 1 = "Added "++show work++" work days to "++lift++"."
                 | work < -1 = "Removed "++show work++" work days from "++lift++"."
+
+
+--Converting and then ensuring valid arguments.
+
+ensure :: Either String a -> (a -> IO ()) -> IO ()
+ensure (Right x) f    = f x   
+ensure (Left error) _ = putStrLn error
+
+readFloat :: String -> Either String Float
+readFloat str = case readMaybe str :: Maybe Float of
+    Just n  -> Right n
+    Nothing -> Left ("'"++str++ "' is not a number.")
+
+readInt :: String -> Either String Int
+readInt str = case readMaybe str :: Maybe Int of
+    Just n  -> Right n
+    Nothing -> Left ("'"++str++ "' is not an integer.")
+
+check :: Show a => (a -> Bool) -> String -> a -> Either String a
+check predicate whatXIsNot x = if predicate x
+    then Right x
+    else Left $ "'"++ show x ++ "' " ++ whatXIsNot
+
+ensureWeight :: String -> (Weight -> IO ()) -> IO ()
+ensureWeight str =
+    ensure $ readFloat str >>= check (>= 0) "can't be negative." 
+
+ensureNonNegativeInt :: String -> (Int -> IO ()) -> IO ()
+ensureNonNegativeInt str =
+    ensure $ readInt str >>= check (>= 0) "can't be negative."
+
+ensurePositiveInt :: String -> (Int -> IO ()) -> IO ()
+ensurePositiveInt str =
+    ensure $ readInt str >>= check (> 0) "must be positive."

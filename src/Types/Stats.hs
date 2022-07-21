@@ -1,4 +1,6 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE 
+    DeriveGeneric,
+    NamedFieldPuns #-}
 
 module Types.Stats where
 
@@ -94,3 +96,13 @@ statsOfLift stats lift' =
     head
     $ filter ((== lift') . lift)
     $ lifts stats    
+
+--Adds bodyweight back to a pr from a log, that has had it subtracted.
+accountForBodyweight :: Lift -> Weight -> Stats -> Weight
+accountForBodyweight lift' weight stats =
+    weight + addedWeight
+    where
+        LiftStats { isBodyweight } = statsOfLift stats lift'
+        addedWeight = if isBodyweight
+            then bodyweight stats
+            else 0

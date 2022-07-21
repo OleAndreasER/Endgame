@@ -22,4 +22,9 @@ liftPR (LiftSession { Log.lift, sets }) =
     (lift, weight $ head sets)
 
 setPRs :: Lift -> Weight -> Stats -> Stats
-setPRs lift pr = toLiftStats (setPR pr) lift
+setPRs lift pr stats = 
+    toLiftStats (setPR pr') lift stats
+    where
+        pr' = accountForBodyweight lift pr stats
+
+

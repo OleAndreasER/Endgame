@@ -59,12 +59,8 @@ handleArguments ["lifts", "progression", lift, weightStr] =
     
 --
 handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
-    handleIfInt posStr
-    $ handleIf (> 0) (\pos ->
-    handleIfInt lenStr
-    $ handleIf (> 0)
-    $ handleIfMsg (>= pos) "Cycle position out of bounds"
-    $ \len -> updateLifts lift (setCycle (pos-1) len))
+    ensureCycle posStr lenStr
+    $ \pos len -> updateLifts lift $ setCycle (pos-1) len
 
 handleArguments ["lifts", "toggle-bodyweight", lift] =
     updateLifts lift toggleBodyweight
@@ -191,11 +187,11 @@ addWork work lift = do
     putStrLn workTxt
     readStats >>= setStats . Stats.addWork work lift
     where 
-        workTxt | work == 0 = ""
+        workTxt | work == 0  = ""
                 | work == 1  = "Added a work day to "++lift++"."
                 | work == -1 = "Removed a work day from "++lift++"."
-                | work > 1 = "Added "++show work++" work days to "++lift++"."
-                | work < -1 = "Removed "++show work++" work days from "++lift++"."
+                | work > 1   = "Added "++show work++" work days to "++lift++"."
+                | work < -1  = "Removed "++show work++" work days from "++lift++"."
 
 
 --Converting and then ensuring valid arguments.
@@ -207,17 +203,17 @@ ensure (Left error) _ = putStrLn error
 readFloat :: String -> Either String Float
 readFloat str = case readMaybe str :: Maybe Float of
     Just n  -> Right n
-    Nothing -> Left ("'"++str++ "' is not a number.")
+    Nothing -> Left $ "'"++str++"' is not a number."
 
 readInt :: String -> Either String Int
 readInt str = case readMaybe str :: Maybe Int of
     Just n  -> Right n
-    Nothing -> Left ("'"++str++ "' is not an integer.")
+    Nothing -> Left $ "'"++str++"' is not an integer."
 
 check :: Show a => (a -> Bool) -> String -> a -> Either String a
-check predicate whatXIsNot x = if predicate x
+check predicate aboutX x = if predicate x
     then Right x
-    else Left $ "'"++ show x ++ "' " ++ whatXIsNot
+    else Left $ "'"++ show x ++"' "++ aboutX 
 
 ensureWeight :: String -> (Weight -> IO ()) -> IO ()
 ensureWeight str =
@@ -230,3 +226,15 @@ ensureNonNegativeInt str =
 ensurePositiveInt :: String -> (Int -> IO ()) -> IO ()
 ensurePositiveInt str =
     ensure $ readInt str >>= check (> 0) "must be positive."
+
+ensureCycle :: String -> String -> (Int -> Int -> IO ()) -> IO ()
+ensureCycle posStr lenStr f =
+    ensurePositiveInt posStr $ \pos ->
+    ensurePositiveInt lenStr $ \len ->
+    ensure (check (<= len) outOfBounds pos)
+    $ \pos' -> f pos' len
+    where 
+        outOfBounds =
+            "is larger than '"++lenStr++"'. Meaning it's out of the cycle's bounds."
+    
+

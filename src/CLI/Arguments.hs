@@ -20,20 +20,17 @@ handleArguments ["next"] = do
     program <- readProgram
     putStrLn . formatLog $ nextLog stats program "Next:"
 
-
-handleArguments ["next", logCountStr] =
-    ensurePositiveInt logCountStr
-    $ \logCount -> do
+handleArguments ["next", nStr] =
+    ensurePositiveInt nStr $ \n -> do
     stats <- readStats
     program <- readProgram
-    let logs = take logCount $ nextLogs stats program
+    let logs = take n $ nextLogs stats program
     putStrLn $ unlines $ reverse $ map formatLog logs
     
 
-handleArguments ["logs", logCountStr] =
-    ensurePositiveInt logCountStr
-    $ \logCount ->
-    readLogs >>= putStrLn . latestLogs logCount . map formatLog
+handleArguments ["logs", nStr] =
+    ensurePositiveInt nStr $ \n ->
+    readLogs >>= putStrLn . unlines . map formatLog . reverse . take n
 
 handleArguments ["logs"] = handleArguments ["logs", "1"]
 
@@ -73,8 +70,7 @@ handleArguments ["bw"] = readStats >>= putStrLn . (++ "kg") . show . bodyweight
 
 
 handleArguments ["bw", bodyweightStr] =
-    ensureWeight bodyweightStr
-    $ \bw -> do
+    ensureWeight bodyweightStr $ \bw -> do
     readStats >>= setStats . \stats -> stats {bodyweight = bw}
     putStrLn ("Bodyweight: "++bodyweightStr++"kg")
    
@@ -134,11 +130,6 @@ handleArguments _ = putStrLn invalidArgumentResponse
 
 invalidArgumentResponse = "Try 'endgame help'"
 
-
-latestLogs :: Int -> [String] -> String
-latestLogs n logs = unlines $ reverse $ take m logs
-    where m = min n $ length logs
-
 --Applies f to the first instance of y in a list
 toElem :: Eq a => a -> (a -> a) -> [a] -> [a]
 toElem y f (x:xs)
@@ -195,7 +186,6 @@ getLog logs n = if n > length logs
     then Left ("There are only "++(show $ length logs)++" logs.")
     else Right $ logs !! (n-1)
 
-
 ensureWeight :: String -> (Weight -> IO ()) -> IO ()
 ensureWeight str =
     ensure $ readFloat str >>= check (>= 0) "can't be negative." 
@@ -217,7 +207,6 @@ ensureCycle posStr lenStr f =
     where 
         outOfBounds =
             "is larger than '"++lenStr++"'. Meaning it's out of the cycle's bounds."
-
 
 ensureLog :: String -> (Log -> IO ()) -> IO ()
 ensureLog nStr f = do

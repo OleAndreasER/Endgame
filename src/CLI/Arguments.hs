@@ -53,7 +53,6 @@ handleArguments ["lifts", "progression", lift, weightStr] =
     ensureWeight weightStr
     $ \weight -> updateLifts lift $ setProgression weight
     
---
 handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
     ensureCycle posStr lenStr
     $ \pos len -> updateLifts lift $ setCycle (pos-1) len

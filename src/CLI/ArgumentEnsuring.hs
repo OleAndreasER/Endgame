@@ -8,8 +8,7 @@ import Text.Read (readMaybe)
 --Converting and then ensuring valid arguments.
 
 ensure :: Either String a -> (a -> IO ()) -> IO ()
-ensure (Right x) f    = f x   
-ensure (Left error) _ = putStrLn error
+ensure x f = either putStrLn f x
 
 readFloat :: String -> Either String Float
 readFloat str = case readMaybe str :: Maybe Float of

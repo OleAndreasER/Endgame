@@ -90,17 +90,14 @@ handleArguments ["profile", profile] = do
 
 
 handleArguments ["log", nStr] = 
-    ensurePositiveInt nStr
-    $ withLog $ putStrLn . formatLog
+    ensureLog nStr $ putStrLn . formatLog
 
 handleArguments ["log"] = handleArguments ["log", "1"]
 
 handleArguments ["log", nStr, "fail", lift] =
-    ensurePositiveInt nStr
-    $ withLog 
-    $ handleIfMsg (did lift) ("You didn't do "++lift)
-    $ \log -> do
+    ensureLog nStr $ \log -> do
     readLogs >>= setLogs . (toElem log $ failLift lift)
+
     let newLog = failLift lift log
     putStrLn $ formatLog newLog
 
@@ -215,6 +212,12 @@ check predicate aboutX x = if predicate x
     then Right x
     else Left $ "'"++ show x ++"' "++ aboutX 
 
+getLog :: [Log] -> Int -> Either String Log
+getLog logs n = if n > length logs
+    then Left ("There are only "++(show $ length logs)++" logs.")
+    else Right $ logs !! (n-1)
+
+
 ensureWeight :: String -> (Weight -> IO ()) -> IO ()
 ensureWeight str =
     ensure $ readFloat str >>= check (>= 0) "can't be negative." 
@@ -236,5 +239,12 @@ ensureCycle posStr lenStr f =
     where 
         outOfBounds =
             "is larger than '"++lenStr++"'. Meaning it's out of the cycle's bounds."
+
+
+ensureLog :: String -> (Log -> IO ()) -> IO ()
+ensureLog nStr f = do
+    logs <- readLogs
+    ensure (readInt nStr >>= check (> 0) "must be positive." >>= getLog logs) f
+
     
 

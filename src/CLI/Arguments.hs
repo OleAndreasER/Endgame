@@ -134,37 +134,10 @@ handleArguments _ = putStrLn invalidArgumentResponse
 
 invalidArgumentResponse = "Try 'endgame help'"
 
---
-handleIfFloat :: String -> (Float -> IO ()) -> IO ()
-handleIfFloat str f = case readMaybe str :: Maybe Float of
-    Nothing -> putStrLn invalidArgumentResponse 
-    Just x  -> f x
-
-handleIfInt :: String -> (Int -> IO ()) -> IO ()
-handleIfInt str f = case readMaybe str :: Maybe Int of
-    Nothing -> putStrLn invalidArgumentResponse 
-    Just x  -> f x
-
-handleIf :: (a -> Bool) -> (a -> IO ()) -> a -> IO ()
-handleIf predicate = handleIfMsg predicate invalidArgumentResponse
-
-handleIfMsg :: (a -> Bool) -> String -> (a -> IO ()) -> a -> IO ()
-handleIfMsg predicate msg f x
-    | predicate x = f x 
-    | otherwise   = putStrLn msg
---
-
 
 latestLogs :: Int -> [String] -> String
 latestLogs n logs = unlines $ reverse $ take m logs
     where m = min n $ length logs
-
-withLog :: (Log -> IO ()) -> Int -> IO ()
-withLog f n = do
-    logs <- readLogs    
-    if n > length logs
-        then putStrLn ("There are only "++(show $ length logs)++" logs")
-        else f $ logs !! (n-1)
 
 --Applies f to the first instance of y in a list
 toElem :: Eq a => a -> (a -> a) -> [a] -> [a]
@@ -173,11 +146,16 @@ toElem y f (x:xs)
     | otherwise = x : toElem y f xs
 
 updateLifts :: String -> (LiftStats -> LiftStats) -> IO ()
-updateLifts lift f =
-    readStats >>=
-    handleIfMsg (liftIsInStats lift) ("You don't do "++lift++".") (\_ -> do 
-        readStats >>= setStats . (toLiftStats f lift)
-        readStats >>= putStrLn . formatStats)
+updateLifts lift f = do
+    stats <- readStats
+    if liftIsInStats lift stats
+    then do
+        let newStats = toLiftStats f lift stats
+        setStats newStats
+        putStrLn $ formatStats newStats
+    else
+        putStrLn $ "You don't do "++lift++"."
+
 
 addWork :: Int -> String -> IO ()
 addWork work lift = do
@@ -245,6 +223,3 @@ ensureLog :: String -> (Log -> IO ()) -> IO ()
 ensureLog nStr f = do
     logs <- readLogs
     ensure (readInt nStr >>= check (> 0) "must be positive." >>= getLog logs) f
-
-    
-

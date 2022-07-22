@@ -35,6 +35,7 @@ executable endgame
                       CLI.StatsFormat,
                       CLI.SetupStats,
                       CLI.Input,
+                      CLI.ArgumentEnsuring,
                       Types.General,
                       Types.Program,
                       Types.Log,

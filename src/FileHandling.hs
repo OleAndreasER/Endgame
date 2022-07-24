@@ -3,8 +3,8 @@ module FileHandling where
 import System.Directory (createDirectoryIfMissing, getAppUserDataDirectory)
 import Data.Binary
 import Types.Program (Program)
-import Types.Log (Log, testLog)
-import Types.Stats (Stats, testStats)
+import Types.Log (Log)
+import Types.Stats (Stats)
 import FirstStatsOfProgram
 import CLI.SetupStats
 
@@ -16,7 +16,7 @@ readFromProfile :: Binary a => String -> IO a
 readFromProfile file = do
     profile <- getProfile
     appPath' <- appPath
-    decodeFile (appPath'++"/profiles/"++profile++"/"++file)
+    decodeFile $ appPath'++"/profiles/"++profile++"/"++file
 
 setInProfile :: Binary a => String -> a -> IO ()
 setInProfile file x = do
@@ -38,7 +38,6 @@ setLogs = setInProfile "logs.txt"
 setProgram :: Program -> IO ()
 setProgram = setInProfile "program.txt"
 
-
 readStats :: IO Stats
 readStats = readFromProfile "stats.txt"
 
@@ -48,7 +47,6 @@ readLogs = readFromProfile "logs.txt"
 readProgram :: IO Program
 readProgram = readFromProfile "program.txt"
 
-
 addProgram :: String -> Program -> IO ()
 addProgram name program = do 
     appPath' <- appPath
@@ -57,7 +55,7 @@ addProgram name program = do
 readStandardProgram :: String -> IO Program
 readStandardProgram programName = do
     appPath' <- appPath
-    decodeFile (appPath'++"/programs/"++programName++".txt")
+    decodeFile $ appPath'++"/programs/"++programName++".txt"
 
 --A profile contains training logs, stats and program. 
 createProfile :: String -> String -> IO ()
@@ -74,11 +72,6 @@ createProfile profile programName = do
     setStats $ firstStatsOfProgram program
     readStats >>= setupStats >>= setStats
 
-
-
-
-    
-
 setProfile :: String -> IO ()
 setProfile profile = do 
     appPath' <- appPath
@@ -87,4 +80,4 @@ setProfile profile = do
 getProfile :: IO String
 getProfile = do 
     appPath' <- appPath
-    readFile (appPath'++"/profile.txt")
+    readFile $ appPath'++"/profile.txt"

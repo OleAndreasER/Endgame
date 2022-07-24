@@ -31,16 +31,19 @@ getLog logs n = if n > length logs
     else Right $ logs !! (n-1)
 
 ensureWeight :: String -> (Weight -> IO ()) -> IO ()
-ensureWeight str =
-    ensure $ readFloat str >>= check (>= 0) "can't be negative." 
+ensureWeight str = ensure 
+    $ readFloat str
+    >>= check (>= 0) "can't be negative." 
 
 ensureNonNegativeInt :: String -> (Int -> IO ()) -> IO ()
-ensureNonNegativeInt str =
-    ensure $ readInt str >>= check (>= 0) "can't be negative."
+ensureNonNegativeInt str = ensure
+    $ readInt str
+    >>= check (>= 0) "can't be negative."
 
 ensurePositiveInt :: String -> (Int -> IO ()) -> IO ()
-ensurePositiveInt str =
-    ensure $ readInt str >>= check (> 0) "must be positive."
+ensurePositiveInt str = ensure
+    $ readInt str
+    >>= check (> 0) "must be positive."
 
 ensureCycle :: String -> String -> (Int -> Int -> IO ()) -> IO ()
 ensureCycle posStr lenStr f =
@@ -48,9 +51,9 @@ ensureCycle posStr lenStr f =
     ensurePositiveInt lenStr $ \len ->
     ensure (check (<= len) outOfBounds pos)
     $ \pos' -> f pos' len
-    where 
-        outOfBounds =
-            "is larger than '"++lenStr++"'. Meaning it's out of the cycle's bounds."
+  where 
+    outOfBounds =
+        "is larger than '"++lenStr++"'. Meaning it's out of the cycle's bounds."
 
 ensureLog :: String -> (Log -> IO ()) -> IO ()
 ensureLog nStr f = do

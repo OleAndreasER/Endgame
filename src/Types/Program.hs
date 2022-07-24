@@ -1,7 +1,5 @@
-{-# LANGUAGE 
-    DeriveGeneric,
-    NamedFieldPuns 
-#-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Types.Program where
 import GHC.Generics (Generic)
@@ -41,11 +39,9 @@ data LiftCycle = LiftCycle
 
 
 cycleOfLift :: Lift -> Program -> LiftCycle
-cycleOfLift lift' program =
-    head
+cycleOfLift lift' program = head
     $ filter ((lift' ==) . lift)
     $ liftCycles program
-
 
 sessions :: LiftCycle -> [[Set]]
 sessions (LiftCycle { prSession, workSessionCycle }) =

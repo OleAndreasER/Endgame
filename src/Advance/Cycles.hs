@@ -26,8 +26,11 @@ advanceLiftStats liftStats@(LiftStats { liftCycle }) = liftStats
 
 advanceLiftGroups :: Stats -> Stats
 advanceLiftGroups stats@(Stats { liftGroupPositions }) = stats
-    { liftGroupPositions = map advanceCyclePosition $ liftGroupPositions }
+    { liftGroupPositions =
+        map advanceCyclePosition liftGroupPositions
+    }
 
 advanceCyclePosition :: CyclePosition -> CyclePosition
-advanceCyclePosition cyclePosition@(CyclePosition { position, Stats.length }) = 
-    cyclePosition { position = (position + 1) `mod` length }
+advanceCyclePosition
+    cyclePosition@(CyclePosition { position, Stats.length })
+  = cyclePosition { position = (position + 1) `mod` length }

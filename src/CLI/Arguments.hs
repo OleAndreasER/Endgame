@@ -61,18 +61,14 @@ handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
 handleArguments ["lifts", "toggle-bodyweight", lift] =
     updateLifts lift toggleBodyweight
 
-
 handleArguments ["program"] = readProgram >>= putStrLn . formatProgram
 
-
 handleArguments ["bw"] = readStats >>= putStrLn . (++ "kg") . show . bodyweight 
-
 
 handleArguments ["bw", bodyweightStr] =
     ensureWeight bodyweightStr $ \bw -> do
     readStats >>= setStats . \stats -> stats {bodyweight = bw}
     putStrLn ("Bodyweight: "++bodyweightStr++"kg")
-   
 
 handleArguments ["profile", "new"] = do
     putStrLn "Profile name:"
@@ -82,7 +78,6 @@ handleArguments ["profile", "new"] = do
 handleArguments ["profile", profile] = do
     setProfile profile
     putStrLn ("Profile: "++profile)
-
 
 handleArguments ["log", nStr] = 
     ensureLog nStr $ putStrLn . formatLog
@@ -102,7 +97,6 @@ handleArguments ["log", nStr, "fail", lift] =
         Just Work -> putStrLn "You can't fail a work set."
         Just (PR True)  -> unfailLift lift
         Just (PR False) -> CLI.Arguments.failLift lift
-    
 
 handleArguments ["help"] =
     putStrLn "Get started by creating a profile:\n\
@@ -139,13 +133,12 @@ updateLifts :: String -> (LiftStats -> LiftStats) -> IO ()
 updateLifts lift f = do
     stats <- readStats
     if liftIsInStats lift stats
-    then do
-        let newStats = toLiftStats f lift stats
-        setStats newStats
-        putStrLn $ formatStats newStats
-    else
-        putStrLn $ "You don't do "++lift++"."
-
+        then do
+            let newStats = toLiftStats f lift stats
+            setStats newStats
+            putStrLn $ formatStats newStats
+        else
+            putStrLn $ "You don't do "++lift++"."
 
 failLift :: Lift -> IO ()
 failLift = addWork (-1)
@@ -157,10 +150,10 @@ addWork :: Int -> Lift -> IO ()
 addWork work lift = do
     putStrLn workTxt
     readStats >>= setStats . Stats.addWork work lift
-    where 
-        workTxt | work == 0  = ""
-                | work == 1  = "Added a work day to "++lift++"."
-                | work == -1 = "Removed a work day from "++lift++"."
-                | work > 1   = "Added "++show work++" work days to "++lift++"."
-                | work < -1  = "Removed "++show work++" work days from "++lift++"."
-
+  where 
+    workTxt 
+        | work == 0  = ""
+        | work == 1  = "Added a work day to "++lift++"."
+        | work == -1 = "Removed a work day from "++lift++"."
+        | work > 1   = "Added "++show work++" work days to "++lift++"."
+        | work < -1  = "Removed "++show work++" work days from "++lift++"."

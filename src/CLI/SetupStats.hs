@@ -22,8 +22,9 @@ setupLift liftStats = do
     putStrLn $ "-"++ lift liftStats ++ ": " 
     pr' <- getWeight "Starting PR weight: "
     progression' <- getWeight "Progression increment: "
-    isBodyweight' <- getBool "Should your bodyweight be subtracted from the weight?\n\
-                             \This is mainly for weighted chins, rows etc. (y/n)"
+    isBodyweight' <- getBool
+        "Should your bodyweight be subtracted from the weight?\n\
+        \This is mainly for weighted chins, rows etc. (y/n)"
     return $ liftStats 
         { pr = pr' 
         , progression = progression'

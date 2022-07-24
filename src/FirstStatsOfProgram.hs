@@ -8,15 +8,15 @@ import qualified Types.Program as Program
 
 firstStatsOfProgram :: Program -> Stats
 firstStatsOfProgram (Program liftGroupCycles liftCycles) = Stats
-    { liftGroupPositions = map liftGroupPosition liftGroupCycles 
+    { liftGroupPositions =
+        map liftGroupPosition liftGroupCycles 
     , lifts = map liftStats liftCycles
-    , bodyweight = 0 }
-
+    , bodyweight = 0
+    }
 
 liftGroupPosition :: LiftGroupCycle -> CyclePosition
 liftGroupPosition liftGroupCycle =
     CyclePosition 0 $ Prelude.length liftGroupCycle
-
 
 liftStats :: LiftCycle -> LiftStats
 liftStats liftCycle = LiftStats
@@ -24,4 +24,5 @@ liftStats liftCycle = LiftStats
     , progression = 1.25
     , pr = 0 
     , liftCycle = CyclePosition 0 1 
-    , isBodyweight = False }
+    , isBodyweight = False
+    }

@@ -54,6 +54,7 @@ executable endgame
     build-depends:    base ^>=4.16.0.0,
                       directory ^>=1.3.6.2,
                       split ^>=0.2.3.4,
-                      binary ^>=0.8.9.0
+                      binary ^>=0.8.9.0,
+                      yjtools ^>=0.9.18 
     hs-source-dirs:   app, src
     default-language: Haskell2010

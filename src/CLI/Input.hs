@@ -2,6 +2,7 @@ module CLI.Input where
 
 import Text.Read (readMaybe)
 import Types.General
+import Control.Monad ((<=<))
 
 getWeight :: String -> IO Weight
 getWeight = input readWeight "Invalid weight"
@@ -20,7 +21,7 @@ input readMaybe' error prompt = do
         Just x  -> return x
 
 readWeight :: String -> Maybe Weight 
-readWeight str = readMaybe str >>= maybeIf (>= 0)
+readWeight = maybeIf (>= 0) <=< readMaybe 
 
 readBool :: String -> Maybe Bool
 readBool "y" = Just True

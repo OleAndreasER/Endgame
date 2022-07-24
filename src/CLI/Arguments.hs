@@ -7,6 +7,7 @@ import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
 import Types.Log as Log
+import Types.General 
 import Types.Stats as Stats (LiftStats, bodyweight, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight)
 import qualified Types.Stats as Stats (addWork)
 import CurrentLog 
@@ -90,17 +91,17 @@ handleArguments ["log"] = handleArguments ["log", "1"]
 
 handleArguments ["log", nStr, "fail", lift] =
     ensureLog nStr $ \log -> do
-    readLogs >>= setLogs . (toElem log $ failLift lift)
+    readLogs >>= setLogs . (toElem log $ Log.failLift lift)
 
-    let newLog = failLift lift log
+    let newLog = Log.failLift lift log
     putStrLn $ formatLog newLog
 
     let setType = liftSetType lift newLog
     case setType of
         Nothing -> return ()
         Just Work -> putStrLn "You can't fail a work set."
-        Just (PR True)  -> addWork (-1) lift
-        Just (PR False) -> addWork 1 lift
+        Just (PR True)  -> unfailLift lift
+        Just (PR False) -> CLI.Arguments.failLift lift
     
 
 handleArguments ["help"] =
@@ -146,7 +147,13 @@ updateLifts lift f = do
         putStrLn $ "You don't do "++lift++"."
 
 
-addWork :: Int -> String -> IO ()
+failLift :: Lift -> IO ()
+failLift = addWork (-1)
+
+unfailLift :: Lift -> IO ()
+unfailLift = addWork 1
+
+addWork :: Int -> Lift -> IO ()
 addWork work lift = do
     putStrLn workTxt
     readStats >>= setStats . Stats.addWork work lift

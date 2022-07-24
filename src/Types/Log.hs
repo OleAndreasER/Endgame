@@ -90,12 +90,12 @@ hasPR liftSession =
 
 
 liftSetType :: Lift -> Log -> Maybe SetType
-liftSetType lift' = setType <.> firstSet <=< sessionOfLift lift'
+liftSetType lift = setType <.> firstSet <=< sessionOfLift lift
     
 
 sessionOfLift :: Lift -> Log -> Maybe LiftSession
 sessionOfLift lift' log =
-    find ((==lift') . lift) $ liftSessions log 
+    find ((lift' ==) . lift) $ liftSessions log 
 
 firstSet :: LiftSession -> Maybe Set
 firstSet (LiftSession _ []) =   Nothing

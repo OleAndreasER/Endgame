@@ -10,8 +10,8 @@ import CLI.Input
 setupStats :: Stats -> IO Stats
 setupStats stats = do
     bw <- getWeight "Your bodyweight will get subtracted from weighted bodyweight exercises.\n\
-                     \Remember to update it frequently if you do any of those.\n\
-                     \Bodyweight: "
+                    \Remember to update it frequently if you do any of those.\n\
+                    \Bodyweight: "
     setupLifts <- sequence $ map setupLift $ lifts stats
     return $ stats
         { lifts = setupLifts

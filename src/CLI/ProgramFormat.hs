@@ -14,7 +14,8 @@ formatLiftGroupCycles :: [LiftGroupCycle] -> String
 formatLiftGroupCycles cycles = 
     (++) "Lift group cycles:\n"
     $ unlines 
-    $ map formatLiftGroupCycle cycles
+    $ formatLiftGroupCycle
+    <$> cycles
 
 formatSet :: Set -> String
 formatSet (Set reps percent setType) =
@@ -34,13 +35,14 @@ formatSession :: [Set] -> String
 formatSession sets =
     (++) " - "
     $ intercalate "\n           "
-    $ map formatSetGroup
-    $ group sets
+    $ formatSetGroup
+    <$> group sets
 
 formatSessionCycle :: [[Set]] -> String
 formatSessionCycle cycle =
     intercalate "\n        "
-    $ map formatSession cycle
+    $ formatSession 
+    <$> cycle
 
 formatLiftCycle :: LiftCycle -> String
 formatLiftCycle cycle =
@@ -48,12 +50,13 @@ formatLiftCycle cycle =
   where 
     liftStr = lift cycle
     prStr =
-        "    PR  " ++ (formatSession . prSession) cycle
+        "    PR  " ++ (formatSession
+        . prSession) cycle
     workStr =
-        "    Work" ++ (formatSessionCycle . workSessionCycle) cycle
+        "    Work" ++ (formatSessionCycle
+        . workSessionCycle) cycle
 
 formatProgram :: Program -> String
 formatProgram (Program liftGroupCycles liftCycles) = 
-    (++) 
-        (formatLiftGroupCycles liftGroupCycles++"\n")
-        (concat $ map formatLiftCycle liftCycles)
+    formatLiftGroupCycles liftGroupCycles++"\n"
+    ++ concatMap formatLiftCycle liftCycles

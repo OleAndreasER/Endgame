@@ -1,6 +1,10 @@
 module FileHandling where
 
-import System.Directory (createDirectoryIfMissing, getAppUserDataDirectory)
+import System.Directory 
+    ( createDirectoryIfMissing
+    , getAppUserDataDirectory
+    , listDirectory
+    )
 import Data.Binary
 import Types.Program (Program)
 import Types.Log (Log)
@@ -76,7 +80,12 @@ setProfile :: String -> IO ()
 setProfile profile = do 
     appPath' <- appPath
     writeFile (appPath'++"/profile.txt") profile
-    
+
+getProfiles :: IO [String]
+getProfiles = do
+    appPath' <- appPath
+    listDirectory $ appPath'++"/profiles/"
+
 getProfile :: IO String
 getProfile = do 
     appPath' <- appPath

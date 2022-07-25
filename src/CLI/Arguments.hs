@@ -76,8 +76,13 @@ handleArguments ["profile", "new"] = do
     createProfile name "everyotherday"
 
 handleArguments ["profile", profile] = do
-    setProfile profile
-    putStrLn ("Profile: "++profile)
+    isProfile <- elem profile <$> getProfiles
+    if isProfile
+    then do
+        setProfile profile
+        putStrLn $ "Profile: "++profile
+    else
+        putStrLn $ "There is no profile called "++profile
 
 handleArguments ["log", nStr] = 
     ensureLog nStr $ putStrLn . formatLog

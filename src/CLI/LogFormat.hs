@@ -8,7 +8,6 @@ formatLog log =
 
 formatLiftSessions :: [LiftSession] -> String
 formatLiftSessions liftSessions = unlines
-    $ map ("    " ++)
     $ foldr (++) []
     $ map formatLiftSession
     $ liftSessions

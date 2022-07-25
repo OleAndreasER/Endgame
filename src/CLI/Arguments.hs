@@ -73,7 +73,11 @@ handleArguments ["bw", bodyweightStr] =
 handleArguments ["profile", "new"] = do
     putStrLn "Profile name:"
     name <- getLine
-    createProfile name "everyotherday"
+    isProfile <- elem name <$> getProfiles
+    if isProfile
+    then putStrLn $ "There is already a profile named '"++name++"'."
+    else createProfile name "everyotherday"
+    
 
 handleArguments ["profile", profile] = do
     isProfile <- elem profile <$> getProfiles
@@ -82,7 +86,7 @@ handleArguments ["profile", profile] = do
         setProfile profile
         putStrLn $ "Profile: "++profile
     else
-        putStrLn $ "There is no profile called "++profile
+        putStrLn $ "There is no profile called '"++profile++"'."
 
 handleArguments ["log", nStr] = 
     ensureLog nStr $ putStrLn . formatLog

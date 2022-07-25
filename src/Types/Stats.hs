@@ -51,6 +51,13 @@ setPR :: Weight -> LiftStats -> LiftStats
 setPR newPr liftStats = liftStats
     { pr = newPr }
 
+addProgressions :: Int -> LiftStats -> LiftStats
+addProgressions n liftStats = liftStats
+    { pr =
+        pr liftStats 
+        + (fromIntegral n * progression liftStats)
+    }
+
 setProgression :: Weight -> LiftStats -> LiftStats
 setProgression newProgression liftStats = liftStats
     { progression = newProgression }

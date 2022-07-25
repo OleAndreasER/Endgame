@@ -8,7 +8,7 @@ import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
 import Types.Log as Log
 import Types.General 
-import Types.Stats as Stats (LiftStats, bodyweight, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight)
+import Types.Stats as Stats (LiftStats, bodyweight, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight, addProgressions)
 import qualified Types.Stats as Stats (addWork)
 import CurrentLog 
 import NextLogs
@@ -133,18 +133,24 @@ updateLifts :: String -> (LiftStats -> LiftStats) -> IO ()
 updateLifts lift f = do
     stats <- readStats
     if liftIsInStats lift stats
-        then do
-            let newStats = toLiftStats f lift stats
-            setStats newStats
-            putStrLn $ formatStats newStats
-        else
-            putStrLn $ "You don't do "++lift++"."
+    then do
+        let newStats = toLiftStats f lift stats
+        setStats newStats
+        putStrLn $ formatStats newStats
+    else
+        putStrLn $ "You don't do "++lift++"."
 
 failLift :: Lift -> IO ()
-failLift = addWork (-1)
+failLift lift = do
+    updateLifts lift (addProgressions (-2))
+    putStrLn $ "Subtracted 2 progression's worth of weight from "++lift++"'s PR."
+    addWork (-1) lift
 
 unfailLift :: Lift -> IO ()
-unfailLift = addWork 1
+unfailLift lift = do
+    updateLifts lift (addProgressions 2)
+    putStrLn $ "Added back 2 progression's worth of weight to "++lift++"'s PR."
+    addWork 1 lift
 
 addWork :: Int -> Lift -> IO ()
 addWork work lift = do

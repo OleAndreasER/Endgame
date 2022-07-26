@@ -5,24 +5,16 @@ import Types.Stats as Stats
 import Types.Log as Log
 import Types.General as General
 
-advancePRs :: Log -> Stats -> Stats
-advancePRs log stats = foldr ($) stats
-    $ map (uncurry $ setPRs)
-    $ prLifts log
-
-prLifts :: Log -> [(Lift, Weight)]
-prLifts log = map liftPR
+prLifts :: Log -> [Lift]
+prLifts log =
+    map Log.lift
     $ filter hasPR
     $ liftSessions log
 
-liftPR :: LiftSession -> (Lift, Weight)
-liftPR (LiftSession { Log.lift, sets }) =
-    ( lift
-    , weight $ head sets
-    )
+setPRs :: Lift -> Stats -> Stats
+setPRs = toLiftStats (addProgressions 1)
 
-setPRs :: Lift -> Weight -> Stats -> Stats
-setPRs lift pr stats = 
-    toLiftStats (setPR pr') lift stats
-  where
-    pr' = accountForBodyweight lift pr stats
+advancePRs :: Log -> Stats -> Stats
+advancePRs log stats = 
+    foldr setPRs stats
+    $ prLifts log

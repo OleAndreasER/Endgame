@@ -76,7 +76,7 @@ handleArguments ["profile", "new"] = do
     isProfile <- elem name <$> getProfiles
     if isProfile
     then putStrLn $ "There is already a profile named '"++name++"'."
-    else createProfile name "everyotherday"
+    else createProfile name
 
 handleArguments ["profile", profile] = do
     isProfile <- elem profile <$> getProfiles

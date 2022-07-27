@@ -11,6 +11,7 @@ import Types.Log (Log)
 import Types.Stats (Stats)
 import FirstStatsOfProgram
 import CLI.SetupStats
+import Data.Functor ((<&>))
 
 
 appPath :: IO FilePath
@@ -19,14 +20,14 @@ appPath = getAppUserDataDirectory "endgame"
 readFromProfile :: Binary a => String -> IO a
 readFromProfile file = do
     profile <- getProfile
-    appPath' <- appPath
-    decodeFile $ appPath'++"/profiles/"++profile++"/"++file
+    filePath <- appPath <&> (++"/profiles/"++profile++"/"++file)
+    decodeFile filePath
 
 setInProfile :: Binary a => String -> a -> IO ()
 setInProfile file x = do
     profile <- getProfile  
-    appPath' <- appPath
-    encodeFile (appPath'++"/profiles/"++profile++"/"++file) x
+    filePath <- appPath <&> (++"/profiles/"++profile++"/"++file)
+    encodeFile filePath x
 
 addLog :: Log -> IO ()
 addLog log = do
@@ -53,40 +54,34 @@ readProgram = readFromProfile "program.txt"
 
 addProgram :: String -> Program -> IO ()
 addProgram name program = do 
-    appPath' <- appPath
-    encodeFile (appPath'++"/programs/"++name++".txt") program
+    filePath <- appPath <&> (++ "/programs/"++name++".txt") 
+    encodeFile filePath program
 
 readStandardProgram :: String -> IO Program
-readStandardProgram programName = do
-    appPath' <- appPath
-    decodeFile $ appPath'++"/programs/"++programName++".txt"
+readStandardProgram programName =
+    appPath <&> (++ "/programs/"++programName++".txt") >>= decodeFile
 
 --A profile contains training logs, stats and program. 
-createProfile :: String -> String -> IO ()
-createProfile profile programName = do
-    appPath' <- appPath
-    let directory = appPath'++"/profiles/"++profile
+createProfile :: String -> IO ()
+createProfile profile = do
+    directory <- appPath <&> (++"/profiles/"++profile)
 
     createDirectoryIfMissing True directory
     setProfile profile
 
-    program <- readStandardProgram programName --fix
+    program <- readStandardProgram "everyotherday"
     setProgram program
     setLogs ([] :: [Log])
     setStats $ firstStatsOfProgram program
     readStats >>= setupStats >>= setStats
 
 setProfile :: String -> IO ()
-setProfile profile = do 
-    appPath' <- appPath
-    writeFile (appPath'++"/profile.txt") profile
+setProfile profile = do
+    filePath <- appPath <&> (++ "/profile.txt")
+    writeFile filePath profile
 
 getProfiles :: IO [String]
-getProfiles = do
-    appPath' <- appPath
-    listDirectory $ appPath'++"/profiles/"
+getProfiles = appPath <&> (++ "/profiles/") >>= listDirectory
 
 getProfile :: IO String
-getProfile = do 
-    appPath' <- appPath
-    readFile $ appPath'++"/profile.txt"
+getProfile = appPath <&> (++ "/profile.txt") >>= readFile

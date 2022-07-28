@@ -6,9 +6,8 @@ import Data.List (group, intercalate)
 
 formatLiftGroupCycle :: LiftGroupCycle -> String
 formatLiftGroupCycle lifts =
-    unwords
-    (map ("-> " ++) lifts)
-    ++ " ->" 
+    (++) "-> "
+    $ unwords $ map (++ " ->") lifts
 
 formatLiftGroupCycles :: [LiftGroupCycle] -> String
 formatLiftGroupCycles cycles = 

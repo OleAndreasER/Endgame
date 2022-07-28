@@ -7,9 +7,10 @@ import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram, formatLiftGroupCycle)
 import CLI.CreateProfile (createProfile)
+import CLI.Edit.LiftGroupCycle (editLiftGroupCycle)
 import Types.Log as Log
 import Types.General 
-import Types.Program as Program (liftGroupCycles)
+import Types.Program as Program (liftGroupCycles, setLiftGroupCycle)
 import Types.Stats as Stats
     ( LiftStats
     , bodyweight
@@ -123,6 +124,14 @@ handleArguments ["program", "lift-group-cycle", nStr] =
     ensurePositiveInt nStr $ \n -> do
     cycles <- liftGroupCycles <$> readProgram
     ensureIndex n cycles $ putStrLn . formatLiftGroupCycle
+
+handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
+    ensurePositiveInt nStr $ \n ->
+    liftGroupCycles <$> readProgram >>= \cycles ->
+    ensureIndex n cycles $ \oldCycle -> do
+    newCycle <- editLiftGroupCycle oldCycle
+    readProgram >>= setProgram . setLiftGroupCycle (n-1) newCycle
+
 
 
 handleArguments ["help"] =

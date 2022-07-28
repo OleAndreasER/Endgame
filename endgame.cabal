@@ -39,6 +39,7 @@ executable endgame
                       CLI.SelectProgram,
                       CLI.CreateProfile,
                       CLI.CreateProgram,
+                      CLI.Edit.LiftGroupCycle,
                       Types.General,
                       Types.Program,
                       Types.Log,

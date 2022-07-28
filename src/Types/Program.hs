@@ -46,3 +46,8 @@ cycleOfLift lift' program = head
 sessions :: LiftCycle -> [[Set]]
 sessions (LiftCycle { prSession, workSessionCycle }) =
     prSession : cycle workSessionCycle
+
+setLiftGroupCycle :: Int -> LiftGroupCycle -> Program -> Program
+setLiftGroupCycle n lgc program =
+    let (xs, _:ys) = splitAt n $ liftGroupCycles program
+    in program { liftGroupCycles = xs ++ (lgc:ys) }

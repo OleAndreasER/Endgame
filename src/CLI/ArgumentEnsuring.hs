@@ -59,3 +59,14 @@ ensureLog :: String -> (Log -> IO ()) -> IO ()
 ensureLog nStr f = do
     logs <- readLogs
     ensure (readInt nStr >>= check (> 0) "must be positive." >>= getLog logs) f
+
+ensureIndex :: Int -> [a] -> (a -> IO ()) -> IO ()
+ensureIndex n xs f
+    | n > length xs = 
+        putStrLn $ "'"++ show n ++ "' is too large."
+ 
+    | n <= 0 =
+        putStrLn $ "'"++ show n ++ "' must be positive."
+    
+    | otherwise =
+        f $ xs !! (n-1)

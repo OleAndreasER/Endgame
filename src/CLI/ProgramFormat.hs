@@ -1,4 +1,4 @@
-module CLI.ProgramFormat (formatProgram) where
+module CLI.ProgramFormat where
 
 import Types.Program
 import Types.General (Percent)

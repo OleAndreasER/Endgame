@@ -5,10 +5,11 @@ import FileHandling
 import CLI.ArgumentEnsuring
 import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
-import CLI.ProgramFormat (formatProgram)
+import CLI.ProgramFormat (formatProgram, formatLiftGroupCycle)
 import CLI.CreateProfile (createProfile)
 import Types.Log as Log
 import Types.General 
+import Types.Program as Program (liftGroupCycles)
 import Types.Stats as Stats
     ( LiftStats
     , bodyweight
@@ -72,7 +73,6 @@ handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
 handleArguments ["lifts", "toggle-bodyweight", lift] =
     updateLifts lift toggleBodyweight
 
-handleArguments ["program"] = readProgram >>= putStrLn . formatProgram
 
 handleArguments ["bw"] = readStats >>= putStrLn . (++ "kg") . show . bodyweight 
 
@@ -116,6 +116,14 @@ handleArguments ["log", nStr, "fail", lift] =
         Just Work -> putStrLn "You can't fail a work set."
         Just (PR True)  -> unfailLift lift
         Just (PR False) -> CLI.Arguments.failLift lift
+
+handleArguments ["program"] = readProgram >>= putStrLn . formatProgram
+
+handleArguments ["program", "lift-group-cycle", nStr] =
+    ensurePositiveInt nStr $ \n -> do
+    cycles <- liftGroupCycles <$> readProgram
+    ensureIndex n cycles $ putStrLn . formatLiftGroupCycle
+
 
 handleArguments ["help"] =
     putStrLn "Get started by creating a profile:\n\

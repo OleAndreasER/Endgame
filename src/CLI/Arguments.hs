@@ -6,9 +6,20 @@ import CLI.ArgumentEnsuring
 import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
 import CLI.ProgramFormat (formatProgram)
+import CLI.CreateProfile (createProfile)
 import Types.Log as Log
 import Types.General 
-import Types.Stats as Stats (LiftStats, bodyweight, setPR, toLiftStats, setProgression, liftIsInStats, setCycle, toggleBodyweight, addProgressions)
+import Types.Stats as Stats
+    ( LiftStats
+    , bodyweight
+    , setPR
+    , toLiftStats
+    , setProgression
+    , liftIsInStats
+    , setCycle
+    , toggleBodyweight
+    , addProgressions
+    )
 import qualified Types.Stats as Stats (addWork)
 import CurrentLog 
 import NextLogs

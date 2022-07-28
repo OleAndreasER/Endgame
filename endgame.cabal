@@ -36,6 +36,8 @@ executable endgame
                       CLI.SetupStats,
                       CLI.Input,
                       CLI.ArgumentEnsuring,
+                      CLI.SelectProgram,
+                      CLI.CreateProfile,
                       Types.General,
                       Types.Program,
                       Types.Log,
@@ -54,6 +56,6 @@ executable endgame
                       directory ^>=1.3.6.2,
                       split ^>=0.2.3.4,
                       binary ^>=0.8.9.0,
-                      yjtools ^>=0.9.18 
+                      yjtools ^>=0.9.18
     hs-source-dirs:   app, src
     default-language: Haskell2010

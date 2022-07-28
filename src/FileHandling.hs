@@ -1,16 +1,13 @@
 module FileHandling where
 
 import System.Directory 
-    ( createDirectoryIfMissing
-    , getAppUserDataDirectory
+    ( getAppUserDataDirectory
     , listDirectory
     )
 import Data.Binary
 import Types.Program (Program)
 import Types.Log (Log)
 import Types.Stats (Stats)
-import FirstStatsOfProgram
-import CLI.SetupStats
 import Data.Functor ((<&>))
 
 
@@ -61,19 +58,6 @@ readStandardProgram :: String -> IO Program
 readStandardProgram programName =
     appPath <&> (++ "/programs/"++programName++".txt") >>= decodeFile
 
---A profile contains training logs, stats and program. 
-createProfile :: String -> IO ()
-createProfile profile = do
-    directory <- appPath <&> (++"/profiles/"++profile)
-
-    createDirectoryIfMissing True directory
-    setProfile profile
-
-    program <- readStandardProgram "everyotherday"
-    setProgram program
-    setLogs ([] :: [Log])
-    setStats $ firstStatsOfProgram program
-    readStats >>= setupStats >>= setStats
 
 setProfile :: String -> IO ()
 setProfile profile = do

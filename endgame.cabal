@@ -38,6 +38,7 @@ executable endgame
                       CLI.ArgumentEnsuring,
                       CLI.SelectProgram,
                       CLI.CreateProfile,
+                      CLI.CreateProgram,
                       Types.General,
                       Types.Program,
                       Types.Log,

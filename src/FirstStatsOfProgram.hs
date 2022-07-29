@@ -16,7 +16,7 @@ firstStatsOfProgram (Program liftGroupCycles liftCycles) = Stats
 
 liftGroupPosition :: LiftGroupCycle -> CyclePosition
 liftGroupPosition liftGroupCycle =
-    CyclePosition 0 $ Prelude.length liftGroupCycle
+    endingCycle $ Prelude.length liftGroupCycle
 
 liftStats :: LiftCycle -> LiftStats
 liftStats liftCycle = LiftStats

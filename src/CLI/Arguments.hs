@@ -14,6 +14,7 @@ import Types.Program as Program (liftGroupCycles, setLiftGroupCycle)
 import Types.Stats as Stats
     ( LiftStats
     , setLiftGroupPosition
+    , endingCycle
     , bodyweight
     , setPR
     , toLiftStats
@@ -41,13 +42,11 @@ handleArguments ["next", nStr] =
     let logs = take n $ nextLogs stats program
     putStrLn $ unlines $ reverse $ map formatLog logs
     
-
 handleArguments ["logs", nStr] =
     ensurePositiveInt nStr $ \n ->
     readLogs >>= putStrLn . unlines . map formatLog . reverse . take n
 
 handleArguments ["logs"] = handleArguments ["logs", "1"]
-
 
 handleArguments ["add"] = do
     stats <- readStats
@@ -57,7 +56,6 @@ handleArguments ["add"] = do
     putStrLn $ "Added:\n" ++ formatLog nextLog'
     setStats nextStats'
     
-
 handleArguments ["lifts"] = readStats >>= putStrLn . formatStats
 
 handleArguments ["lifts", "pr", lift, weightStr] =
@@ -74,7 +72,6 @@ handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
 
 handleArguments ["lifts", "toggle-bodyweight", lift] =
     updateLifts lift toggleBodyweight
-
 
 handleArguments ["bw"] = readStats >>= putStrLn . (++ "kg") . show . bodyweight 
 
@@ -132,7 +129,7 @@ handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
     ensureIndex n cycles $ \oldCycle -> do
     newCycle <- editLiftGroupCycle oldCycle
     readProgram >>= setProgram . setLiftGroupCycle (n-1) newCycle
-    readStats >>= setStats . setLiftGroupPosition (n-1) 0 (length newCycle)
+    readStats >>= setStats . setLiftGroupPosition (n-1) (endingCycle $ length newCycle)
 
 
 handleArguments ["help"] =

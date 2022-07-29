@@ -1,9 +1,7 @@
 module FirstStatsOfProgram (firstStatsOfProgram) where
 
-import Types.Stats
-import qualified Types.Stats as Stats
-import Types.Program
-import qualified Types.Program as Program
+import Types.Stats as Stats
+import Types.Program as Program
 
 
 firstStatsOfProgram :: Program -> Stats

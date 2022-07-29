@@ -87,3 +87,10 @@ statsOfLift :: Stats -> Lift -> LiftStats
 statsOfLift stats lift' = head
     $ filter ((lift' ==) . lift)
     $ lifts stats    
+
+setLiftGroupPosition :: Int -> Int -> Int -> Stats -> Stats
+setLiftGroupPosition n pos len stats =
+    stats { liftGroupPositions = xs ++ (newPos:ys)}
+  where
+    (xs, _:ys) = splitAt n $ liftGroupPositions stats
+    newPos = CyclePosition pos len

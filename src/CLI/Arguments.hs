@@ -13,6 +13,7 @@ import Types.General
 import Types.Program as Program (liftGroupCycles, setLiftGroupCycle)
 import Types.Stats as Stats
     ( LiftStats
+    , setLiftGroupPosition
     , bodyweight
     , setPR
     , toLiftStats
@@ -131,7 +132,7 @@ handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
     ensureIndex n cycles $ \oldCycle -> do
     newCycle <- editLiftGroupCycle oldCycle
     readProgram >>= setProgram . setLiftGroupCycle (n-1) newCycle
-
+    readStats >>= setStats . setLiftGroupPosition (n-1) 0 (length newCycle)
 
 
 handleArguments ["help"] =

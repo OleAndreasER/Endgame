@@ -2,7 +2,7 @@
 module Advance.Cycles (advanceCycles) where
 
 import Types.Stats as Stats
-import Types.Log
+import Types.Log as Log
 
 
 {-After a log, 

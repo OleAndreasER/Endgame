@@ -27,6 +27,7 @@ import Types.Stats as Stats
 import qualified Types.Stats as Stats (addWork)
 import CurrentLog 
 import NextLogs
+import Advance.PRs (regressPRs)
 
 handleArguments :: [String] -> IO ()
 
@@ -155,6 +156,22 @@ handleArguments ["log", nStr, "fail", lift] =
         Just (PR True)  -> unfailLift lift
         Just (PR False) -> CLI.Arguments.failLift lift
 
+--    
+handleArguments ["log", "1", "remove"] = 
+    ensureLog "1" $ \log -> do
+    readLogs >>= setLogs . tail
+    readStats >>= setStats . regressPRs log
+    putStrLn "Removed:"
+    putStrLn $ formatLog log
+    putStrLn "After undoing PRs, this is your stats:"
+    readStats >>= putStrLn . formatStats
+
+
+handleArguments ["log", nStr, "remove"] =
+    ensureLog nStr $ \log -> do
+    return ()
+--
+
 handleArguments ["program", "help"] =
     putStrLn "View or edit a lift group cycle:\n\
              \  endgame program lift-group-cycle {n}\n\
@@ -174,7 +191,6 @@ handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
     newCycle <- editLiftGroupCycle oldCycle
     readProgram >>= setProgram . setLiftGroupCycle (n-1) newCycle
     readStats >>= setStats . setLiftGroupPosition (n-1) (endingCycle $ length newCycle)
-
 
 
 handleArguments _ = putStrLn invalidArgumentResponse

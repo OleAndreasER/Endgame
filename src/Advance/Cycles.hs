@@ -9,7 +9,7 @@ import qualified CurrentLog as CurrentLog (lifts)
   all the liftGroupCycles advance e.g. 
   Press -> Bench, 
   and the cycles of each lift present in the log advances e.g.
-  Bench: PR -> Work.
+  Press: PR -> Work.
 -}
 
 advanceCycles :: Program -> Stats -> Stats

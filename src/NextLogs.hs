@@ -36,7 +36,10 @@ nextLogAndStats stats program label =
 
 getNextLogAndStats :: String -> IO (Log, Stats)
 getNextLogAndStats label =
-    nextLogAndStats <$> readStats <*> readProgram ?? label
+    nextLogAndStats
+    <$> readStats
+    <*> readProgram
+    ?? label
 
 getNextLogs :: IO [Log]
 getNextLogs = nextLogs <$> readStats <*> readProgram

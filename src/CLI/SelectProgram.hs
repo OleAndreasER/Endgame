@@ -28,6 +28,6 @@ getPrograms =
 
 formatProgramSelect :: [String] -> String
 formatProgramSelect names =
-    init
+    init --remove newline
     $ unlines
     $ ("- "++) <$> names

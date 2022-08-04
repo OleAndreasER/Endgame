@@ -212,19 +212,19 @@ updateLifts lift f = do
 
 failLift :: Lift -> IO ()
 failLift lift = do
-    updateLifts lift (addProgressions (-2))
     putStrLn $ "Subtracted 2 progression's worth of weight from "++lift++"'s PR."
     addWork 1 lift
+    updateLifts lift (addProgressions (-2))
 
 unfailLift :: Lift -> IO ()
 unfailLift lift = do
-    updateLifts lift (addProgressions 2)
     putStrLn $ "Added back 2 progression's worth of weight to "++lift++"'s PR."
     addWork (-1) lift
+    updateLifts lift (addProgressions 2)
 
 addWork :: Int -> Lift -> IO ()
 addWork work lift = do
-    putStrLn workTxt
+    putStrLn $ workTxt ++ "\n"
     readStats >>= setStats . Stats.addWork work lift
   where 
     workTxt 

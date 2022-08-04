@@ -10,8 +10,8 @@ programs =
 
 everyotherday :: Program
 everyotherday = Program 
-    [["Press", "Press", "Bench"],
-     ["Squat", "Squat", "Deadlift"],
+    [["Press", "Bench", "Press"],
+     ["Squat", "Deadlift", "Squat"],
      ["Chin", "Row"]]
      
     [LiftCycle {lift = "Press",
@@ -36,7 +36,7 @@ everyotherday = Program
 everyday :: Program
 everyday = Program 
     [["Press", "Bench"],
-     ["Squat", "Squat", "Deadlift"],
+     ["Squat", "Deadlift", "Squat"],
      ["Chin", "Row"]]
      
     [LiftCycle {lift = "Press",

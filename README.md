@@ -1,6 +1,6 @@
 # endgame
 
-This is currently work in progress, but it should be usable.
+Currently work in progress, but it should be usable.
 
 This is a command line tool for logging training sessions and keeping track of progress for training programs of my training system.
 

@@ -75,7 +75,7 @@ doneLifts (Log { liftSessions }) = map lift liftSessions
 
 hasPR :: LiftSession -> Bool
 hasPR liftSession = 
-    any ((== PR True) . setType)
+    any ((PR True ==) . setType)
     $ sets liftSession 
 
 liftSetType :: Lift -> Log -> Maybe SetType

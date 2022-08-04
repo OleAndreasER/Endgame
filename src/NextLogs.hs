@@ -1,7 +1,5 @@
 module NextLogs
     ( nextLogs
-    , nextLog
-    , nextStats
     , nextLogAndStats
     , getNextLogAndStats
     , getNextLogs
@@ -14,6 +12,7 @@ import Advance.PRs
 import Types.Log
 import Types.Program
 import Types.Stats
+import Relude.Functor.Fmap ((??))
 
 --Endless list of future logs.
 nextLogs' :: Int -> Stats -> Program -> [Log]
@@ -27,14 +26,6 @@ nextLogs' i stats program =
 nextLogs :: Stats -> Program -> [Log]
 nextLogs = nextLogs' 1
 
-nextLog :: Stats -> Program -> String -> Log
-nextLog stats program =
-    fst . nextLogAndStats stats program
-
-nextStats :: Stats -> Program -> String -> Stats
-nextStats stats program =
-    snd . nextLogAndStats stats program
-
 nextLogAndStats :: Stats -> Program -> String -> (Log, Stats)
 nextLogAndStats stats program label =
     (nextLog', nextStats')
@@ -44,14 +35,8 @@ nextLogAndStats stats program label =
     nextStats' = advanceCycles program advancedPRs 
 
 getNextLogAndStats :: String -> IO (Log, Stats)
-getNextLogAndStats label = do
-    stats <- readStats
-    program <- readProgram
-    pure $ nextLogAndStats stats program label
+getNextLogAndStats label =
+    nextLogAndStats <$> readStats <*> readProgram ?? label
 
---make cooler
 getNextLogs :: IO [Log]
-getNextLogs = do
-    stats <- readStats
-    program <- readProgram
-    pure $ nextLogs stats program
+getNextLogs = nextLogs <$> readStats <*> readProgram

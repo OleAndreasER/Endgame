@@ -1,5 +1,14 @@
-module NextLogs (nextLogs, nextLog, nextStats, nextLogAndStats) where
+module NextLogs
+    ( nextLogs
+    , nextLog
+    , nextStats
+    , nextLogAndStats
+    , firstLogAndStats
+    , getNextLogAndStats
+    , getNextLogs
+    ) where
 
+import FileHandling
 import CurrentLog
 import Advance.Cycles
 import Advance.PRs
@@ -30,10 +39,34 @@ nextStats stats program =
 nextLogAndStats :: Stats -> Program -> String -> (Log, Stats)
 nextLogAndStats stats program label =
     (nextLog', nextStats')
-  where 
-    currentLog' :: Stats -> Log
-    currentLog' stats' = currentLog program stats' label
-    log = currentLog' stats
-    advancedCycles = advanceCycles log stats
-    nextLog' = currentLog' advancedCycles
+  where
+    advancedCycles = advanceCycles program stats
+    nextLog' = currentLog program advancedCycles label
     nextStats' = advancePRs nextLog' advancedCycles
+
+--Does not advance stats prior to getting the log.
+firstLogAndStats :: Stats -> Program -> String -> (Log, Stats)
+firstLogAndStats stats program label =
+    (firstLog, nextStats')
+  where 
+    firstLog   = currentLog program stats label
+    nextStats' = advancePRs firstLog stats
+
+getNextLogAndStats :: String -> IO (Log, Stats)
+getNextLogAndStats label = do
+    stats <- readStats
+    program <- readProgram
+    logs <- readLogs
+    pure $ case logs of
+        [] -> firstLogAndStats stats program label
+        _  -> nextLogAndStats stats program label
+
+getNextLogs :: IO [Log]
+getNextLogs = do
+    stats <- readStats
+    program <- readProgram
+    logs <- readLogs
+    let (firstLog, nextStats') = firstLogAndStats stats program "1."
+    pure $ case logs of
+        [] -> firstLog : nextLogs' 2 nextStats' program
+        _  -> nextLogs stats program

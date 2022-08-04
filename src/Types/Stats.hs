@@ -94,6 +94,3 @@ setLiftGroupPosition n (CyclePosition pos len) stats =
   where
     (xs, _:ys) = splitAt n $ liftGroupPositions stats
     newPos = CyclePosition pos len
-
-endingCycle :: Int -> CyclePosition
-endingCycle len = CyclePosition (len-1) len

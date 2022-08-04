@@ -1,4 +1,4 @@
-module CurrentLog (currentLog) where
+module CurrentLog (currentLog, CurrentLog.lifts) where
 
 import Types.Log as Log
 import Types.Program as Program

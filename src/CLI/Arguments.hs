@@ -2,6 +2,7 @@ module CLI.Arguments where
 
 import Data.Char 
 import FileHandling
+import Date (dateStr)
 import CLI.ArgumentEnsuring
 import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
@@ -76,7 +77,7 @@ handleArguments ["logs", nStr] =
 handleArguments ["logs"] = handleArguments ["logs", "1"]
 
 handleArguments ["add"] = do
-    (nextLog', nextStats') <- getNextLogAndStats "Date"
+    (nextLog', nextStats') <- getNextLogAndStats =<< dateStr
     addLog nextLog'
     putStrLn $ "Added:\n" ++ formatLog nextLog'
     setStats nextStats'

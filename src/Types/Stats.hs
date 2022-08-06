@@ -9,7 +9,6 @@ import GHC.Generics (Generic)
 
 type Bodyweight = Float
 
-
 instance Binary Stats
 instance Binary CyclePosition
 instance Binary LiftStats

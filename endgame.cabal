@@ -47,6 +47,7 @@ executable endgame
                       Advance.Cycles,
                       Advance.PRs,
                       CurrentLog,
+                      Date,
                       NextLogs,
                       FileHandling,
                       FirstStatsOfProgram
@@ -59,6 +60,7 @@ executable endgame
                       split ^>=0.2.3.4,
                       binary ^>=0.8.9.0,
                       yjtools ^>=0.9.18,
-                      relude ^>=1.1.0.0
+                      relude ^>=1.1.0.0,
+                      time ^>=1.11.1.1
     hs-source-dirs:   app, src
     default-language: Haskell2010

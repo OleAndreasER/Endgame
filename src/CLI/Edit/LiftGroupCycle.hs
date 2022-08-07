@@ -22,8 +22,12 @@ addLifts new old = do
         | lift `elem` old =
             addLifts (new ++ [lift]) old
         
-        | lift == "" =
+        | lift == "" && all (`elem` new) old =
             return new
+
+        | lift == "" = do
+            putStrLn "All the lifts have to be added."
+            addLifts new old
 
         | otherwise = do
             putStrLn $ lift ++ " is not a lift of this lift group cycle."

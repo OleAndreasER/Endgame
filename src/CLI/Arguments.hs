@@ -6,12 +6,20 @@ import Date (dateStr)
 import CLI.ArgumentEnsuring
 import CLI.LogFormat (formatLog)
 import CLI.StatsFormat (formatStats)
-import CLI.ProgramFormat (formatProgram, formatLiftGroupCycle)
+import CLI.ProgramFormat
+    (formatProgram
+    , formatLiftGroupCycle
+    , formatLiftCycle
+    )
 import CLI.CreateProfile (createProfile)
 import CLI.Edit.LiftGroupCycle (editLiftGroupCycle)
 import Types.Log as Log
 import Types.General 
-import Types.Program as Program (liftGroupCycles, setLiftGroupCycle)
+import Types.Program as Program
+    ( liftGroupCycles
+    , setLiftGroupCycle
+    , cycleOfLift
+    )
 import Types.Stats as Stats
     ( LiftStats
     , CyclePosition (CyclePosition)
@@ -167,7 +175,6 @@ handleArguments ["log", "1", "remove"] =
     putStrLn "After undoing PRs and cycle advances, this is your stats:"
     readStats >>= putStrLn . formatStats
 
-
 handleArguments ["log", nStr, "remove"] = ifProfile $
     ensurePositiveInt nStr $ \n ->
     ensureLog nStr         $ \log -> do
@@ -180,7 +187,10 @@ handleArguments ["log", nStr, "remove"] = ifProfile $
 handleArguments ["program", "help"] =
     putStrLn "View or edit a lift group cycle:\n\
              \  endgame program lift-group-cycle {n}\n\
-             \  endgame program lift-group-cycle {n} edit\n"
+             \  endgame program lift-group-cycle {n} edit\n\n\
+             \View or edit a lift:\n\
+             \  endgame program lift {lift}\n\
+             \  endgame program lift {lift} edit\n"
 
 handleArguments ["program"] = ifProfile $
     readProgram >>= putStrLn . formatProgram
@@ -199,6 +209,9 @@ handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
     let resetCycle = CyclePosition 0 $ length newCycle
     readStats >>= setStats . setLiftGroupPosition (n-1) resetCycle
 
+handleArguments ["program", "lift", liftStr] =
+    ifProfile $ ensureLift liftStr $ \lift ->
+    putStrLn =<< formatLiftCycle . cycleOfLift lift <$> readProgram
 
 handleArguments _ = putStrLn invalidArgumentResponse
 

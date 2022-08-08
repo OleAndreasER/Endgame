@@ -51,3 +51,8 @@ setLiftGroupCycle :: Int -> LiftGroupCycle -> Program -> Program
 setLiftGroupCycle n lgc program =
     let (xs, _:ys) = splitAt n $ liftGroupCycles program
     in program { liftGroupCycles = xs ++ (lgc:ys) }
+
+liftInProgram :: Program -> Lift -> Bool
+liftInProgram program lift' =
+    any ((lift' ==). lift)
+    $ liftCycles program

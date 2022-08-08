@@ -2,6 +2,7 @@ module CLI.ArgumentEnsuring where
 
 import Types.General
 import Types.Log
+import Types.Program
 import FileHandling
 import Text.Read (readMaybe)
 
@@ -59,6 +60,15 @@ ensureLog :: String -> (Log -> IO ()) -> IO ()
 ensureLog nStr f = do
     logs <- readLogs
     ensure (readInt nStr >>= check (> 0) "must be positive." >>= getLog logs) f
+
+ensureLift :: String -> (Lift -> IO()) -> IO ()
+ensureLift liftStr f = do
+    program <- readProgram
+    if liftInProgram program liftStr
+    then f liftStr
+    else putStrLn $ "'"++liftStr++"' is not in your program"
+    
+
 
 ensureIndex :: Int -> [a] -> (a -> IO ()) -> IO ()
 ensureIndex n xs f

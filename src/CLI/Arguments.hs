@@ -29,6 +29,7 @@ import qualified Types.Stats as Stats (addWork)
 import CurrentLog 
 import NextLogs
 import Advance.PRs (regressPRs)
+import Advance.Cycles (regressCycles)
 
 handleArguments :: [String] -> IO ()
 
@@ -159,9 +160,11 @@ handleArguments ["log", "1", "remove"] = ifProfile $
     ensureLog "1" $ \log -> do
     readLogs >>= setLogs . tail
     readStats >>= setStats . regressPRs log
+    setStats =<< regressCycles <$> readProgram <*> readStats
+
     putStrLn "Removed:"
     putStrLn $ formatLog log
-    putStrLn "After undoing PRs, this is your stats:"
+    putStrLn "After undoing PRs and cycle advances, this is your stats:"
     readStats >>= putStrLn . formatStats
 
 

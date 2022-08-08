@@ -155,9 +155,9 @@ handleArguments ["log", nStr, "fail", lift] = ifProfile $
         Just (PR True)  -> unfailLift lift
         Just (PR False) -> CLI.Arguments.failLift lift
 
---    
-handleArguments ["log", "1", "remove"] = ifProfile $
-    ensureLog "1" $ \log -> do
+handleArguments ["log", "1", "remove"] =
+    ifProfile $ ensureLog "1" $ \log -> do
+
     readLogs >>= setLogs . tail
     readStats >>= setStats . regressPRs log
     setStats =<< regressCycles <$> readProgram <*> readStats
@@ -169,9 +169,13 @@ handleArguments ["log", "1", "remove"] = ifProfile $
 
 
 handleArguments ["log", nStr, "remove"] = ifProfile $
-    ensureLog nStr $ \log -> do
-    return ()
---
+    ensurePositiveInt nStr $ \n ->
+    ensureLog nStr         $ \log -> do
+    
+    setLogs =<< removeAt (n - 1) <$> readLogs
+
+    putStrLn "Removed:"
+    putStrLn $ formatLog log
 
 handleArguments ["program", "help"] =
     putStrLn "View or edit a lift group cycle:\n\
@@ -205,6 +209,12 @@ toElem :: Eq a => a -> (a -> a) -> [a] -> [a]
 toElem y f (x:xs)
     | y == x    = f x : xs
     | otherwise = x : toElem y f xs
+
+removeAt :: Int -> [a] -> [a]
+removeAt n xs 
+    | n < length xs = left ++ right
+    | otherwise     = xs
+    where (left, (_ :right)) = splitAt n xs
 
 updateLifts :: String -> (LiftStats -> LiftStats) -> IO ()
 updateLifts lift f = do

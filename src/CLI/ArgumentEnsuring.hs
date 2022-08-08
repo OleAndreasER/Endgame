@@ -70,3 +70,11 @@ ensureIndex n xs f
     
     | otherwise =
         f $ xs !! (n-1)
+
+ifProfile :: IO () -> IO ()
+ifProfile f = do
+    profileIsSelected' <- profileIsSelected
+    if profileIsSelected'
+    then f
+    else putStrLn "You must create a profile first."
+

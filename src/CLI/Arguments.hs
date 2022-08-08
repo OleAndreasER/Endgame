@@ -61,28 +61,29 @@ handleArguments ["help"] =
              \Commands for editing your program:\n\
              \  endgame program help\n"
 
-handleArguments ["next"] = do
+handleArguments ["next"] = ifProfile $ do
     (nextLog', _) <- getNextLogAndStats "Next:"
     putStrLn $ formatLog nextLog'
 
-handleArguments ["next", nStr] =
+handleArguments ["next", nStr] = ifProfile $
     ensurePositiveInt nStr $ \n -> do
     logs <- take n <$> getNextLogs
     putStrLn $ unlines $ reverse $ map formatLog logs
     
-handleArguments ["logs", nStr] =
+handleArguments ["logs", nStr] = ifProfile $
     ensurePositiveInt nStr $ \n ->
     readLogs >>= putStrLn . unlines . map formatLog . reverse . take n
 
 handleArguments ["logs"] = handleArguments ["logs", "1"]
 
-handleArguments ["add"] = do
+handleArguments ["add"] = ifProfile $ do
     (nextLog', nextStats') <- getNextLogAndStats =<< dateStr
     addLog nextLog'
     putStrLn $ "Added:\n" ++ formatLog nextLog'
     setStats nextStats'
     
-handleArguments ["lifts"] = readStats >>= putStrLn . formatStats
+handleArguments ["lifts"] =
+    ifProfile $ readStats >>= putStrLn . formatStats
 
 handleArguments ["lifts", "help"] =
     putStrLn "Set pr for a lift:\n\
@@ -95,23 +96,24 @@ handleArguments ["lifts", "help"] =
              \  endgame toggle-bodyweight {lift}\n"
 
 handleArguments ["lifts", "pr", lift, weightStr] =
-    ensureWeight weightStr
+    ifProfile $ ensureWeight weightStr
     $ \weight -> updateLifts lift $ setPR weight
 
 handleArguments ["lifts", "progression", lift, weightStr] =
-    ensureWeight weightStr
+    ifProfile $ ensureWeight weightStr
     $ \weight -> updateLifts lift $ setProgression weight
     
 handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
-    ensureCycle posStr lenStr
+    ifProfile $ ensureCycle posStr lenStr
     $ \pos len -> updateLifts lift $ setCycle (pos-1) len
 
 handleArguments ["lifts", "toggle-bodyweight", lift] =
-    updateLifts lift toggleBodyweight
+    ifProfile $ updateLifts lift toggleBodyweight
 
-handleArguments ["bw"] = readStats >>= putStrLn . (++ "kg") . show . bodyweight 
+handleArguments ["bw"] =
+    ifProfile $ readStats >>= putStrLn . (++ "kg") . show . bodyweight 
 
-handleArguments ["bw", bodyweightStr] =
+handleArguments ["bw", bodyweightStr] = ifProfile $
     ensureWeight bodyweightStr $ \bw -> do
     readStats >>= setStats . \stats -> stats {bodyweight = bw}
     putStrLn ("Bodyweight: "++bodyweightStr++"kg")
@@ -133,12 +135,12 @@ handleArguments ["profile", profile] = do
     else
         putStrLn $ "There is no profile called '"++profile++"'."
 
-handleArguments ["log", nStr] = 
+handleArguments ["log", nStr] = ifProfile $ 
     ensureLog nStr $ putStrLn . formatLog
 
 handleArguments ["log"] = handleArguments ["log", "1"]
 
-handleArguments ["log", nStr, "fail", lift] =
+handleArguments ["log", nStr, "fail", lift] = ifProfile $
     ensureLog nStr $ \log -> do
     readLogs >>= setLogs . (toElem log $ Log.failLift lift)
 
@@ -153,7 +155,7 @@ handleArguments ["log", nStr, "fail", lift] =
         Just (PR False) -> CLI.Arguments.failLift lift
 
 --    
-handleArguments ["log", "1", "remove"] = 
+handleArguments ["log", "1", "remove"] = ifProfile $
     ensureLog "1" $ \log -> do
     readLogs >>= setLogs . tail
     readStats >>= setStats . regressPRs log
@@ -163,7 +165,7 @@ handleArguments ["log", "1", "remove"] =
     readStats >>= putStrLn . formatStats
 
 
-handleArguments ["log", nStr, "remove"] =
+handleArguments ["log", nStr, "remove"] = ifProfile $
     ensureLog nStr $ \log -> do
     return ()
 --
@@ -173,15 +175,16 @@ handleArguments ["program", "help"] =
              \  endgame program lift-group-cycle {n}\n\
              \  endgame program lift-group-cycle {n} edit\n"
 
-handleArguments ["program"] = readProgram >>= putStrLn . formatProgram
+handleArguments ["program"] = ifProfile $
+    readProgram >>= putStrLn . formatProgram
 
 handleArguments ["program", "lift-group-cycle", nStr] =
-    ensurePositiveInt nStr $ \n -> do
+    ifProfile $ ensurePositiveInt nStr $ \n -> do
     cycles <- liftGroupCycles <$> readProgram
     ensureIndex n cycles $ putStrLn . formatLiftGroupCycle
 
 handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
-    ensurePositiveInt nStr $ \n ->
+    ifProfile $ ensurePositiveInt nStr $ \n ->
     liftGroupCycles <$> readProgram >>= \cycles ->
     ensureIndex n cycles $ \oldCycle -> do
     newCycle <- editLiftGroupCycle oldCycle

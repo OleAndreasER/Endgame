@@ -3,6 +3,8 @@ module FileHandling where
 import System.Directory 
     ( getAppUserDataDirectory
     , listDirectory
+    , doesFileExist
+    , doesDirectoryExist
     )
 import Data.Binary
 import Types.Program (Program)
@@ -65,7 +67,17 @@ setProfile profile = do
     writeFile filePath profile
 
 getProfiles :: IO [String]
-getProfiles = appPath <&> (++ "/profiles/") >>= listDirectory
+getProfiles = do
+    isProfiles' <- isProfiles
+    if isProfiles'
+    then appPath <&> (++ "/profiles/") >>= listDirectory
+    else pure []
 
 getProfile :: IO String
 getProfile = appPath <&> (++ "/profile.txt") >>= readFile
+
+profileIsSelected :: IO Bool
+profileIsSelected = appPath <&> (++"/profile.txt") >>= doesFileExist
+
+isProfiles :: IO Bool
+isProfiles = appPath <&> (++ "/profiles/") >>= doesDirectoryExist

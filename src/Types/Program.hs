@@ -54,5 +54,5 @@ setLiftGroupCycle n lgc program =
 
 liftInProgram :: Program -> Lift -> Bool
 liftInProgram program lift' =
-    any ((lift' ==). lift)
+    any ((lift' ==) . lift)
     $ liftCycles program

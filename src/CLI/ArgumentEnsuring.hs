@@ -61,12 +61,6 @@ ensureLog nStr f = do
     logs <- readLogs
     ensure (readInt nStr >>= check (> 0) "must be positive." >>= getLog logs) f
 
-ensureLift :: String -> (Lift -> IO()) -> IO ()
-ensureLift liftStr f = do
-    program <- readProgram
-    if liftInProgram program liftStr
-    then f liftStr
-    else putStrLn $ "'"++liftStr++"' is not in your program"
     
 
 
@@ -88,3 +82,10 @@ ifProfile f = do
     then f
     else putStrLn "You must create a profile first."
 
+ifLift :: String -> IO() -> IO ()
+ifLift lift f = do
+    program <- readProgram
+    if liftInProgram program lift
+    then f
+    else putStrLn $ "'"++lift++"' is not in your program"
+    

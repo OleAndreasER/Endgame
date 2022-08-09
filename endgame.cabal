@@ -40,6 +40,7 @@ executable endgame
                       CLI.CreateProfile,
                       CLI.CreateProgram,
                       CLI.Edit.LiftGroupCycle,
+                      CLI.Edit.LiftCycle,
                       Types.General,
                       Types.Program,
                       Types.Log,

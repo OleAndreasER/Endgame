@@ -13,6 +13,7 @@ import CLI.ProgramFormat
     )
 import CLI.CreateProfile (createProfile)
 import CLI.Edit.LiftGroupCycle (editLiftGroupCycle)
+import CLI.Edit.LiftCycle (editLiftCycle)
 import Types.Log as Log
 import Types.General 
 import Types.Program as Program
@@ -209,9 +210,14 @@ handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
     let resetCycle = CyclePosition 0 $ length newCycle
     readStats >>= setStats . setLiftGroupPosition (n-1) resetCycle
 
-handleArguments ["program", "lift", liftStr] =
-    ifProfile $ ensureLift liftStr $ \lift ->
+handleArguments ["program", "lift", lift] =
+    ifProfile $ ifLift lift $
     putStrLn =<< formatLiftCycle . cycleOfLift lift <$> readProgram
+
+handleArguments ["program", "lift", lift, "edit"] =
+    ifProfile $ ifLift lift $ do
+    editLiftCycle =<< cycleOfLift lift <$> readProgram
+    putStrLn "hhh"
 
 handleArguments _ = putStrLn invalidArgumentResponse
 

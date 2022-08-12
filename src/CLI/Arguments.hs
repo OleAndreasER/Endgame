@@ -217,7 +217,7 @@ handleArguments ["program", "lift", lift] =
 handleArguments ["program", "lift", lift, "edit"] =
     ifProfile $ ifLift lift $ do
     editLiftCycle =<< cycleOfLift lift <$> readProgram
-    putStrLn "hhh"
+    return ()
 
 handleArguments _ = putStrLn invalidArgumentResponse
 

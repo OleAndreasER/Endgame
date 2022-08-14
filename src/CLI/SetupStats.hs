@@ -1,7 +1,7 @@
 module CLI.SetupStats where
 
 import Types.Stats
-import CLI.Input
+import CLI.Input.Input
 
 {- Goes through each lift,
    and asks pr, etc. 

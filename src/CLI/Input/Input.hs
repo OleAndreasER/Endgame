@@ -4,6 +4,8 @@ import Types.General as General
 import CLI.Input.Readers
     ( readWeight
     , readBool
+    , readPositiveInteger
+    , readPercentage
     )
 
 --Asks until it gets a valid input (Just a)
@@ -23,3 +25,9 @@ getWeight = input readWeight "Invalid weight"
 
 getBool :: String -> IO Bool
 getBool = input readBool "Enter 'y' or 'n'."
+
+getPositiveInteger :: String -> IO Integer
+getPositiveInteger = input readPositiveInteger "Enter a positive integer."
+
+getPercentage :: String -> IO Percent
+getPercentage = input readPercentage "Must be a percentage larger than 0%."

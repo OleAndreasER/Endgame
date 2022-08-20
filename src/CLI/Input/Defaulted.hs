@@ -1,7 +1,11 @@
 module CLI.Input.Defaulted where
 
 import CLI.Input.Input (input)
-import CLI.Input.Readers (readPositiveInteger)
+import CLI.Input.Readers
+    ( readPositiveInteger
+    , readBool
+    )
+import Types.General as General
 
 -- Input, except a default value is accepted when entering "".
 
@@ -15,3 +19,9 @@ inputDefaulted readMaybe error default' =
 
 getPositiveInteger :: Integer -> String -> IO Integer
 getPositiveInteger = inputDefaulted readPositiveInteger "Enter a positive integer."
+
+getString :: String -> String -> IO String
+getString = inputDefaulted Just ""
+
+getBool :: Bool -> String -> IO Bool
+getBool = inputDefaulted readBool "Enter 'y' or 'n'."

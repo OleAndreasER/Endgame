@@ -19,7 +19,7 @@ import Types.General
 import Types.Program as Program
     ( liftGroupCycles
     , setLiftGroupCycle
-    , setLiftCycle
+    , integrateLiftCycle
     , cycleOfLift
     )
 import Types.Stats as Stats
@@ -218,7 +218,7 @@ handleArguments ["program", "lift", lift] =
 handleArguments ["program", "lift", lift, "edit"] =
     ifProfile $ ifLift lift $ do
     edited <- editLiftCycle =<< cycleOfLift lift <$> readProgram
-    readProgram >>= setProgram . setLiftCycle lift edited
+    readProgram >>= setProgram . integrateLiftCycle lift edited
 
 handleArguments _ = putStrLn invalidArgumentResponse
 

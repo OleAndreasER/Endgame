@@ -52,6 +52,21 @@ setLiftCycle lift' newCycle program =
         | lift oldCycle == lift' = newCycle
         | otherwise              = oldCycle
 
+integrateLiftCycle :: Lift -> LiftCycle -> Program -> Program
+integrateLiftCycle lift' newCycle program =
+    renameInLiftGroupCycle lift' (lift newCycle)
+    $ setLiftCycle lift' newCycle program
+
+renameInLiftGroupCycle :: Lift -> Lift -> Program -> Program
+renameInLiftGroupCycle old new program = program
+    { liftGroupCycles =
+        (map . map) (rename old new) $ liftGroupCycles program
+    }
+
+rename :: String -> String -> String -> String
+rename old new str
+    | str == old = new
+    | otherwise  = str
 
 sessions :: LiftCycle -> [[Set]]
 sessions (LiftCycle { prSession, workSessionCycle }) =

@@ -43,6 +43,16 @@ cycleOfLift lift' program = head
     $ filter ((lift' ==) . lift)
     $ liftCycles program
 
+setLiftCycle :: Lift -> LiftCycle -> Program -> Program
+setLiftCycle lift' newCycle program =
+    program { liftCycles = maybeSet <$> liftCycles program }
+  where
+    maybeSet :: LiftCycle -> LiftCycle
+    maybeSet oldCycle
+        | lift oldCycle == lift' = newCycle
+        | otherwise              = oldCycle
+
+
 sessions :: LiftCycle -> [[Set]]
 sessions (LiftCycle { prSession, workSessionCycle }) =
     prSession : cycle workSessionCycle

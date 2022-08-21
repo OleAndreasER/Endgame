@@ -93,3 +93,11 @@ setLiftGroupPosition n (CyclePosition pos len) stats =
   where
     (xs, _:ys) = splitAt n $ liftGroupPositions stats
     newPos = CyclePosition pos len
+
+renameLift :: Lift -> Lift -> Stats -> Stats
+renameLift old new =
+    toLiftStats (renameLiftCycle new) old
+
+renameLiftCycle :: Lift -> LiftStats -> LiftStats
+renameLiftCycle new liftStats =
+    liftStats { lift = new }

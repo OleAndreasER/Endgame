@@ -16,6 +16,9 @@ import CLI.Edit.LiftGroupCycle (editLiftGroupCycle)
 import CLI.Edit.LiftCycle (editLiftCycle)
 import Types.Log as Log
 import Types.General 
+import qualified Types.Program as Program
+    ( lift 
+    )
 import Types.Program as Program
     ( liftGroupCycles
     , setLiftGroupCycle
@@ -27,6 +30,7 @@ import Types.Stats as Stats
     , CyclePosition (CyclePosition)
     , setLiftGroupPosition
     , bodyweight
+    , renameLift
     , setPR
     , toLiftStats
     , setProgression
@@ -219,6 +223,7 @@ handleArguments ["program", "lift", lift, "edit"] =
     ifProfile $ ifLift lift $ do
     edited <- editLiftCycle =<< cycleOfLift lift <$> readProgram
     readProgram >>= setProgram . integrateLiftCycle lift edited
+    readStats >>= setStats . renameLift lift (Program.lift edited)
 
 handleArguments _ = putStrLn invalidArgumentResponse
 

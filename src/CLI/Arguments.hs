@@ -27,6 +27,13 @@ import Endgame.Profile
     ( createNewProfile
     , switchToProfile
     )
+import Endgame.Program
+    ( displayProgram
+    , displayLiftGroupCycle
+    , editLiftGroupCycle
+    , displayProgramLift
+    , editProgramLift
+    ) 
 
 import Data.Char 
 import FileHandling
@@ -40,8 +47,6 @@ import CLI.ProgramFormat
     , formatLiftCycle
     )
 import CLI.CreateProfile (createProfile)
-import CLI.Edit.LiftGroupCycle (editLiftGroupCycle)
-import CLI.Edit.LiftCycle (editLiftCycle)
 import Types.Log as Log
 import Types.General 
 import qualified Types.Program as Program
@@ -125,32 +130,17 @@ handleArguments ["log", nStr, "fail", lift] = ensurePositiveInt nStr $ failLiftI
 
 handleArguments ["log", nStr, "remove"] = ensurePositiveInt nStr removeLog
 
-handleArguments ["program"] = ifProfile $
-    readProgram >>= putStrLn . formatProgram
+handleArguments ["program"] = displayProgram
 
 handleArguments ["program", "lift-group-cycle", nStr] =
-    ifProfile $ ensurePositiveInt nStr $ \n -> do
-    cycles <- liftGroupCycles <$> readProgram
-    ensureIndex n cycles $ putStrLn . formatLiftGroupCycle
+    ensurePositiveInt nStr displayLiftGroupCycle
 
 handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
-    ifProfile $ ensurePositiveInt nStr $ \n ->
-    liftGroupCycles <$> readProgram >>= \cycles ->
-    ensureIndex n cycles $ \oldCycle -> do
-    newCycle <- editLiftGroupCycle oldCycle
-    readProgram >>= setProgram . setLiftGroupCycle (n-1) newCycle
-    let resetCycle = CyclePosition 0 $ length newCycle
-    readStats >>= setStats . setLiftGroupPosition (n-1) resetCycle
+    ensurePositiveInt nStr editLiftGroupCycle
 
-handleArguments ["program", "lift", lift] =
-    ifProfile $ ifLift lift $
-    putStrLn =<< formatLiftCycle . cycleOfLift lift <$> readProgram
+handleArguments ["program", "lift", lift] = displayProgramLift lift
 
-handleArguments ["program", "lift", lift, "edit"] =
-    ifProfile $ ifLift lift $ do
-    edited <- editLiftCycle =<< cycleOfLift lift <$> readProgram
-    readProgram >>= setProgram . integrateLiftCycle lift edited
-    readStats >>= setStats . renameLift lift (Program.lift edited)
+handleArguments ["program", "lift", lift, "edit"] = editProgramLift lift
 
 handleArguments _ = putStrLn invalidArgumentResponse
 

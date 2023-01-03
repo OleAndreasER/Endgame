@@ -16,6 +16,9 @@ import Endgame.Help
     , displayLiftsHelp
     , displayProgramHelp
     )
+import Endgame.Add
+    ( addNextLog
+    )
 
 import Data.Char 
 import FileHandling
@@ -78,11 +81,7 @@ handleArguments ["logs", nStr] = ensurePositiveInt nStr displayLogs
 
 handleArguments ["logs"] = displayLogs 1
 
-handleArguments ["add"] = ifProfile $ do
-    (nextLog', nextStats') <- getNextLogAndStats =<< dateStr
-    addLog nextLog'
-    putStrLn $ "Added:\n" ++ formatLog nextLog'
-    setStats nextStats'
+handleArguments ["add"] = addNextLog
     
 handleArguments ["lifts"] =
     ifProfile $ readStats >>= putStrLn . formatStats

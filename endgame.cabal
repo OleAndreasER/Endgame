@@ -32,6 +32,7 @@ executable endgame
                       Endgame.NextLog,
                       Endgame.Log,
                       Endgame.Help,
+                      Endgame.Add,
                       CLI.Arguments,
                       CLI.LogFormat,
                       CLI.ProgramFormat,

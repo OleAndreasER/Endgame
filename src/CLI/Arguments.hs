@@ -1,5 +1,10 @@
 module CLI.Arguments where
 
+import Endgame.NextLog
+    ( displayNextLog
+    , displayNextLogs
+    )
+
 import Data.Char 
 import FileHandling
 import Date (dateStr)
@@ -76,14 +81,9 @@ handleArguments ["help"] =
              \Commands for editing your program:\n\
              \  endgame program help\n"
 
-handleArguments ["next"] = ifProfile $ do
-    (nextLog', _) <- getNextLogAndStats "Next:"
-    putStrLn $ formatLog nextLog'
+handleArguments ["next"] = displayNextLog
 
-handleArguments ["next", nStr] = ifProfile $
-    ensurePositiveInt nStr $ \n -> do
-    logs <- take n <$> getNextLogs
-    putStrLn $ unlines $ reverse $ map formatLog logs
+handleArguments ["next", nStr] = ensurePositiveInt nStr displayNextLogs
     
 handleArguments ["logs", nStr] = ifProfile $
     ensurePositiveInt nStr $ \n ->

@@ -34,6 +34,7 @@ executable endgame
                       Endgame.Help,
                       Endgame.Add,
                       Endgame.Bodyweight,
+                      Endgame.Profile,
                       CLI.Arguments,
                       CLI.LogFormat,
                       CLI.ProgramFormat,

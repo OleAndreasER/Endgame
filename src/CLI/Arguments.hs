@@ -23,6 +23,10 @@ import Endgame.Bodyweight
     ( displayBodyweight
     , setBodyweight
     )
+import Endgame.Profile
+    ( createNewProfile
+    , switchToProfile
+    )
 
 import Data.Char 
 import FileHandling
@@ -109,22 +113,9 @@ handleArguments ["bw"] = displayBodyweight
 
 handleArguments ["bw", bodyweightStr] = ensureWeight bodyweightStr setBodyweight
 
-handleArguments ["profile", "new"] = do
-    putStrLn "Profile name:"
-    name <- getLine
-    isProfile <- elem name <$> getProfiles
-    if isProfile
-    then putStrLn $ "There is already a profile named '"++name++"'."
-    else createProfile name
+handleArguments ["profile", "new"] = createNewProfile
 
-handleArguments ["profile", profile] = do
-    isProfile <- elem profile <$> getProfiles
-    if isProfile
-    then do
-        setProfile profile
-        putStrLn $ "Profile: "++profile
-    else
-        putStrLn $ "There is no profile called '"++profile++"'."
+handleArguments ["profile", profile] = switchToProfile profile
 
 handleArguments ["log", nStr] = ensurePositiveInt nStr displayLog
 

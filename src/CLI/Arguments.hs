@@ -4,6 +4,13 @@ import Endgame.NextLog
     ( displayNextLog
     , displayNextLogs
     )
+import Endgame.Log
+    ( displayLogs
+    , displayLog
+    , failLiftInLog
+    , removeLog
+    , updateLifts -- temp location
+    )
 
 import Data.Char 
 import FileHandling
@@ -85,11 +92,9 @@ handleArguments ["next"] = displayNextLog
 
 handleArguments ["next", nStr] = ensurePositiveInt nStr displayNextLogs
     
-handleArguments ["logs", nStr] = ifProfile $
-    ensurePositiveInt nStr $ \n ->
-    readLogs >>= putStrLn . unlines . map formatLog . reverse . take n
+handleArguments ["logs", nStr] = ensurePositiveInt nStr displayLogs
 
-handleArguments ["logs"] = handleArguments ["logs", "1"]
+handleArguments ["logs"] = displayLogs 1
 
 handleArguments ["add"] = ifProfile $ do
     (nextLog', nextStats') <- getNextLogAndStats =<< dateStr
@@ -150,45 +155,13 @@ handleArguments ["profile", profile] = do
     else
         putStrLn $ "There is no profile called '"++profile++"'."
 
-handleArguments ["log", nStr] = ifProfile $ 
-    ensureLog nStr $ putStrLn . formatLog
+handleArguments ["log", nStr] = ensurePositiveInt nStr displayLog
 
-handleArguments ["log"] = handleArguments ["log", "1"]
+handleArguments ["log"] = displayLog 1
 
-handleArguments ["log", nStr, "fail", lift] = ifProfile $
-    ensureLog nStr $ \log -> do
-    readLogs >>= setLogs . (toElem log $ Log.failLift lift)
+handleArguments ["log", nStr, "fail", lift] = ensurePositiveInt nStr $ failLiftInLog lift
 
-    let newLog = Log.failLift lift log
-    putStrLn $ formatLog newLog
-
-    let setType = liftSetType lift newLog
-    case setType of
-        Nothing -> return ()
-        Just Work -> putStrLn "You can't fail a work set."
-        Just (PR True)  -> unfailLift lift
-        Just (PR False) -> CLI.Arguments.failLift lift
-
-handleArguments ["log", "1", "remove"] =
-    ifProfile $ ensureLog "1" $ \log -> do
-
-    readLogs >>= setLogs . tail
-    readStats >>= setStats . regressPRs log
-    setStats =<< regressCycles <$> readProgram <*> readStats
-
-    putStrLn "Removed:"
-    putStrLn $ formatLog log
-    putStrLn "After undoing PRs and cycle advances, this is your stats:"
-    readStats >>= putStrLn . formatStats
-
-handleArguments ["log", nStr, "remove"] = ifProfile $
-    ensurePositiveInt nStr $ \n ->
-    ensureLog nStr         $ \log -> do
-    
-    setLogs =<< removeAt (n - 1) <$> readLogs
-
-    putStrLn "Removed:"
-    putStrLn $ formatLog log
+handleArguments ["log", nStr, "remove"] = ensurePositiveInt nStr removeLog
 
 handleArguments ["program", "help"] =
     putStrLn "View or edit a lift group cycle:\n\
@@ -228,50 +201,3 @@ handleArguments ["program", "lift", lift, "edit"] =
 handleArguments _ = putStrLn invalidArgumentResponse
 
 invalidArgumentResponse = "Try 'endgame help'"
-
---Applies f to the first instance of y in a list
-toElem :: Eq a => a -> (a -> a) -> [a] -> [a]
-toElem y f (x:xs)
-    | y == x    = f x : xs
-    | otherwise = x : toElem y f xs
-
-removeAt :: Int -> [a] -> [a]
-removeAt n xs 
-    | n < length xs = left ++ right
-    | otherwise     = xs
-    where (left, (_ :right)) = splitAt n xs
-
-updateLifts :: String -> (LiftStats -> LiftStats) -> IO ()
-updateLifts lift f = do
-    stats <- readStats
-    if liftIsInStats lift stats
-    then do
-        let newStats = toLiftStats f lift stats
-        setStats newStats
-        putStrLn $ formatStats newStats
-    else
-        putStrLn $ "You don't do "++lift++"."
-
-failLift :: Lift -> IO ()
-failLift lift = do
-    putStrLn $ "Subtracted 2 progression's worth of weight from "++lift++"'s PR."
-    addWork 1 lift
-    updateLifts lift (addProgressions (-2))
-
-unfailLift :: Lift -> IO ()
-unfailLift lift = do
-    putStrLn $ "Added back 2 progression's worth of weight to "++lift++"'s PR."
-    addWork (-1) lift
-    updateLifts lift (addProgressions 2)
-
-addWork :: Int -> Lift -> IO ()
-addWork work lift = do
-    putStrLn $ workTxt ++ "\n"
-    readStats >>= setStats . Stats.addWork work lift
-  where 
-    workTxt 
-        | work == 0  = ""
-        | work == 1  = "Added a work day to "++lift++"."
-        | work == -1 = "Removed a work day from "++lift++"."
-        | work > 1   = "Added "++show work++" work days to "++lift++"."
-        | work < -1  = "Removed "++show work++" work days from "++lift++"."

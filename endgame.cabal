@@ -30,6 +30,7 @@ executable endgame
     other-modules:    Setup.Setup,
                       Setup.Programs,
                       Endgame.NextLog,
+                      Endgame.Log,
                       CLI.Arguments,
                       CLI.LogFormat,
                       CLI.ProgramFormat,

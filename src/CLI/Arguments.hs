@@ -34,49 +34,18 @@ import Endgame.Program
     , displayProgramLift
     , editProgramLift
     ) 
-
-import Data.Char 
-import FileHandling
-import Date (dateStr)
-import CLI.ArgumentEnsuring
-import CLI.LogFormat (formatLog)
-import CLI.StatsFormat (formatStats)
-import CLI.ProgramFormat
-    (formatProgram
-    , formatLiftGroupCycle
-    , formatLiftCycle
-    )
-import CLI.CreateProfile (createProfile)
-import Types.Log as Log
-import Types.General 
-import qualified Types.Program as Program
-    ( lift 
-    )
-import Types.Program as Program
-    ( liftGroupCycles
-    , setLiftGroupCycle
-    , integrateLiftCycle
-    , cycleOfLift
-    )
-import Types.Stats as Stats
-    ( LiftStats
-    , CyclePosition (CyclePosition)
-    , setLiftGroupPosition
-    , bodyweight
-    , renameLift
+import Endgame.Lifts
+    ( displayLifts
     , setPR
-    , toLiftStats
     , setProgression
-    , liftIsInStats
     , setCycle
     , toggleBodyweight
-    , addProgressions
     )
-import qualified Types.Stats as Stats (addWork)
-import CurrentLog 
-import NextLogs
-import Advance.PRs (regressPRs)
-import Advance.Cycles (regressCycles)
+import CLI.ArgumentEnsuring
+    ( ensurePositiveInt
+    , ensureWeight
+    , ensureCycle
+    )
 
 handleArguments :: [String] -> IO ()
 
@@ -96,23 +65,19 @@ handleArguments ["logs"] = displayLogs 1
 
 handleArguments ["add"] = addNextLog
     
-handleArguments ["lifts"] =
-    ifProfile $ readStats >>= putStrLn . formatStats
+handleArguments ["lifts"] = displayLifts
 
 handleArguments ["lifts", "pr", lift, weightStr] =
-    ifProfile $ ensureWeight weightStr
-    $ \weight -> updateLifts lift $ setPR weight
+    ensureWeight weightStr $ setPR lift
 
 handleArguments ["lifts", "progression", lift, weightStr] =
-    ifProfile $ ensureWeight weightStr
-    $ \weight -> updateLifts lift $ setProgression weight
+    ensureWeight weightStr $ setProgression lift
     
 handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
-    ifProfile $ ensureCycle posStr lenStr
-    $ \pos len -> updateLifts lift $ setCycle (pos-1) len
+    ensureCycle posStr lenStr $ \pos len ->
+    setCycle lift (pos-1) len
 
-handleArguments ["lifts", "toggle-bodyweight", lift] =
-    ifProfile $ updateLifts lift toggleBodyweight
+handleArguments ["lifts", "toggle-bodyweight", lift] = toggleBodyweight lift
 
 handleArguments ["bw"] = displayBodyweight
 

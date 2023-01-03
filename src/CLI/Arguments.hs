@@ -19,6 +19,10 @@ import Endgame.Help
 import Endgame.Add
     ( addNextLog
     )
+import Endgame.Bodyweight
+    ( displayBodyweight
+    , setBodyweight
+    )
 
 import Data.Char 
 import FileHandling
@@ -101,13 +105,9 @@ handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
 handleArguments ["lifts", "toggle-bodyweight", lift] =
     ifProfile $ updateLifts lift toggleBodyweight
 
-handleArguments ["bw"] =
-    ifProfile $ readStats >>= putStrLn . (++ "kg") . show . bodyweight 
+handleArguments ["bw"] = displayBodyweight
 
-handleArguments ["bw", bodyweightStr] = ifProfile $
-    ensureWeight bodyweightStr $ \bw -> do
-    readStats >>= setStats . \stats -> stats {bodyweight = bw}
-    putStrLn ("Bodyweight: "++bodyweightStr++"kg")
+handleArguments ["bw", bodyweightStr] = ensureWeight bodyweightStr setBodyweight
 
 handleArguments ["profile", "new"] = do
     putStrLn "Profile name:"

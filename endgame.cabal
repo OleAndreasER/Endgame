@@ -61,7 +61,13 @@ executable endgame
                       Date,
                       NextLogs,
                       FileHandling,
-                      FirstStatsOfProgram
+                      FirstStatsOfProgram,
+                      Program.Program,
+                      Program.LiftGroupCycle,
+                      Program.LiftCycle,
+                      Program.Session,
+                      Program.Set
+
 
 
     -- LANGUAGE extensions used by modules in this package.

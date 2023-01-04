@@ -1,4 +1,4 @@
-module Endgame.Lifts
+module CLI.Endgame.Lifts
     ( displayLifts
     , setPR
     , setProgression
@@ -17,7 +17,7 @@ import FileHandling
     ( readStats
     , setStats
     )
-import Endgame.Log
+import CLI.Endgame.Log
     ( updateLifts -- temp location
     )
 import qualified Types.Stats as Stats

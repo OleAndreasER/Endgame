@@ -1,4 +1,4 @@
-module Endgame.NextLog
+module CLI.Endgame.NextLog
     ( displayNextLog
     , displayNextLogs
     ) where

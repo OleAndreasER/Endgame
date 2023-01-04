@@ -1,4 +1,4 @@
-module Endgame.Help
+module CLI.Endgame.Help
     ( displayHelp
     , displayLiftsHelp
     , displayProgramHelp

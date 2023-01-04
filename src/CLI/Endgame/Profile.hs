@@ -1,4 +1,4 @@
-module Endgame.Profile
+module CLI.Endgame.Profile
     ( createNewProfile
     , switchToProfile
     ) where

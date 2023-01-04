@@ -1,4 +1,4 @@
-module Endgame.Bodyweight 
+module CLI.Endgame.Bodyweight 
     ( displayBodyweight
     , setBodyweight
     ) where

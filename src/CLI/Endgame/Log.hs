@@ -1,4 +1,4 @@
-module Endgame.Log
+module CLI.Endgame.Log
     ( displayLogs
     , displayLog
     , failLiftInLog

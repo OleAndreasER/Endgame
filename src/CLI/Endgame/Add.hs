@@ -1,4 +1,4 @@
-module Endgame.Add
+module CLI.Endgame.Add
     ( addNextLog
     ) where
 

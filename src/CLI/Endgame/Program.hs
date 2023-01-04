@@ -1,4 +1,4 @@
-module Endgame.Program 
+module CLI.Endgame.Program 
     ( displayProgram
     , displayLiftGroupCycle
     , editLiftGroupCycle

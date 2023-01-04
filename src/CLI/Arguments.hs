@@ -1,40 +1,40 @@
 module CLI.Arguments where
 
-import Endgame.NextLog
+import CLI.Endgame.NextLog
     ( displayNextLog
     , displayNextLogs
     )
-import Endgame.Log
+import CLI.Endgame.Log
     ( displayLogs
     , displayLog
     , failLiftInLog
     , removeLog
     , updateLifts -- temp location
     )
-import Endgame.Help
+import CLI.Endgame.Help
     ( displayHelp
     , displayLiftsHelp
     , displayProgramHelp
     )
-import Endgame.Add
+import CLI.Endgame.Add
     ( addNextLog
     )
-import Endgame.Bodyweight
+import CLI.Endgame.Bodyweight
     ( displayBodyweight
     , setBodyweight
     )
-import Endgame.Profile
+import CLI.Endgame.Profile
     ( createNewProfile
     , switchToProfile
     )
-import Endgame.Program
+import CLI.Endgame.Program
     ( displayProgram
     , displayLiftGroupCycle
     , editLiftGroupCycle
     , displayProgramLift
     , editProgramLift
     ) 
-import Endgame.Lifts
+import CLI.Endgame.Lifts
     ( displayLifts
     , setPR
     , setProgression

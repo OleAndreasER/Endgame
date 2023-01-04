@@ -9,7 +9,6 @@ import CLI.Endgame.Log
     , displayLog
     , failLiftInLog
     , removeLog
-    , updateLifts -- temp location
     )
 import CLI.Endgame.Help
     ( displayHelp

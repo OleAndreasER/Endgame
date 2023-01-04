@@ -56,13 +56,10 @@ ensureCycle posStr lenStr f =
     outOfBounds =
         "is larger than '"++lenStr++"'. Meaning it's out of the cycle's bounds."
 
-ensureLog :: String -> (Log -> IO ()) -> IO ()
-ensureLog nStr f = do
+ensureLog :: Int -> (Log -> IO ()) -> IO ()
+ensureLog n f = do
     logs <- readLogs
-    ensure (readInt nStr >>= check (> 0) "must be positive." >>= getLog logs) f
-
-    
-
+    ensure (check (> 0) "must be positive." n >>= getLog logs) f
 
 ensureIndex :: Int -> [a] -> (a -> IO ()) -> IO ()
 ensureIndex n xs f

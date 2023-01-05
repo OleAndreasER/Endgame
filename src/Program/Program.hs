@@ -1,6 +1,11 @@
 {-# LANGUAGE DeriveGeneric #-}
 module Program.Program
-    ( Program (..)
+    ( Program
+        ( liftGroupCycles
+        , lifts
+        )
+    , program
+    , lift
     , liftCycle
     , prSession
     ) where
@@ -24,9 +29,17 @@ import qualified Data.Map as Map
 import GHC.Generics (Generic)
 
 data Program = Program
-    { lifts :: Map.Map Lift LiftCycle
-    , liftGroupCycles :: [LiftGroupCycle]
+    { liftGroupCycles :: [LiftGroupCycle]
+    , lifts :: Map.Map Lift LiftCycle
     } deriving (Show, Read, Eq, Generic)
+
+
+program :: [LiftGroupCycle] -> [(Lift, LiftCycle)] -> Program
+program liftGroupCycles' lifts' =
+    Program liftGroupCycles' $ Map.fromList lifts'
+
+lift :: Lift -> LiftCycle -> (Lift, LiftCycle)
+lift = (,)
 
 liftCycle :: Lift -> Program -> Maybe LiftCycle
 liftCycle lift program =

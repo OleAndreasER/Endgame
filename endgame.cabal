@@ -68,7 +68,10 @@ executable endgame
         Program.LiftGroupCycle,
         Program.LiftCycle,
         Program.Session,
-        Program.Set
+        Program.Set,
+        Log.Log,
+        Log.Session,
+        Log.Set
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

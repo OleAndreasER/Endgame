@@ -1,6 +1,8 @@
 {-# LANGUAGE DeriveGeneric #-}
 module Program.Program
-    (
+    ( Program (Program, liftGroupCycles)
+    , liftCycle
+    , prSession
     ) where
 
 import Types.General
@@ -9,7 +11,19 @@ import Types.General
 import Program.LiftGroupCycle
     ( LiftGroupCycle
     )
-import Data.HashMap.Strict
+import Program.LiftCycle
+    ( LiftCycle
+    )
+import qualified Program.LiftCycle as LiftCycle
+    ( prSession
+    )
+import Program.Session
+    ( Session
+    )
+import Data.HashMap.Strict as HashMap
+    ( HashMap (..)
+    , lookup
+    )
 import GHC.Generics (Generic)
 
 data Program = Program
@@ -17,5 +31,10 @@ data Program = Program
     , liftGroupCycles :: [LiftGroupCycle]
     } deriving (Show, Read, Eq, Generic)
 
-type LiftCycle = Int
+liftCycle :: Lift -> Program -> Maybe LiftCycle
+liftCycle lift program =
+    HashMap.lookup lift $ lifts program
 
+prSession :: Lift -> Program -> Maybe Session
+prSession lift program =
+    LiftCycle.prSession <$> liftCycle lift program

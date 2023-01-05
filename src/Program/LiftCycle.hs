@@ -2,17 +2,14 @@
 
 module Program.LiftCycle
     ( LiftCycle
+    , prSession
     ) where
 
-import GHC.Generics
-    ( Generic
-    )
 import Program.Session
     ( Session
     )
 
+type LiftCycle = [Session]
 
-data LiftCycle = LiftCycle
-    { prSession :: Session
-    , workSessions :: [Session]
-    } deriving (Show, Read, Eq, Generic)
+prSession :: LiftCycle -> Session
+prSession = head

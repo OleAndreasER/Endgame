@@ -1,7 +1,8 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Program.Set
-    ( Set
+    ( Set (..)
+    , SetType (..)
     ) where
 
 import GHC.Generics (Generic)

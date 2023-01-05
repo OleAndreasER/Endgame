@@ -24,69 +24,73 @@ extra-source-files:
     README.md
 
 executable endgame
-    main-is:          Main.hs
+    main-is: Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules:    Setup.Setup,
-                      Setup.Programs,
-                      CLI.Endgame.NextLog,
-                      CLI.Endgame.Log,
-                      CLI.Endgame.Help,
-                      CLI.Endgame.Add,
-                      CLI.Endgame.Bodyweight,
-                      CLI.Endgame.Profile,
-                      CLI.Endgame.Program,
-                      CLI.Endgame.Lifts,
-                      CLI.Arguments,
-                      CLI.LogFormat,
-                      CLI.ProgramFormat,
-                      CLI.StatsFormat,
-                      CLI.SetupStats,
-                      CLI.ArgumentEnsuring,
-                      CLI.SelectProgram,
-                      CLI.CreateProfile,
-                      CLI.CreateProgram,
-                      CLI.Edit.LiftGroupCycle,
-                      CLI.Edit.LiftCycle,
-                      CLI.Input.Input,
-                      CLI.Input.Defaulted,
-                      CLI.Input.Readers,
-                      Types.General,
-                      Types.Program,
-                      Types.Log,
-                      Types.Stats,
-                      Advance.Cycles,
-                      Advance.PRs,
-                      CurrentLog,
-                      Date,
-                      NextLogs,
-                      FileHandling,
-                      FirstStatsOfProgram,
-                      Program.Program,
-                      Program.LiftGroupCycle,
-                      Program.LiftCycle,
-                      Program.Session,
-                      Program.Set
+    other-modules:
+        Setup.Setup,
+        Setup.Programs,
+        Setup.NewPrograms,
+        CLI.Endgame.NextLog,
+        CLI.Endgame.Log,
+        CLI.Endgame.Help,
+        CLI.Endgame.Add,
+        CLI.Endgame.Bodyweight,
+        CLI.Endgame.Profile,
+        CLI.Endgame.Program,
+        CLI.Endgame.Lifts,
+        CLI.Arguments,
+        CLI.LogFormat,
+        CLI.ProgramFormat,
+        CLI.StatsFormat,
+        CLI.SetupStats,
+        CLI.ArgumentEnsuring,
+        CLI.SelectProgram,
+        CLI.CreateProfile,
+        CLI.CreateProgram,
+        CLI.Edit.LiftGroupCycle,
+        CLI.Edit.LiftCycle,
+        CLI.Input.Input,
+        CLI.Input.Defaulted,
+        CLI.Input.Readers,
+        Types.General,
+        Types.Program,
+        Types.Log,
+        Types.Stats,
+        Advance.Cycles,
+        Advance.PRs,
+        CurrentLog,
+        Date,
+        NextLogs,
+        FileHandling,
+        FirstStatsOfProgram,
+        Program.Program,
+        Program.LiftGroupCycle,
+        Program.LiftCycle,
+        Program.Session,
+        Program.Set
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    build-depends:    base ^>=4.16.0.0,
-                      directory ^>=1.3.6.2,
-                      split ^>=0.2.3.4,
-                      binary ^>=0.8.9.0,
-                      yjtools ^>=0.9.18,
-                      relude ^>=1.1.0.0,
-                      time ^>=1.11.1.1
+    build-depends:
+        base ^>=4.16.0.0,
+        directory ^>=1.3.6.2,
+        split ^>=0.2.3.4,
+        binary ^>=0.8.9.0,
+        yjtools ^>=0.9.18,
+        relude ^>=1.1.0.0,
+        containers ^>= 0.6.5.1,
+        time ^>=1.11.1.1
     hs-source-dirs:   app, src
     default-language: Haskell2010
 
 test-suite test
     type: exitcode-stdio-1.0
     main-is: Test.hs
-    hs-source-dirs:
-        test, src
+    hs-source-dirs: test, src
     ghc-options: -threaded -rtsopts -with-rtsopts=-N
     build-depends:
-        base >=4.7 && <5,
+        base ^>=4.16.0.0,
         hspec ^>= 2.10.0
+
     default-language: Haskell2010

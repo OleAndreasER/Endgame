@@ -3,10 +3,9 @@ module Main where
 import Test.Hspec
 
 main :: IO ()
-main = hspec simpleTest
+main = hspec tests
 
-simpleTest :: Spec
-simpleTest = describe "H" $ do
-    it "Should be right" $
-        (4 + 5) `shouldBe` 9
-
+tests :: Spec
+tests = describe "Nothing" $ do
+    it "n/a" $
+        (2 - 1) `shouldBe` 1

@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 module Program.Program
-    ( Program (Program, liftGroupCycles)
+    ( Program (..)
     , liftCycle
     , prSession
     ) where
@@ -20,20 +20,17 @@ import qualified Program.LiftCycle as LiftCycle
 import Program.Session
     ( Session
     )
-import Data.HashMap.Strict as HashMap
-    ( HashMap (..)
-    , lookup
-    )
+import qualified Data.Map as Map
 import GHC.Generics (Generic)
 
 data Program = Program
-    { lifts :: HashMap Lift LiftCycle
+    { lifts :: Map.Map Lift LiftCycle
     , liftGroupCycles :: [LiftGroupCycle]
     } deriving (Show, Read, Eq, Generic)
 
 liftCycle :: Lift -> Program -> Maybe LiftCycle
 liftCycle lift program =
-    HashMap.lookup lift $ lifts program
+    Map.lookup lift $ lifts program
 
 prSession :: Lift -> Program -> Maybe Session
 prSession lift program =

@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Program.Session
-    ( Session
+    ( Session (..)
     , prSet
     ) where
 

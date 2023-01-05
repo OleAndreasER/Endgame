@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Program.Session
-    ( Session (..)
+    ( Session
     , prSet
     ) where
 
@@ -12,9 +12,7 @@ import Program.Set
     ( Set
     )
 
-newtype Session = Session
-    { sets :: [Set] }
-    deriving (Show, Read, Eq, Generic)
+type Session = [Set]
 
 prSet :: Session -> Set
-prSet = head . sets
+prSet = head

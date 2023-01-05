@@ -11,18 +11,16 @@ import Program.Set
     , workSets
     )
 import Program.Session
-    ( Session (..)
+    ( Session
     )
 
 standardHalfDays :: Program
 standardHalfDays = Program
     { lifts = Map.fromList
         [ ( "Press"
-          , [ Session $
-                prSet "Press" 3 :
-                workSets "Press" 1 5 87
-            , Session $
-                workSets "Press" 3 5 87
+          , [ prSet "Press" 3 :
+              workSets "Press" 1 5 87
+            , workSets "Press" 3 5 87
             ]
           )
         ]

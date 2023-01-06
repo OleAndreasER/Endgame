@@ -7,7 +7,10 @@ import Program.Program
     ( Program
     , program
     , lift
-    , LiftInfo (..)
+    )
+import Program.LiftInfo
+    ( LiftInfo 
+        (..)
     )
 import Program.Set
     ( prSet

@@ -3,8 +3,6 @@
 module Program.Program
     ( Program
         ( liftGroupCycles )
-    , LiftInfo.LiftInfo
-        (..)
     , program
     , lift
     , liftCycle

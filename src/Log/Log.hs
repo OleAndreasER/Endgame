@@ -27,7 +27,7 @@ import Types.General
 
 data Log = Log 
     { label :: String
-    , sessions :: Map.Map Lift Session
+    , sessionMap :: Map.Map Lift Session
     } deriving (Generic, Show, Read, Eq)
 
 instance Binary Log
@@ -37,11 +37,11 @@ log label sessions = Log label $ Map.fromList sessions
 
 session :: Lift -> Log -> Maybe Session
 session lift log =
-    Map.lookup lift $ sessions log
+    Map.lookup lift $ sessionMap log
 
 toSession :: (Session -> Session) -> Lift -> Log -> Log
 toSession f lift log = log
-    { sessions = Map.adjust f lift $ sessions log }
+    { sessionMap = Map.adjust f lift $ sessionMap log }
 
 liftSession :: Lift -> Session -> (Lift, Session)
 liftSession = (,)
@@ -53,4 +53,4 @@ failPR :: Lift -> Log -> Log
 failPR = toSession Session.failPR
 
 lifts :: Log -> [Lift]
-lifts log = Map.keys $ sessions log
+lifts log = Map.keys $ sessionMap log

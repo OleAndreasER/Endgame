@@ -3,11 +3,10 @@
 module Stats.Stats
     ( Stats
         ( liftGroupPositions
-        , liftStats
         , bodyweight
         )
     , fromProgram
-    , statsOfLift
+    , liftStats
     , renameLift
     ) where
 
@@ -33,7 +32,7 @@ import Program.Program
 
 data Stats = Stats
     { liftGroupPositions :: [Int]
-    , liftStats :: Map.Map Lift LiftStats
+    , liftStatsMap :: Map.Map Lift LiftStats
     , bodyweight :: Weight
     } deriving (Generic, Show, Eq, Read)
 
@@ -42,26 +41,29 @@ instance Binary Stats
 fromProgram :: Program -> Stats
 fromProgram program = Stats
     { liftGroupPositions = map (\_ -> 0) $ liftGroupCycles program
-    , liftStats = newLiftStats $ liftList program
+    , liftStatsMap = newLiftStatsMap $ liftList program
     , bodyweight = 0
     }
 
-newLiftStats :: [Lift] -> Map.Map Lift LiftStats
-newLiftStats lifts =
+newLiftStatsMap :: [Lift] -> Map.Map Lift LiftStats
+newLiftStatsMap lifts =
     Map.fromList $ zip lifts $ repeat LiftStats.newLiftStats
 
-statsOfLift :: Lift -> Stats -> Maybe LiftStats
-statsOfLift lift stats = Map.lookup lift $ liftStats stats
+liftStats :: Lift -> Stats -> Maybe LiftStats
+liftStats lift stats = Map.lookup lift $ liftStatsMap stats
 
 toLiftStats :: (LiftStats -> LiftStats) -> Lift -> Stats -> Stats
 toLiftStats f lift stats = stats
-    { liftStats = Map.adjust f lift $ liftStats stats }
+    { liftStatsMap = Map.adjust f lift $ liftStatsMap stats }
 
 renameLift :: Lift -> Lift -> Stats -> Stats
-renameLift old new stats = case statsOfLift old stats of
+renameLift old new stats = case liftStats old stats of
     Nothing -> stats
     Just liftStats' -> stats
-        { liftStats = insertNew liftStats' $ removeOld $ liftStats stats }
+        { liftStatsMap =
+            insertNew liftStats' $
+            removeOld $ liftStatsMap stats
+        }
   where
     insertNew = Map.insert new
     removeOld = Map.delete old

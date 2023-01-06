@@ -3,8 +3,7 @@ module Program.LiftGroupCycle
     ) where
 
 import Types.General
-    ( Lift
-    )
+    ( Lift )
 
 type LiftGroupCycle = [Lift]
 

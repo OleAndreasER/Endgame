@@ -6,11 +6,9 @@ module Program.Session
     ) where
 
 import GHC.Generics
-    ( Generic
-    )
+    ( Generic )
 import Program.Set
-    ( Set
-    )
+    ( Set )
 
 type Session = [Set]
 

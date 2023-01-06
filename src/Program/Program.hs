@@ -12,22 +12,18 @@ module Program.Program
     ) where
 
 import Types.General
-    ( Lift
-    )
+    ( Lift )
 import Program.LiftGroupCycle
-    ( LiftGroupCycle
-    )
+    ( LiftGroupCycle )
 import Program.LiftCycle
-    ( LiftCycle
-    )
+    ( LiftCycle )
 import qualified Program.LiftCycle as LiftCycle
-    ( prSession
-    )
+    ( prSession )
 import Program.Session
-    ( Session
-    )
+    ( Session )
 import qualified Data.Map as Map
-import GHC.Generics (Generic)
+import GHC.Generics
+    (Generic)
 
 data Program = Program
     { liftGroupCycles :: [LiftGroupCycle]

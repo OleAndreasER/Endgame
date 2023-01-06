@@ -1,14 +1,15 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Log.Set
-    ( Set (..)
-    , SetType (..)
+    ( Set
+        (..)
+    , SetType
+        (..)
     , failSet
     ) where
 
 import GHC.Generics
-    ( Generic
-    )
+    ( Generic )
 import Data.Binary
 import Types.General
     ( Reps
@@ -16,9 +17,7 @@ import Types.General
     , Lift
     )
 
-data SetType
-    = Work 
-    | PR Bool
+data SetType = Work | PR Bool
     deriving (Generic, Show, Read, Eq)
 
 instance Binary SetType

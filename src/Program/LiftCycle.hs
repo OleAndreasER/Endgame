@@ -6,8 +6,7 @@ module Program.LiftCycle
     ) where
 
 import Program.Session
-    ( Session
-    )
+    ( Session )
 
 type LiftCycle = [Session]
 

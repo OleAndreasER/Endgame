@@ -7,12 +7,14 @@ module Program.Set
         , percent
         , setType
         )
-    , SetType (..)
+    , SetType
+        (..)
     , prSet
     , workSets
     ) where
 
-import GHC.Generics (Generic)
+import GHC.Generics
+    (Generic)
 import Types.General
     ( Lift
     , Reps

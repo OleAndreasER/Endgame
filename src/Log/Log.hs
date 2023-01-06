@@ -2,8 +2,7 @@
 
 module Log.Log
     ( Log
-        ( label
-        )
+        ( label )
     , log
     , session
     , liftSession
@@ -14,22 +13,17 @@ module Log.Log
 
 
 import Prelude hiding
-    ( log
-    )
+    ( log )
 import GHC.Generics
-    ( Generic
-    )
+    ( Generic )
 import Data.Binary
 import qualified Data.Map as Map
 import Log.Session
-    ( Session
-    )
+    ( Session )
 import qualified Log.Session as Session
-    ( failPR
-    )
+    ( failPR )
 import Types.General
-    ( Lift
-    )
+    ( Lift )
 
 data Log = Log 
     { label :: String
@@ -47,8 +41,7 @@ session lift log =
 
 toSession :: (Session -> Session) -> Lift -> Log -> Log
 toSession f lift log = log
-    { sessions = Map.adjust f lift $ sessions log
-    }
+    { sessions = Map.adjust f lift $ sessions log }
 
 liftSession :: Lift -> Session -> (Lift, Session)
 liftSession = (,)

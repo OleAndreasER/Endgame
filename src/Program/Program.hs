@@ -8,6 +8,7 @@ module Program.Program
     , lift
     , liftCycle
     , prSession
+    , liftList
     ) where
 
 import Types.General
@@ -48,3 +49,6 @@ liftCycle lift program =
 prSession :: Lift -> Program -> Maybe Session
 prSession lift program =
     LiftCycle.prSession <$> liftCycle lift program
+
+liftList :: Program -> [Lift]
+liftList = Map.keys . lifts

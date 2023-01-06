@@ -71,7 +71,9 @@ executable endgame
         Program.Set,
         Log.Log,
         Log.Session,
-        Log.Set
+        Log.Set,
+        Stats.Stats,
+        Stats.LiftStats
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

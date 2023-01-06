@@ -69,6 +69,7 @@ executable endgame
         Program.LiftCycle,
         Program.Session,
         Program.Set,
+        Program.LiftInfo,
         Log.Log,
         Log.Session,
         Log.Set,

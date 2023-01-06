@@ -8,6 +8,8 @@ module Program.Program
     , program
     , lift
     , liftCycle
+    , progression
+    , isBodyweight
     , prSession
     , liftList
     ) where
@@ -35,9 +37,9 @@ import GHC.Generics
 
 data Program = Program
     { liftGroupCycles :: [LiftGroupCycle]
-    , lifts :: Map.Map Lift LiftCycle
-    , progression :: Map.Map Lift Weight
-    , isBodyweight :: Map.Map Lift Bool
+    , liftCycleMap :: Map.Map Lift LiftCycle
+    , progressionMap :: Map.Map Lift Weight
+    , isBodyweightMap :: Map.Map Lift Bool
     } deriving (Show, Read, Eq, Generic)
 
 instance Binary Program
@@ -62,12 +64,16 @@ lift :: LiftInfo.LiftInfo -> LiftCycle -> (LiftInfo.LiftInfo, LiftCycle)
 lift = (,)
 
 liftCycle :: Lift -> Program -> Maybe LiftCycle
-liftCycle lift program =
-    Map.lookup lift $ lifts program
+liftCycle lift program = Map.lookup lift $ liftCycleMap program
+
+progression :: Lift -> Program -> Maybe Weight
+progression lift program = Map.lookup lift $ progressionMap program
+
+isBodyweight :: Lift -> Program -> Maybe Bool
+isBodyweight lift program = Map.lookup lift $ isBodyweightMap program
 
 prSession :: Lift -> Program -> Maybe Session
-prSession lift program =
-    LiftCycle.prSession <$> liftCycle lift program
+prSession lift program = LiftCycle.prSession <$> liftCycle lift program
 
 liftList :: Program -> [Lift]
-liftList = Map.keys . lifts
+liftList = Map.keys . liftCycleMap

@@ -15,6 +15,7 @@ module Program.Set
 
 import GHC.Generics
     (Generic)
+import Data.Binary
 import Types.General
     ( Lift
     , Reps
@@ -28,8 +29,12 @@ data Set = Set
     , setType :: SetType
     } deriving (Show, Read, Eq, Generic)
 
+instance Binary Set
+
 data SetType = PR | Work
     deriving (Show, Read, Eq, Generic)
+
+instance Binary SetType
 
 prSet :: Lift -> Reps -> Set
 prSet lift reps = Set lift reps 100 PR

@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+
 module Program.Program
     ( Program
         ( liftGroupCycles
@@ -22,6 +23,7 @@ import qualified Program.LiftCycle as LiftCycle
 import Program.Session
     ( Session )
 import qualified Data.Map as Map
+import Data.Binary
 import GHC.Generics
     (Generic)
 
@@ -30,6 +32,7 @@ data Program = Program
     , lifts :: Map.Map Lift LiftCycle
     } deriving (Show, Read, Eq, Generic)
 
+instance Binary Program
 
 program :: [LiftGroupCycle] -> [(Lift, LiftCycle)] -> Program
 program liftGroupCycles' lifts' =

@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
-
 module Program.LiftCycle
     ( LiftCycle
     , prSession

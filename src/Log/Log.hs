@@ -11,7 +11,6 @@ module Log.Log
     , lifts
     ) where 
 
-
 import Prelude hiding
     ( log )
 import GHC.Generics

@@ -6,4 +6,3 @@ import Types.General
     ( Lift )
 
 type LiftGroupCycle = [Lift]
-

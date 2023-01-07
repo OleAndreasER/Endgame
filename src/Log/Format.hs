@@ -1,4 +1,4 @@
-module CLI.Format.Log
+module Log.Format
     ( format
     ) where
 

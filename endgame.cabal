@@ -53,7 +53,6 @@ executable endgame
         CLI.Input.Input,
         CLI.Input.Defaulted,
         CLI.Input.Readers,
-        CLI.Format.Log,
         Types.General,
         Types.Program,
         Types.Log,
@@ -74,6 +73,7 @@ executable endgame
         Log.Log,
         Log.Session,
         Log.Set,
+        Log.Format,
         Stats.Stats,
         Stats.LiftStats
 
@@ -102,10 +102,14 @@ test-suite test
         containers ^>= 0.6.5.1,
         hspec ^>= 2.10.0
     other-modules:
+        --src/
         Log.Log,
         Log.Session,
         Types.General,
         Log.Set,
-        CLI.Format.Log
+        Log.Format
+
+        --test/
+        LogFormatTest
 
     default-language: Haskell2010

@@ -8,6 +8,9 @@ module Stats.Stats
     , fromProgram
     , liftStats
     , renameLift
+    , setBodyweight
+    , setPr
+    , setCycle
     ) where
 
 import qualified Data.Map as Map
@@ -17,7 +20,10 @@ import GHC.Generics
 import Stats.LiftStats
     ( LiftStats )
 import qualified Stats.LiftStats as LiftStats
-    ( newLiftStats )
+    ( newLiftStats
+    , setPr
+    , setCycle
+    )
 import Program.Program
     ( liftList )
 import Types.General
@@ -55,6 +61,15 @@ liftStats lift stats = Map.lookup lift $ liftStatsMap stats
 toLiftStats :: (LiftStats -> LiftStats) -> Lift -> Stats -> Stats
 toLiftStats f lift stats = stats
     { liftStatsMap = Map.adjust f lift $ liftStatsMap stats }
+
+setPr :: Weight -> Lift -> Stats -> Stats
+setPr weight = toLiftStats (LiftStats.setPr weight)
+
+setCycle :: Int -> Int -> Lift -> Stats -> Stats
+setCycle pos len = toLiftStats (LiftStats.setCycle pos len)
+
+setBodyweight :: Weight -> Stats -> Stats
+setBodyweight bw stats = stats { bodyweight = bw }
 
 renameLift :: Lift -> Lift -> Stats -> Stats
 renameLift old new stats = case liftStats old stats of

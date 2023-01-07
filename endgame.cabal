@@ -75,7 +75,8 @@ executable endgame
         Log.Set,
         Log.Format,
         Stats.Stats,
-        Stats.LiftStats
+        Stats.LiftStats,
+        Stats.Format
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -107,7 +108,18 @@ test-suite test
         Log.Session,
         Types.General,
         Log.Set,
-        Log.Format
+        Log.Format,
+        Stats.Stats,
+        Stats.LiftStats,
+        Stats.Format,
+        Program.LiftCycle,
+        Program.LiftGroupCycle,
+        Program.LiftInfo,
+        Program.Program,
+        Program.Session,
+        Program.Set,
+        StatsFormatTest,
+        TestProgram
 
         --test/
         LogFormatTest

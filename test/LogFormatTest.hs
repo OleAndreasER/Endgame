@@ -20,6 +20,11 @@ import Log.Set
 import Log.Format
     ( format )
 
+testLogFormat :: Spec
+testLogFormat =
+    it "Log Format" $
+    format testLog `shouldBe` expectedLogFormat
+
 testLog :: Log
 testLog = log "1/1/2023"
     [ liftSession "Bench" $
@@ -29,13 +34,9 @@ testLog = log "1/1/2023"
         workSets "Squat" 3 5 135
     ]
 
+expectedLogFormat :: String
 expectedLogFormat =
     "1/1/2023\n\
     \Bench PR 1x3 100.0kg (FAIL)\n\
     \Press Work 2x7 50.0kg\n\
     \Squat Work 3x5 135.0kg"
-
-testLogFormat :: Spec
-testLogFormat =
-    it "Log Format" $
-    format testLog `shouldBe` expectedLogFormat

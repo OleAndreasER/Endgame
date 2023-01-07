@@ -23,7 +23,7 @@ import Log.Format
 testLog :: Log
 testLog = log "1/1/2023"
     [ liftSession "Bench" $
-        fail (Log.Set.prSet "Bench" 3 100) :
+        fail (prSet "Bench" 3 100) :
         workSets "Press" 2 7 50
     , liftSession "Squat" $
         workSets "Squat" 3 5 135

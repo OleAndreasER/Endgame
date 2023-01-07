@@ -9,6 +9,7 @@ module Log.Log
     , did
     , failPR
     , lifts
+    , sessions
     ) where 
 
 import Prelude hiding
@@ -52,4 +53,7 @@ failPR :: Lift -> Log -> Log
 failPR = toSession Session.failPR
 
 lifts :: Log -> [Lift]
-lifts log = Map.keys $ sessionMap log
+lifts = Map.keys . sessionMap
+
+sessions :: Log -> [Session]
+sessions = Map.elems . sessionMap

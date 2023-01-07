@@ -5,7 +5,9 @@ module Log.Set
         (..)
     , SetType
         (..)
-    , failSet
+    , prSet
+    , workSets
+    , fail
     ) where
 
 import GHC.Generics
@@ -16,6 +18,8 @@ import Types.General
     , Weight
     , Lift
     )
+import Prelude hiding
+    ( fail )
 
 data SetType = Work | PR Bool
     deriving (Generic, Show, Read, Eq)
@@ -31,8 +35,15 @@ data Set = Set
 
 instance Binary Set
 
-failSet :: Set -> Set
-failSet (Set lift reps weight setType) = 
+prSet :: Lift -> Reps -> Weight -> Set
+prSet lift reps weight = Set lift reps weight (PR True)
+
+workSets :: Lift -> Int -> Reps -> Weight -> [Set]
+workSets lift sets reps weight =
+    take sets $ repeat $ Set lift reps weight Work
+
+fail :: Set -> Set
+fail (Set lift reps weight setType) = 
     Set lift reps weight $ case setType of 
         Work         -> Work
         PR succeeded -> PR (not succeeded)

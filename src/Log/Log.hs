@@ -9,10 +9,13 @@ module Log.Log
     , did
     , failPR
     , lifts
+    , sessions
     ) where 
 
 import Prelude hiding
     ( log )
+import Data.Maybe
+    ( fromJust )
 import GHC.Generics
     ( Generic )
 import Data.Binary
@@ -27,12 +30,16 @@ import Types.General
 data Log = Log 
     { label :: String
     , sessionMap :: Map.Map Lift Session
+    , liftsInOrder :: [Lift]
     } deriving (Generic, Show, Read, Eq)
 
 instance Binary Log
 
 log :: String -> [(Lift, Session)] -> Log
-log label sessions = Log label $ Map.fromList sessions
+log label sessions = Log
+    label
+    (Map.fromList sessions)
+    (fst <$> sessions)
 
 session :: Lift -> Log -> Maybe Session
 session lift log =
@@ -52,4 +59,9 @@ failPR :: Lift -> Log -> Log
 failPR = toSession Session.failPR
 
 lifts :: Log -> [Lift]
-lifts log = Map.keys $ sessionMap log
+lifts = liftsInOrder
+
+sessions :: Log -> [Session]
+sessions log =
+    (\lift -> fromJust $ session lift log) <$>
+    liftsInOrder log

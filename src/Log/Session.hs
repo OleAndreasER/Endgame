@@ -4,17 +4,17 @@ module Log.Session
     , hasSuccessfulPR
     ) where
 
-import Log.Set
+import Log.Set as Set
     ( Set (setType)
     , SetType (..)
-    , failSet
+    , fail
     )
 
 type Session = [Set]
 
 failPR :: Session -> Session
 failPR (prSet : workSets) =
-    failSet prSet : workSets
+    Set.fail prSet : workSets
 
 hasSuccessfulPR :: Session -> Bool
 hasSuccessfulPR (prSet : _) = PR True == setType prSet

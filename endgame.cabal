@@ -70,6 +70,7 @@ executable endgame
         Program.Session,
         Program.Set,
         Program.LiftInfo,
+        Program.Format,
         Log.Log,
         Log.Session,
         Log.Set,
@@ -118,10 +119,13 @@ test-suite test
         Program.Program,
         Program.Session,
         Program.Set,
+        Program.Format,
         StatsFormatTest,
         TestProgram
 
         --test/
         LogFormatTest
+        ProgramFormatTest
+        StatsFormatTest
 
     default-language: Haskell2010

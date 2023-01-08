@@ -36,7 +36,7 @@ testStats =
 expectedStatsFormat :: String
 expectedStatsFormat =
     "Bodyweight: 72.5kg\n\
-    \Press: 60kg 1/3\n\
-    \Bench: 100kg 2/4\n\
-    \Squat: 160kg 2/2\n\
-    \Chin: 80kg 1/2"
+    \Press: 60.0kg 1/3\n\
+    \Bench: 100.0kg 2/4\n\
+    \Squat: 160.0kg 2/2\n\
+    \Chin: 80.0kg 1/2"

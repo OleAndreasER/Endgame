@@ -38,6 +38,7 @@ data Program = Program
     , liftCycleMap :: Map.Map Lift LiftCycle
     , progressionMap :: Map.Map Lift Weight
     , isBodyweightMap :: Map.Map Lift Bool
+    , liftsInOrder :: [Lift]
     } deriving (Show, Read, Eq, Generic)
 
 instance Binary Program
@@ -47,11 +48,12 @@ program :: [LiftGroupCycle]
         -> Program
 program liftGroupCycles liftInfos = Program
     liftGroupCycles
-    (Map.fromList $ lift <$> liftInfos)
+    (Map.fromList $ liftCycle <$> liftInfos)
     (Map.fromList $ progression <$> liftInfos)
     (Map.fromList $ isBodyweight <$> liftInfos)
+    (LiftInfo.name . fst <$> liftInfos)
   where
-    lift (info, cycle) =
+    liftCycle (info, cycle) =
         ( LiftInfo.name info, cycle )
     progression (info, _) =
         ( LiftInfo.name info, LiftInfo.progression info )
@@ -74,4 +76,4 @@ prSession :: Lift -> Program -> Maybe Session
 prSession lift program = LiftCycle.prSession <$> liftCycle lift program
 
 liftList :: Program -> [Lift]
-liftList = Map.keys . liftCycleMap
+liftList = liftsInOrder

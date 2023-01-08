@@ -14,6 +14,8 @@ module Stats.Stats
     , withLiftStats
     ) where
 
+import Data.Maybe
+    ( fromJust )
 import qualified Data.Map as Map
 import Data.Binary
 import GHC.Generics
@@ -41,6 +43,7 @@ data Stats = Stats
     { liftGroupPositions :: [Int]
     , liftStatsMap :: Map.Map Lift LiftStats
     , bodyweight :: Weight
+    , liftsInOrder :: [Lift]
     } deriving (Generic, Show, Eq, Read)
 
 instance Binary Stats
@@ -50,6 +53,7 @@ fromProgram program = Stats
     { liftGroupPositions = map (\_ -> 0) $ liftGroupCycles program
     , liftStatsMap = newLiftStatsMap $ liftList program
     , bodyweight = 0
+    , liftsInOrder = liftList program
     }
 
 newLiftStatsMap :: [Lift] -> Map.Map Lift LiftStats
@@ -84,8 +88,12 @@ renameLift old new stats = case liftStats old stats of
     insertNew = Map.insert new
     removeOld = Map.delete old
 
+liftStatsInOrder :: Stats -> [(Lift, LiftStats)]
+liftStatsInOrder stats =
+    (\lift -> (lift, fromJust $ liftStats lift stats)) <$>
+    liftsInOrder stats
+
 withLiftStats :: (Lift -> LiftStats -> a) -> Stats -> [a]
 withLiftStats f stats =
-    (uncurry f) <$>
-    (Map.toList $ liftStatsMap stats)
+    (uncurry f) <$> liftStatsInOrder stats
 

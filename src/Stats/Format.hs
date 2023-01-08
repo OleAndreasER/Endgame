@@ -18,7 +18,7 @@ import Types.General
 
 format :: Stats -> String
 format stats = 
-    unlines $
+    init $ unlines $
     ("Bodyweight: " ++ show (bodyweight stats) ++ "kg") :
     withLiftStats formatLiftStats stats
 
@@ -28,5 +28,3 @@ formatLiftStats lift liftStats =
     show (pr liftStats) ++ "kg " ++
     show (cyclePosition liftStats) ++ "/" ++
     show (cycleLength liftStats)
-
-

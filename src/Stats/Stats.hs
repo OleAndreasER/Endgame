@@ -11,6 +11,7 @@ module Stats.Stats
     , setBodyweight
     , setPr
     , setCycle
+    , withLiftStats
     ) where
 
 import qualified Data.Map as Map
@@ -82,3 +83,9 @@ renameLift old new stats = case liftStats old stats of
   where
     insertNew = Map.insert new
     removeOld = Map.delete old
+
+withLiftStats :: (Lift -> LiftStats -> a) -> Stats -> [a]
+withLiftStats f stats =
+    (uncurry f) <$>
+    (Map.toList $ liftStatsMap stats)
+

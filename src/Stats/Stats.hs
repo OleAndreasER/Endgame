@@ -2,12 +2,12 @@
 
 module Stats.Stats
     ( Stats
-        ( liftGroupPositions
-        , bodyweight
-        )
+    , liftGroupPositions
+    , bodyweight
     , fromProgram
     , liftStats
     , renameLift
+    , setLiftGroupPosition
     , setBodyweight
     , setPr
     , setCycle
@@ -97,3 +97,10 @@ withLiftStats :: (Lift -> LiftStats -> a) -> Stats -> [a]
 withLiftStats f stats =
     (uncurry f) <$> liftStatsInOrder stats
 
+setLiftGroupPosition :: Int -> Int -> Stats -> Maybe Stats
+setLiftGroupPosition n newPosition stats
+    | (length $ liftGroupPositions stats) <= n = Nothing
+    | otherwise = Just $ stats
+        { liftGroupPositions = xs ++ (newPosition:ys) }
+  where
+    (xs, _:ys)= splitAt n $ liftGroupPositions stats

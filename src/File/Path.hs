@@ -14,7 +14,7 @@ endgame :: IO FilePath
 endgame = getAppUserDataDirectory "endgame"
 
 profile :: String -> IO FilePath
-profile profileName = endgame <&> (++ "profiles/" ++ profileName)
+profile profileName = endgame <&> (++ "/profiles/" ++ profileName)
 
 stats :: String -> IO FilePath
 stats profileName = profile profileName <&> (++ "/stats.txt")

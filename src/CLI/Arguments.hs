@@ -16,8 +16,7 @@ import CLI.Endgame.Help
     , displayProgramHelp
     )
 import CLI.Endgame.Add
-    ( addNextLog
-    )
+    ( addNextLog )
 import CLI.Endgame.Bodyweight
     ( displayBodyweight
     , setBodyweight
@@ -40,6 +39,8 @@ import CLI.Endgame.Lifts
     , setCycle
     , toggleBodyweight
     )
+import CLI.Endgame.Convert
+    ( convertProfile )
 import CLI.ArgumentEnsuring
     ( ensurePositiveInt
     , ensureWeight
@@ -105,6 +106,9 @@ handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
 handleArguments ["program", "lift", lift] = displayProgramLift lift
 
 handleArguments ["program", "lift", lift, "edit"] = editProgramLift lift
+
+--SCARY:
+handleArguments ["convert"] = convertProfile
 
 handleArguments _ = putStrLn invalidArgumentResponse
 

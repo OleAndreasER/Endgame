@@ -39,6 +39,7 @@ executable endgame
         CLI.Endgame.Profile,
         CLI.Endgame.Program,
         CLI.Endgame.Lifts,
+        CLI.Endgame.Convert,
         CLI.Arguments,
         CLI.LogFormat,
         CLI.ProgramFormat,

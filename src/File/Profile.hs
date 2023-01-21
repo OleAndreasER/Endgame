@@ -8,6 +8,7 @@ module File.Profile
     , readStats
     , setProgram
     , setStats
+    , setLogs
     , addLog
     ) where
 
@@ -68,7 +69,7 @@ encodeFile' :: Binary a => a -> FilePath -> IO ()
 encodeFile' = flip encodeFile
 
 setStats :: Stats -> IO ()
-setStats stats = encodeFile' stats =<< Path.logs =<< getProfile
+setStats stats = encodeFile' stats =<< Path.stats =<< getProfile
 
 setLogs :: [Log] -> IO ()
 setLogs logs = encodeFile' logs =<< Path.logs =<< getProfile 

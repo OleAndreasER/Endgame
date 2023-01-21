@@ -26,5 +26,5 @@ formatLiftStats :: Lift -> LiftStats -> String
 formatLiftStats lift liftStats =
     lift ++ ": " ++
     show (pr liftStats) ++ "kg " ++
-    show (cyclePosition liftStats) ++ "/" ++
+    show (1 + cyclePosition liftStats) ++ "/" ++
     show (cycleLength liftStats)

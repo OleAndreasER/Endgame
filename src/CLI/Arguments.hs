@@ -51,9 +51,22 @@ handleArguments :: [String] -> IO ()
 
 handleArguments ["help"] = displayHelp
 
+handleArguments ["program", "help"] = displayProgramHelp
+
+handleArguments ["profile", "new"] = createNewProfile
+
+handleArguments ["profile", profile] = switchToProfile profile
+
 handleArguments ["lifts", "help"] = displayLiftsHelp
 
-handleArguments ["program", "help"] = displayProgramHelp
+--SCARY:
+handleArguments ["convert"] = convertProfile
+
+handleArguments _ = putStrLn invalidArgumentResponse
+
+invalidArgumentResponse = "Try 'endgame help'"
+
+{-
 
 handleArguments ["next"] = displayNextLog
 
@@ -83,10 +96,6 @@ handleArguments ["bw"] = displayBodyweight
 
 handleArguments ["bw", bodyweightStr] = ensureWeight bodyweightStr setBodyweight
 
-handleArguments ["profile", "new"] = createNewProfile
-
-handleArguments ["profile", profile] = switchToProfile profile
-
 handleArguments ["log", nStr] = ensurePositiveInt nStr displayLog
 
 handleArguments ["log"] = displayLog 1
@@ -106,10 +115,4 @@ handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
 handleArguments ["program", "lift", lift] = displayProgramLift lift
 
 handleArguments ["program", "lift", lift, "edit"] = editProgramLift lift
-
---SCARY:
-handleArguments ["convert"] = convertProfile
-
-handleArguments _ = putStrLn invalidArgumentResponse
-
-invalidArgumentResponse = "Try 'endgame help'"
+-}

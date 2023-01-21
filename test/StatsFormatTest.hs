@@ -27,10 +27,10 @@ testStats =
     setPr 100 "Bench" $
     setPr 160 "Squat" $
     setPr 80 "Chin" $
-    setCycle 1 3 "Press" $
-    setCycle 2 4 "Bench" $
-    setCycle 2 2 "Squat" $ 
-    setCycle 1 2 "Chin" $
+    setCycle 0 3 "Press" $
+    setCycle 1 4 "Bench" $
+    setCycle 1 2 "Squat" $ 
+    setCycle 0 2 "Chin" $
     fromProgram testProgram
 
 expectedStatsFormat :: String

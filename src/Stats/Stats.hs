@@ -12,6 +12,7 @@ module Stats.Stats
     , setPr
     , setCycle
     , withLiftStats
+    , hasLift
     ) where
 
 import Data.Maybe
@@ -104,3 +105,6 @@ setLiftGroupPosition n newPosition stats
         { liftGroupPositions = xs ++ (newPosition:ys) }
   where
     (xs, _:ys)= splitAt n $ liftGroupPositions stats
+
+hasLift :: Lift -> Stats -> Bool
+hasLift lift stats = lift `elem` liftsInOrder stats

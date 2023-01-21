@@ -34,10 +34,8 @@ import CLI.Endgame.Program
     ) 
 import CLI.Endgame.Lifts
     ( displayLifts
-    , setPR
-    , setProgression
+    , setPr
     , setCycle
-    , toggleBodyweight
     )
 import CLI.Endgame.Convert
     ( convertProfile )
@@ -67,6 +65,14 @@ handleArguments ["log", nStr] = ensurePositiveInt nStr displayLog
 
 handleArguments ["log"] = displayLog 1
 
+handleArguments ["lifts"] = displayLifts
+
+handleArguments ["pr", lift, weightStr] =
+    ensureWeight weightStr $ setPr lift
+
+handleArguments ["cycle", lift, posStr, lenStr] =
+    ensureCycle posStr lenStr $ \pos len ->
+    setCycle lift (pos-1) len
 
 --SCARY:
 handleArguments ["convert"] = convertProfile
@@ -83,17 +89,8 @@ handleArguments ["next", nStr] = ensurePositiveInt nStr displayNextLogs
     
 handleArguments ["add"] = addNextLog
     
-handleArguments ["lifts"] = displayLifts
-
-handleArguments ["lifts", "pr", lift, weightStr] =
-    ensureWeight weightStr $ setPR lift
-
 handleArguments ["lifts", "progression", lift, weightStr] =
     ensureWeight weightStr $ setProgression lift
-    
-handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
-    ensureCycle posStr lenStr $ \pos len ->
-    setCycle lift (pos-1) len
 
 handleArguments ["lifts", "toggle-bodyweight", lift] = toggleBodyweight lift
 

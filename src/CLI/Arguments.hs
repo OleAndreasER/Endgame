@@ -74,6 +74,10 @@ handleArguments ["cycle", lift, posStr, lenStr] =
     ensureCycle posStr lenStr $ \pos len ->
     setCycle lift (pos-1) len
 
+handleArguments ["bw"] = displayBodyweight
+
+handleArguments ["bw", bodyweightStr] = ensureWeight bodyweightStr setBodyweight
+
 --SCARY:
 handleArguments ["convert"] = convertProfile
 
@@ -93,10 +97,6 @@ handleArguments ["lifts", "progression", lift, weightStr] =
     ensureWeight weightStr $ setProgression lift
 
 handleArguments ["lifts", "toggle-bodyweight", lift] = toggleBodyweight lift
-
-handleArguments ["bw"] = displayBodyweight
-
-handleArguments ["bw", bodyweightStr] = ensureWeight bodyweightStr setBodyweight
 
 handleArguments ["log", nStr, "fail", lift] = ensurePositiveInt nStr $ failLiftInLog lift
 

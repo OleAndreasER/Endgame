@@ -4,26 +4,27 @@ module CLI.Endgame.Bodyweight
     ) where
 
 import Types.General
-    ( Weight
-    )
-import FileHandling
+    ( Weight )
+import File.Profile
     ( readStats
-    , setStats
+    , toStats
     )
 import CLI.ArgumentEnsuring
-    ( ifProfile
-    )
-import Types.Stats
-    ( bodyweight
-    )
+    ( ifProfile )
+import Stats.Stats
+    ( bodyweight )
+import qualified Stats.Stats as Stats
+    ( setBodyweight )
 
 displayBodyweight :: IO ()
-displayBodyweight =
-    ifProfile $
-    readStats >>= putStrLn . (++ "kg") . show . bodyweight 
+displayBodyweight = ifProfile $ displayBodyweight'
+
+displayBodyweight' :: IO ()
+displayBodyweight' =
+    readStats >>=
+    putStrLn . ("Bodyweight: " ++ ) . (++ "kg") . show . bodyweight 
 
 setBodyweight :: Weight -> IO ()
-setBodyweight bw = 
-    ifProfile $ do
-    readStats >>= setStats . \stats -> stats {bodyweight = bw}
-    putStrLn ("Bodyweight: "++ show bw ++"kg")
+setBodyweight bw = ifProfile $ do
+    toStats (Stats.setBodyweight bw)
+    displayBodyweight'

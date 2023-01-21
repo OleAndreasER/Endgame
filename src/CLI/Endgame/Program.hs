@@ -1,9 +1,7 @@
 module CLI.Endgame.Program 
-    ( displayProgram
-    , displayLiftGroupCycle
-    , editLiftGroupCycle
-    , displayProgramLift
-    , editProgramLift
+    ( displayProfileProgram
+    , setProgression
+    , toggleBodyweight
     ) where
 
 import CLI.ArgumentEnsuring
@@ -12,73 +10,46 @@ import CLI.ArgumentEnsuring
     , ifLift
     )
 import CLI.ProgramFormat
-    ( formatProgram
-    )
-import FileHandling
+    ( formatProgram )
+import File.Profile
     ( readProgram
-    , setProgram
-    , readStats
-    , setStats
-    )
+    , toProgram
+    ) 
+import Types.General
+    ( Lift )
+import Program.Format
+    ( format )
 import Types.General
     ( Lift
+    , Weight
     )
-import qualified Types.Program as Program
-    ( lift
+import Program.Program
+    ( Program
+    , hasLift
     )
-import Types.Stats
-    ( CyclePosition (CyclePosition)
-    , setLiftGroupPosition
-    , renameLift
-    )
-import Types.Program
-    ( integrateLiftCycle
-    , cycleOfLift
-    , setLiftGroupCycle
-    , liftGroupCycles
-    )
-import CLI.Edit.LiftCycle
-    ( editLiftCycle
-    )
-import qualified CLI.Edit.LiftGroupCycle as Edit.LGC
-    ( editLiftGroupCycle
-    )
-import CLI.ProgramFormat
-    ( formatLiftCycle
-    , formatLiftGroupCycle
+import qualified Program.Program as Program
+    ( setProgression
+    , toggleBodyweight
     )
 
-displayProgram :: IO ()
-displayProgram = 
+displayProfileProgram :: IO ()
+displayProfileProgram = ifProfile $ displayProfileProgram'
+
+displayProfileProgram' :: IO ()
+displayProfileProgram' = putStrLn =<< format <$> readProgram
+
+setProgression :: Lift -> Weight -> IO ()
+setProgression lift weight =
+    toLift lift (Program.setProgression lift weight)
+
+toggleBodyweight :: Lift -> IO ()
+toggleBodyweight lift =
+    toLift lift (Program.toggleBodyweight lift)
+
+toLift :: Lift -> (Program -> Program) -> IO ()
+toLift lift f =
     ifProfile $
-    readProgram >>= putStrLn . formatProgram
-
-displayLiftGroupCycle :: Int -> IO ()
-displayLiftGroupCycle n =
-    ifProfile $ do
-    cycles <- liftGroupCycles <$> readProgram
-    ensureIndex n cycles $ putStrLn . formatLiftGroupCycle
-
-editLiftGroupCycle :: Int -> IO ()
-editLiftGroupCycle n =
-    ifProfile $
-    liftGroupCycles <$> readProgram >>= \cycles ->
-    ensureIndex n cycles $ \oldCycle -> do
-    newCycle <- Edit.LGC.editLiftGroupCycle oldCycle
-    readProgram >>= setProgram . setLiftGroupCycle (n-1) newCycle
-    let resetCycle = CyclePosition 0 $ length newCycle
-    readStats >>= setStats . setLiftGroupPosition (n-1) resetCycle
-
-displayProgramLift :: Lift -> IO ()
-displayProgramLift lift =
-    ifProfile $
-    ifLift lift $
-    putStrLn =<< formatLiftCycle . cycleOfLift lift <$> readProgram
-
-editProgramLift :: Lift -> IO ()
-editProgramLift lift =
-    ifProfile $
-    ifLift lift $ do
-    edited <- editLiftCycle =<< cycleOfLift lift <$> readProgram
-    readProgram >>= setProgram . integrateLiftCycle lift edited
-    readStats >>= setStats . renameLift lift (Program.lift edited)
+    hasLift lift <$> readProgram >>= \hasLift' ->
+    if hasLift'
+    then toProgram f >> displayProfileProgram'
+    else putStrLn ("You don't do " ++ lift ++ ".")

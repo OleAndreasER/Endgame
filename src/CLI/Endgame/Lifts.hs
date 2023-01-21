@@ -17,8 +17,11 @@ import FileHandling
     ( readStats
     , setStats
     )
-import CLI.Endgame.Log
-    ( updateLifts -- temp location
+import Types.Stats
+    ( LiftStats
+    , addProgressions
+    , liftIsInStats
+    , toLiftStats
     )
 import qualified Types.Stats as Stats
     ( setPR
@@ -27,8 +30,7 @@ import qualified Types.Stats as Stats
     , toggleBodyweight
     )
 import CLI.ArgumentEnsuring
-    ( ifProfile
-    )
+    ( ifProfile )
 
 displayLifts :: IO ()
 displayLifts = 
@@ -54,3 +56,15 @@ toggleBodyweight :: Lift -> IO ()
 toggleBodyweight lift =
     ifProfile $
     updateLifts lift Stats.toggleBodyweight
+
+
+updateLifts :: Lift -> (LiftStats -> LiftStats) -> IO ()
+updateLifts lift f = do
+    stats <- readStats
+    if liftIsInStats lift stats
+    then do
+        let newStats = toLiftStats f lift stats
+        setStats newStats
+        putStrLn $ formatStats newStats
+    else
+        putStrLn $ "You don't do "++lift++"."

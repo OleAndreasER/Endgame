@@ -4,6 +4,7 @@ module File.Profile
     , toLog
     , readLogs
     , readLog
+    , logCount
     , readProgram
     , readStats
     , setProgram
@@ -39,7 +40,7 @@ toStats f = readStats >>= setStats . f
 
 toLog :: Int -> (Log -> Log) -> IO ()
 toLog n f = do
-    logs <- readLogs
+    logs <- readAllLogs
     setLogs $ toLog' logs n f
   where
     toLog' :: [Log] -> Int -> (Log -> Log) -> [Log]
@@ -51,8 +52,14 @@ toLog n f = do
 readStats :: IO Stats
 readStats = decodeFile =<< Path.stats =<< getProfile
 
-readLogs :: IO [Log]
-readLogs = decodeFile =<< Path.logs =<< getProfile
+readAllLogs :: IO [Log]
+readAllLogs = decodeFile =<< Path.logs =<< getProfile
+
+readLogs :: Int -> IO [Log]
+readLogs logCount = take logCount <$> readAllLogs
+
+logCount :: IO Int
+logCount = length <$> readAllLogs
 
 (!!?) :: [a] -> Int -> Maybe a
 xs !!? i
@@ -60,7 +67,7 @@ xs !!? i
     | otherwise = Nothing
 
 readLog :: Int -> IO (Maybe Log)
-readLog n = (!!? n) <$> readLogs
+readLog n = (!!? n) <$> readAllLogs
 
 readProgram :: IO Program
 readProgram = decodeFile =<< Path.program =<< getProfile
@@ -79,5 +86,5 @@ setProgram program = encodeFile' program =<< Path.program =<< getProfile
 
 addLog :: Log -> IO ()
 addLog log = do
-    logs <- readLogs
+    logs <- readAllLogs
     setLogs (log:logs)

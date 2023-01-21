@@ -7,8 +7,8 @@ import CLI.Endgame.NextLog
 import CLI.Endgame.Log
     ( displayLogs
     , displayLog
-    , failLiftInLog
-    , removeLog
+    --, failLiftInLog
+    --, removeLog
     )
 import CLI.Endgame.Help
     ( displayHelp
@@ -59,6 +59,15 @@ handleArguments ["profile", profile] = switchToProfile profile
 
 handleArguments ["lifts", "help"] = displayLiftsHelp
 
+handleArguments ["logs", nStr] = ensurePositiveInt nStr displayLogs
+
+handleArguments ["logs"] = displayLogs 1
+
+handleArguments ["log", nStr] = ensurePositiveInt nStr displayLog
+
+handleArguments ["log"] = displayLog 1
+
+
 --SCARY:
 handleArguments ["convert"] = convertProfile
 
@@ -72,10 +81,6 @@ handleArguments ["next"] = displayNextLog
 
 handleArguments ["next", nStr] = ensurePositiveInt nStr displayNextLogs
     
-handleArguments ["logs", nStr] = ensurePositiveInt nStr displayLogs
-
-handleArguments ["logs"] = displayLogs 1
-
 handleArguments ["add"] = addNextLog
     
 handleArguments ["lifts"] = displayLifts
@@ -95,10 +100,6 @@ handleArguments ["lifts", "toggle-bodyweight", lift] = toggleBodyweight lift
 handleArguments ["bw"] = displayBodyweight
 
 handleArguments ["bw", bodyweightStr] = ensureWeight bodyweightStr setBodyweight
-
-handleArguments ["log", nStr] = ensurePositiveInt nStr displayLog
-
-handleArguments ["log"] = displayLog 1
 
 handleArguments ["log", nStr, "fail", lift] = ensurePositiveInt nStr $ failLiftInLog lift
 

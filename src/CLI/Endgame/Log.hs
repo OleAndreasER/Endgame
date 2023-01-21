@@ -1,9 +1,9 @@
 module CLI.Endgame.Log
     ( displayLogs
     , displayLog
-    , failLiftInLog
-    , removeLog
-    , updateLifts -- temp location
+    --, failLiftInLog
+    --, removeLog
+    --, updateLifts -- temp location
     ) where
 
 import CLI.ArgumentEnsuring
@@ -11,31 +11,19 @@ import CLI.ArgumentEnsuring
     , ensureLog
     )
 import CLI.LogFormat
-    ( formatLog
-    )
+    ( formatLog )
 import CLI.StatsFormat
-    ( formatStats
-    )
-import FileHandling
-    ( readLogs
-    , setLogs
-    , readStats
-    , setStats
-    , readProgram
-    )
+    ( formatStats )
 import qualified Types.Log as Log
-    ( failLift
-    )
+    ( failLift )
 import Types.Log
     ( SetType (Work, PR)
     , liftSetType
     )
 import Types.General
-    ( Lift
-    )
+    ( Lift )
 import qualified Types.Stats as Stats
-    ( addWork
-    )
+    ( addWork )
 import Types.Stats
     ( LiftStats
     , addProgressions
@@ -43,24 +31,35 @@ import Types.Stats
     , toLiftStats
     )
 import Advance.Cycles
-    ( regressCycles
-    )
+    ( regressCycles )
 import Advance.PRs
-    ( regressPRs
+    ( regressPRs )
+-- New:
+import Log.Format
+    ( format )
+import File.Profile
+    ( readLogs
+    , readLog
+    , logCount
     )
 
+-- logCount: positive integer
 displayLogs :: Int -> IO ()
-displayLogs logs =
-    ifProfile $
-    readLogs >>=
-    putStrLn . unlines . map formatLog . reverse . take logs
+displayLogs logCount = ifProfile $ do
+    logs <- readLogs logCount
+    putStrLn $ unlines $ reverse $ (++"\n") <$> format <$> logs
 
+-- n: positive integer
 displayLog :: Int -> IO ()
-displayLog n =
-    ifProfile $ 
-    ensureLog n $
-    putStrLn . formatLog
+displayLog n = ifProfile $ do
+    maybeLog <- readLog (n - 1)
+    case maybeLog of
+        Just log -> putStrLn $ format log
+        Nothing  -> do
+            logCount' <- logCount
+            putStrLn ("There are only "++ show logCount' ++ " logs.")
 
+{-
 failLiftInLog :: Lift -> Int -> IO ()
 failLiftInLog lift logIndex = 
     ifProfile $
@@ -123,17 +122,6 @@ addWork work lift = do
         | work > 1   = "Added "++show work++" work days to "++lift++"."
         | work < -1  = "Removed "++show work++" work days from "++lift++"."
 
-updateLifts :: Lift -> (LiftStats -> LiftStats) -> IO ()
-updateLifts lift f = do
-    stats <- readStats
-    if liftIsInStats lift stats
-    then do
-        let newStats = toLiftStats f lift stats
-        setStats newStats
-        putStrLn $ formatStats newStats
-    else
-        putStrLn $ "You don't do "++lift++"."
-
 --Applies f to the first instance of y in a list
 toElem :: Eq a => a -> (a -> a) -> [a] -> [a]
 toElem y f (x:xs)
@@ -145,3 +133,4 @@ removeAt n xs
     | n < length xs = left ++ right
     | otherwise     = xs
     where (left, (_ :right)) = splitAt n xs
+-}

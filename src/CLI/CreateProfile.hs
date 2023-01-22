@@ -19,11 +19,12 @@ import Program.Program
 import Log.Log
     ( Log )
 import File.ProfileManagement
-    ( setProfile )
+    ( setCurrentProfile )
 import File.Profile
-    ( setProgram
-    , setStats
-    , setLogs
+    ( setProfile )
+import Profile.Profile
+    ( toStatsM
+    , newProfile
     )
 import qualified File.Path as Path
     ( profile )
@@ -42,16 +43,11 @@ import Data.Maybe
 -}
 
 createProfile :: String -> IO ()
-createProfile profileName = do  
-    program <- selectProgram
-    stats <- setupStats $ Stats.fromProgram program
-    let logs = [] :: [Log]
-
+createProfile profileName = do
+    profile <- toStatsM setupStats =<< newProfile <$> selectProgram
     createDirectoryIfMissing True =<< Path.profile profileName
-    setProfile profileName
-    setProgram program
-    setStats stats
-    setLogs logs
+    setCurrentProfile profileName
+    setProfile profile
 
 selectProgram :: IO Program
 selectProgram = do

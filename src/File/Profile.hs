@@ -11,8 +11,18 @@ module File.Profile
     , setStats
     , setLogs
     , addLog
+    , setProfile
+    , readProfile
+    , toProfile
     ) where
 
+import Profile.Profile
+    ( Profile
+    , profile 
+    , program
+    , stats
+    , logs
+    )
 import Program.Program
     ( Program )
 import Stats.Stats
@@ -88,3 +98,19 @@ addLog :: Log -> IO ()
 addLog log = do
     logs <- readAllLogs
     setLogs (log:logs)
+
+setProfile :: Profile -> IO ()
+setProfile profile = do
+    setProgram $ program profile
+    setStats $ stats profile
+    setLogs $ logs profile
+
+readProfile :: IO Profile
+readProfile =
+    profile <$>
+    readProgram <*>
+    readStats <*>
+    readAllLogs
+
+toProfile :: (Profile -> Profile) -> IO ()
+toProfile f = readProfile >>= setProfile . f

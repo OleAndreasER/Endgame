@@ -1,5 +1,5 @@
 module File.ProfileManagement
-    ( setProfile
+    ( setCurrentProfile
     , getProfiles
     , getProfile
     , profileIsSelected
@@ -16,8 +16,8 @@ import System.Directory
     , doesDirectoryExist
     )
 
-setProfile :: String -> IO ()
-setProfile profileName = do
+setCurrentProfile :: String -> IO ()
+setCurrentProfile profileName = do
     profilePath <- Path.currentProfile
     writeFile profilePath profileName
 

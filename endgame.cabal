@@ -71,6 +71,7 @@ executable endgame
         Convert.Program,
         Convert.Stats,
         Convert.Log,
+        Profile.Profile,
         Program.Program,
         Program.LiftGroupCycle,
         Program.LiftCycle,

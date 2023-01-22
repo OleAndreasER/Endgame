@@ -5,7 +5,7 @@ module CLI.Endgame.Profile
 
 import File.ProfileManagement
     ( getProfiles
-    , setProfile
+    , setCurrentProfile
     )
 import qualified CLI.CreateProfile as CLI
     ( createProfile )
@@ -25,7 +25,7 @@ switchToProfile profileName = do
     profileExists <- elem profileName <$> getProfiles
     if profileExists
     then do
-        setProfile profileName
+        setCurrentProfile profileName
         putStrLn $ "Profile: " ++ profileName
     else
         putStrLn $ "There is no profile called '" ++ profileName ++ "'."

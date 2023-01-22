@@ -16,8 +16,6 @@ import Types.General
     ( Lift )
 import Program.Program
     ( Program )
-import Log.Log
-    ( Log )
 import File.ProfileManagement
     ( setCurrentProfile )
 import File.Profile

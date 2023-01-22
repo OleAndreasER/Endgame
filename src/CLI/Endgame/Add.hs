@@ -2,26 +2,23 @@ module CLI.Endgame.Add
     ( addNextLog
     ) where
 
-import NextLogs
-    ( getNextLogAndStats
+import Profile.NextLog
+    ( addLog )
+import File.Profile
+    ( readLog
+    , toProfile
     )
-import FileHandling
-    ( addLog
-    , setStats
-    )
-import CLI.LogFormat
-    ( formatLog
-    )
+import Log.Format
+    ( format )
 import CLI.ArgumentEnsuring
-    ( ifProfile
-    )
+    ( ifProfile )
 import Date
-    ( dateStr
-    )
+    ( dateStr )
+import Data.Maybe
+    ( fromJust )
 
 addNextLog :: IO ()
 addNextLog = ifProfile $ do
-    (nextLog', nextStats') <- getNextLogAndStats =<< dateStr
-    addLog nextLog'
-    putStrLn $ "Added:\n" ++ formatLog nextLog'
-    setStats nextStats'
+    dateStr' <- dateStr
+    toProfile (addLog dateStr')
+    putStrLn =<< format <$> (fromJust <$> readLog 1)

@@ -4,22 +4,22 @@ module CLI.Endgame.NextLog
     ) where
 
 import CLI.ArgumentEnsuring
-    ( ifProfile
+    ( ifProfile )
+import Profile.NextLog
+    ( nextLog
+    , nextLogs
     )
-import CLI.LogFormat
-    ( formatLog
-    )
-import NextLogs
-    ( getNextLogAndStats
-    , getNextLogs
-    )
+import File.Profile
+    ( readProfile )
+import Log.Format
+    ( format )
 
 displayNextLog :: IO ()
-displayNextLog = ifProfile $ do
-    (nextLog', _) <- getNextLogAndStats "Next:"
-    putStrLn $ formatLog nextLog'
+displayNextLog =
+    ifProfile $
+    putStrLn =<< format . nextLog <$> readProfile
 
 displayNextLogs :: Int -> IO ()
 displayNextLogs n = ifProfile $ do
-    logs <- take n <$> getNextLogs
-    putStrLn $ unlines $ reverse $ map formatLog logs
+    logs <- take n . nextLogs <$> readProfile
+    putStrLn $ unlines $ reverse $ format <$> logs

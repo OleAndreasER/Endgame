@@ -10,7 +10,6 @@ module File.Profile
     , setProgram
     , setStats
     , setLogs
-    , addLog
     , setProfile
     , readProfile
     , toProfile
@@ -93,11 +92,6 @@ setLogs logs = encodeFile' logs =<< Path.logs =<< getProfile
 
 setProgram :: Program -> IO ()
 setProgram program = encodeFile' program =<< Path.program =<< getProfile
-
-addLog :: Log -> IO ()
-addLog log = do
-    logs <- readAllLogs
-    setLogs (log:logs)
 
 setProfile :: Profile -> IO ()
 setProfile profile = do

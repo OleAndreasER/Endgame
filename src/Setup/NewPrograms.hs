@@ -1,5 +1,6 @@
 module Setup.NewPrograms
-    ( standardHalfDays
+    ( programs
+    , standardHalfDays
     , fiveLiftsHalfDays
     ) where
 
@@ -16,6 +17,12 @@ import Program.Set
     ( prSet
     , workSets
     )
+
+programs :: [(String, Program)]
+programs =
+    [ ("standard-half-days", standardHalfDays)
+    , ("five-lifts-half-days", fiveLiftsHalfDays)
+    ]
 
 press :: LiftInfo
 press = LiftInfo

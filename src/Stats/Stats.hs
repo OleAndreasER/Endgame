@@ -13,6 +13,7 @@ module Stats.Stats
     , setCycle
     , withLiftStats
     , hasLift
+    , Stats.Stats.liftList
     ) where
 
 import Data.Maybe
@@ -34,11 +35,13 @@ import Types.General
     ( Weight
     , Lift
     )
+import qualified Program.Program as Program
+    ( liftList )
 import Program.Program
     ( Program
     , liftGroupCycles
-    , liftList
     )
+
 
 data Stats = Stats
     { liftGroupPositions :: [Int]
@@ -52,9 +55,9 @@ instance Binary Stats
 fromProgram :: Program -> Stats
 fromProgram program = Stats
     { liftGroupPositions = map (\_ -> 0) $ liftGroupCycles program
-    , liftStatsMap = newLiftStatsMap $ liftList program
+    , liftStatsMap = newLiftStatsMap $ Program.liftList program
     , bodyweight = 0
-    , liftsInOrder = liftList program
+    , liftsInOrder = Program.liftList program
     }
 
 newLiftStatsMap :: [Lift] -> Map.Map Lift LiftStats
@@ -108,3 +111,6 @@ setLiftGroupPosition n newPosition stats
 
 hasLift :: Lift -> Stats -> Bool
 hasLift lift stats = lift `elem` liftsInOrder stats
+
+liftList :: Stats -> [Lift]
+liftList = liftsInOrder

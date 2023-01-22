@@ -22,17 +22,13 @@ import CLI.Endgame.Bodyweight
     , setBodyweight
     )
 import CLI.Endgame.Profile
-    ( createNewProfile
+    ( createProfile
     , switchToProfile
     )
 import CLI.Endgame.Program
     ( displayProfileProgram
     , setProgression
     , toggleBodyweight
-    --, displayLiftGroupCycle
-    --, editLiftGroupCycle
-    --, displayProgramLift
-    --, editProgramLift
     ) 
 import CLI.Endgame.Lifts
     ( displayLifts
@@ -53,9 +49,9 @@ handleArguments ["help"] = displayHelp
 
 handleArguments ["program", "help"] = displayProgramHelp
 
-handleArguments ["profile", "new"] = createNewProfile
+handleArguments ["new", "profile"] = createProfile
 
-handleArguments ["profile", profile] = switchToProfile profile
+handleArguments ["profile", profileName] = switchToProfile profileName
 
 handleArguments ["lifts", "help"] = displayLiftsHelp
 

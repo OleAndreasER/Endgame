@@ -2,10 +2,9 @@
 
 module Stats.LiftStats
     ( LiftStats
-        ( pr
-        , cyclePosition
-        , cycleLength
-        )
+    , pr
+    , cyclePosition
+    , cycleLength
     , newLiftStats
     , addWork
     , setPr

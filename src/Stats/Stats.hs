@@ -8,6 +8,7 @@ module Stats.Stats
     , liftStats
     , renameLift
     , setLiftGroupPosition
+    , toLiftGroupPositions
     , setBodyweight
     , setPr
     , setCycle
@@ -114,3 +115,7 @@ hasLift lift stats = lift `elem` liftsInOrder stats
 
 liftList :: Stats -> [Lift]
 liftList = liftsInOrder
+
+toLiftGroupPositions :: ([Int] -> [Int]) -> Stats -> Stats
+toLiftGroupPositions f stats = stats
+    { liftGroupPositions = f $ liftGroupPositions stats }

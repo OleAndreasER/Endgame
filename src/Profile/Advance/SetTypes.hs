@@ -1,9 +1,24 @@
 module Profile.Advance.SetTypes
-    (
+    ( advance
     ) where
 
 import Profile.Profile
-    ( Profile )
+    ( Profile
+    , toStats
+    , logs
+    )
+import Log.Log
+    ( lifts )
+import Stats.Stats
+    ( advanceCycle )
+import Types.General
+    ( Lift )
 
 advance :: Profile -> Profile
-advance = undefined
+advance profile =
+    foldr advanceLift profile $ -- Advance cycle of each lift in log
+    lifts $ head $ logs profile
+  where
+    advanceLift :: Lift -> Profile -> Profile
+    advanceLift lift profile =
+        toStats (advanceCycle lift) profile

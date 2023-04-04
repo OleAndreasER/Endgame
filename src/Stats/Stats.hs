@@ -6,6 +6,7 @@ module Stats.Stats
     , bodyweight
     , fromProgram
     , liftStats
+    , toLiftStats
     , renameLift
     , setLiftGroupPosition
     , toLiftGroupPositions
@@ -15,6 +16,7 @@ module Stats.Stats
     , withLiftStats
     , hasLift
     , Stats.Stats.liftList
+    , advanceCycle
     ) where
 
 import Data.Maybe
@@ -29,6 +31,7 @@ import qualified Stats.LiftStats as LiftStats
     ( newLiftStats
     , setPr
     , setCycle
+    , advanceCycle
     )
 import Program.Program
     ( liftList )
@@ -42,7 +45,6 @@ import Program.Program
     ( Program
     , liftGroupCycles
     )
-
 
 data Stats = Stats
     { liftGroupPositions :: [Int]
@@ -80,6 +82,9 @@ setCycle pos len = toLiftStats (LiftStats.setCycle pos len)
 
 setBodyweight :: Weight -> Stats -> Stats
 setBodyweight bw stats = stats { bodyweight = bw }
+
+advanceCycle :: Lift -> Stats -> Stats
+advanceCycle lift = toLiftStats LiftStats.advanceCycle lift
 
 renameLift :: Lift -> Lift -> Stats -> Stats
 renameLift old new stats = case liftStats old stats of

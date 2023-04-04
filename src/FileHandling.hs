@@ -60,7 +60,6 @@ readStandardProgram :: String -> IO Program
 readStandardProgram programName =
     appPath <&> (++ "/programs/"++programName++".txt") >>= decodeFile
 
-
 setProfile :: String -> IO ()
 setProfile profile = do
     filePath <- appPath <&> (++ "/profile.txt")

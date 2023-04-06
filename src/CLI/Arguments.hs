@@ -42,6 +42,7 @@ import CLI.ArgumentEnsuring
     , ensureWeight
     , ensureCycle
     )
+import CLI.Endgame.Remove (removeLog)
 
 handleArguments :: [String] -> IO ()
 
@@ -62,6 +63,11 @@ handleArguments ["logs"] = displayLogs 1
 handleArguments ["log", nStr] = ensurePositiveInt nStr displayLog
 
 handleArguments ["log"] = displayLog 1
+
+handleArguments ["remove", "log", nStr] =
+   ensurePositiveInt nStr removeLog
+
+handleArguments ["remove", "log"] = removeLog 1
 
 handleArguments ["lifts"] = displayLifts
 

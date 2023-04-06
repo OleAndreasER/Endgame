@@ -3,7 +3,8 @@ module Profile.Advance.Prs
     ) where
 
 import Profile.Profile
-    ( Profile (stats)
+    ( Profile 
+    , stats
     , toStats
     , logs
     , program
@@ -14,7 +15,8 @@ import qualified Log.Log as Log
     ( lifts )
 import Stats.Stats
     ( Stats
-    , toLiftStats, timeForPr
+    , toLiftStats
+    , timeForPr
     )
 import Stats.LiftStats
     ( increasePr )

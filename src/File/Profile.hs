@@ -13,6 +13,7 @@ module File.Profile
     , setProfile
     , readProfile
     , toProfile
+    , toLogs
     ) where
 
 import Profile.Profile
@@ -46,6 +47,9 @@ toProgram f = readProgram >>= setProgram . f
 
 toStats :: (Stats -> Stats) -> IO ()
 toStats f = readStats >>= setStats . f
+
+toLogs :: ([Log] -> [Log]) -> IO ()
+toLogs f = readAllLogs >>= setLogs . f
 
 toLog :: Int -> (Log -> Log) -> IO ()
 toLog n f = do

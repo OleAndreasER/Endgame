@@ -17,12 +17,15 @@ module Stats.Stats
     , hasLift
     , Stats.Stats.liftList
     , advanceCycle
+    , cyclePosition
+    , pr
+    , timeForPr
     ) where
 
 import Data.Maybe
     ( fromJust )
 import qualified Data.Map as Map
-import Data.Binary
+import Data.Binary ( Binary )
 import GHC.Generics
     ( Generic )
 import Stats.LiftStats
@@ -32,9 +35,9 @@ import qualified Stats.LiftStats as LiftStats
     , setPr
     , setCycle
     , advanceCycle
+    , cyclePosition
+    , pr
     )
-import Program.Program
-    ( liftList )
 import Types.General
     ( Weight
     , Lift
@@ -44,6 +47,7 @@ import qualified Program.Program as Program
 import Program.Program
     ( Program
     , liftGroupCycles
+    , liftList
     )
 
 data Stats = Stats
@@ -57,7 +61,7 @@ instance Binary Stats
 
 fromProgram :: Program -> Stats
 fromProgram program = Stats
-    { liftGroupPositions = map (\_ -> 0) $ liftGroupCycles program
+    { liftGroupPositions = map (const 0) $ liftGroupCycles program
     , liftStatsMap = newLiftStatsMap $ Program.liftList program
     , bodyweight = 0
     , liftsInOrder = Program.liftList program
@@ -84,7 +88,7 @@ setBodyweight :: Weight -> Stats -> Stats
 setBodyweight bw stats = stats { bodyweight = bw }
 
 advanceCycle :: Lift -> Stats -> Stats
-advanceCycle lift = toLiftStats LiftStats.advanceCycle lift
+advanceCycle = toLiftStats LiftStats.advanceCycle
 
 renameLift :: Lift -> Lift -> Stats -> Stats
 renameLift old new stats = case liftStats old stats of
@@ -105,11 +109,11 @@ liftStatsInOrder stats =
 
 withLiftStats :: (Lift -> LiftStats -> a) -> Stats -> [a]
 withLiftStats f stats =
-    (uncurry f) <$> liftStatsInOrder stats
+    uncurry f <$> liftStatsInOrder stats
 
 setLiftGroupPosition :: Int -> Int -> Stats -> Maybe Stats
 setLiftGroupPosition n newPosition stats
-    | (length $ liftGroupPositions stats) <= n = Nothing
+    | length (liftGroupPositions stats) <= n = Nothing
     | otherwise = Just $ stats
         { liftGroupPositions = xs ++ (newPosition:ys) }
   where
@@ -124,3 +128,16 @@ liftList = liftsInOrder
 toLiftGroupPositions :: ([Int] -> [Int]) -> Stats -> Stats
 toLiftGroupPositions f stats = stats
     { liftGroupPositions = f $ liftGroupPositions stats }
+
+cyclePosition :: Lift -> Stats -> Maybe Int
+cyclePosition lift stats =
+    LiftStats.cyclePosition <$>
+    liftStats lift stats
+
+timeForPr :: Stats -> Lift -> Bool
+timeForPr stats lift = Just 0 == cyclePosition lift stats
+
+pr :: Lift -> Stats -> Maybe Weight
+pr lift stats = 
+    LiftStats.pr <$>
+    liftStats lift stats

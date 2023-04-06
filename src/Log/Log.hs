@@ -2,12 +2,13 @@
 
 module Log.Log
     ( Log
-        ( label )
+    , label
     , log
     , session
     , liftSession
     , did
     , failPR
+    , wasPr
     , lifts
     , sessions
     ) where 
@@ -19,9 +20,12 @@ import Data.Maybe
 import GHC.Generics
     ( Generic )
 import Data.Binary
+    ( Binary )
 import qualified Data.Map as Map
 import Log.Session
-    ( Session )
+    ( Session
+    , hasSuccessfulPr
+    )
 import qualified Log.Session as Session
     ( failPR )
 import Types.General
@@ -54,6 +58,10 @@ liftSession = (,)
 
 did :: Lift -> Log -> Bool
 did lift log = lift `elem` lifts log
+
+wasPr :: Log -> Lift -> Bool
+wasPr log lift =
+    Just True == (hasSuccessfulPr <$> session lift log)
 
 failPR :: Lift -> Log -> Log
 failPR = toSession Session.failPR

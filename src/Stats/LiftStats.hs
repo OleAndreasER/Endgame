@@ -50,6 +50,6 @@ setCycle pos len liftStats = liftStats
 
 advanceCycle :: LiftStats -> LiftStats
 advanceCycle liftStats = setCycle
-    (cyclePosition liftStats + 1 `mod` cycleLength liftStats)
+    ((cyclePosition liftStats + 1) `mod` cycleLength liftStats)
     (cycleLength liftStats)
     liftStats

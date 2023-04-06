@@ -3,7 +3,7 @@ module Profile.Advance.Prs
     ) where
 
 import Profile.Profile
-    ( Profile
+    ( Profile (stats)
     , toStats
     , logs
     , program
@@ -14,7 +14,7 @@ import qualified Log.Log as Log
     ( lifts )
 import Stats.Stats
     ( Stats
-    , toLiftStats
+    , toLiftStats, timeForPr
     )
 import Stats.LiftStats
     ( increasePr )
@@ -24,20 +24,30 @@ import Types.General
     )
 import Data.Maybe
     ( fromJust )
+import Log.Log
+    ( Log
+    , wasPr
+    )
+import Profile.NextLifts
+    ( nextLifts )
+
+-- 130kg -> 132.5kg
 
 advance :: Profile -> Profile
 advance profile =
     toStats (advancePrs increases) profile
   where
-    lifts :: [Lift]
-    lifts = Log.lifts $ head $ logs profile
+    prLifts :: [Lift]
+    prLifts = filter (timeForPr $ stats profile) $ nextLifts profile
+
     progressions :: [Weight]
     progressions =
-        fromJust <$>
+        fromJust .
         (\lift -> Program.progression lift $ program profile) <$>
-        lifts
+        prLifts
+
     increases :: [(Lift, Weight)]
-    increases = zip lifts progressions
+    increases = zip prLifts progressions
 
 advancePrs :: [(Lift, Weight)] -> Stats -> Stats
 advancePrs increases stats =

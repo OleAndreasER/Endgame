@@ -42,7 +42,7 @@ import Data.Maybe
 
 createProfile :: String -> IO ()
 createProfile profileName = do
-    profile <- toStatsM setupStats =<< newProfile <$> selectProgram
+    profile <- toStatsM setupStats . newProfile =<< selectProgram
     createDirectoryIfMissing True =<< Path.profile profileName
     setCurrentProfile profileName
     setProfile profile
@@ -50,12 +50,12 @@ createProfile profileName = do
 selectProgram :: IO Program
 selectProgram = do
     putStrLn "Which program do you want to run?"
-    putStrLn $ formatProgramNames $ (fst <$> programs)
-    selectedProgramName <- getSelectedProgram $ (fst <$> programs)
+    putStrLn $ formatProgramNames (fst <$> programs)
+    selectedProgramName <- getSelectedProgram (fst <$> programs)
     pure $ fromJust $ lookup selectedProgramName programs
 
 getSelectedProgram :: [String] -> IO String
-getSelectedProgram programs = do 
+getSelectedProgram programs = do
     answer <- getLine
     if answer `elem` programs
     then pure answer
@@ -72,7 +72,7 @@ setupStats stats = do
     stats' <- setBodyweight stats
     putStrLn "Enter starting PR for each lift: "
     setPrs stats'
-    
+
 setPrs :: Stats -> IO Stats
 setPrs stats = foldrM setPr stats $ Stats.liftList stats
 

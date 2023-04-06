@@ -14,6 +14,8 @@ import Profile.Profile
     , toStats
     )
 
+-- Squat -> Deadlift
+
 advance :: Profile -> Profile
 advance profile =
     toStats (

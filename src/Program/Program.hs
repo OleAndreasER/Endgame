@@ -89,7 +89,7 @@ toProgression f lift program = program
     { progressionMap = Map.adjust f lift $ progressionMap program }
 
 setProgression :: Lift -> Weight -> Program -> Program
-setProgression lift weight = toProgression (\_ -> weight) lift
+setProgression lift weight = toProgression (const weight) lift
 
 toIsBodyweight :: (Bool -> Bool) -> Lift -> Program -> Program
 toIsBodyweight f lift program = program

@@ -86,18 +86,18 @@ handleArguments ["toggle-bodyweight", lift] = toggleBodyweight lift
 --SCARY:
 handleArguments ["convert"] = convertProfile
 
-handleArguments _ = putStrLn invalidArgumentResponse
-
-invalidArgumentResponse = "Try 'endgame help'"
-
-{-
-
 handleArguments ["next"] = displayNextLog
 
 handleArguments ["next", nStr] = ensurePositiveInt nStr displayNextLogs
     
 handleArguments ["add"] = addNextLog
 
+handleArguments _ = putStrLn invalidArgumentResponse
+
+invalidArgumentResponse :: String
+invalidArgumentResponse = "Try 'endgame help'"
+
+{-
 handleArguments ["log", nStr, "fail", lift] = ensurePositiveInt nStr $ failLiftInLog lift
 
 handleArguments ["log", nStr, "remove"] = ensurePositiveInt nStr removeLog

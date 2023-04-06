@@ -73,6 +73,7 @@ executable endgame
         Convert.Log,
         Profile.Profile,
         Profile.NextLog,
+        Profile.NextLifts,
         Profile.Advance.Lifts,
         Profile.Advance.Prs,
         Profile.Advance.SetTypes,

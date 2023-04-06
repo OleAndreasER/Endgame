@@ -14,11 +14,12 @@ import Stats.Stats
 import Types.General
     ( Lift )
 
+-- PR -> Work -> Work -> PR ->
+
 advance :: Profile -> Profile
 advance profile =
     foldr advanceLift profile $ -- Advance cycle of each lift in log
     lifts $ head $ logs profile
   where
     advanceLift :: Lift -> Profile -> Profile
-    advanceLift lift profile =
-        toStats (advanceCycle lift) profile
+    advanceLift lift = toStats (advanceCycle lift)

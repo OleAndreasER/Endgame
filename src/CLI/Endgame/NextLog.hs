@@ -17,7 +17,7 @@ import Log.Format
 displayNextLog :: IO ()
 displayNextLog =
     ifProfile $
-    putStrLn =<< format . nextLog <$> readProfile
+    putStrLn . format . nextLog =<< readProfile
 
 displayNextLogs :: Int -> IO ()
 displayNextLogs n = ifProfile $ do

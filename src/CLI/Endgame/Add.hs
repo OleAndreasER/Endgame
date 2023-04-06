@@ -21,4 +21,4 @@ addNextLog :: IO ()
 addNextLog = ifProfile $ do
     dateStr' <- dateStr
     toProfile (addLog dateStr')
-    putStrLn =<< format <$> (fromJust <$> readLog 1)
+    putStrLn . format =<< (fromJust <$> readLog 0)

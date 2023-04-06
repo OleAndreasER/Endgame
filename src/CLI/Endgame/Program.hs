@@ -1,4 +1,4 @@
-module CLI.Endgame.Program 
+module CLI.Endgame.Program
     ( displayProfileProgram
     , setProgression
     , toggleBodyweight
@@ -14,15 +14,13 @@ import CLI.ProgramFormat
 import File.Profile
     ( readProgram
     , toProgram
-    ) 
-import Types.General
-    ( Lift )
-import Program.Format
-    ( format )
+    )
 import Types.General
     ( Lift
     , Weight
     )
+import Program.Format
+    ( format )
 import Program.Program
     ( Program
     , hasLift
@@ -33,10 +31,10 @@ import qualified Program.Program as Program
     )
 
 displayProfileProgram :: IO ()
-displayProfileProgram = ifProfile $ displayProfileProgram'
+displayProfileProgram = ifProfile displayProfileProgram'
 
 displayProfileProgram' :: IO ()
-displayProfileProgram' = putStrLn =<< format <$> readProgram
+displayProfileProgram' = putStrLn . format =<< readProgram
 
 setProgression :: Lift -> Weight -> IO ()
 setProgression lift weight =

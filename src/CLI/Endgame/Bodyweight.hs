@@ -17,7 +17,7 @@ import qualified Stats.Stats as Stats
     ( setBodyweight )
 
 displayBodyweight :: IO ()
-displayBodyweight = ifProfile $ displayBodyweight'
+displayBodyweight = ifProfile displayBodyweight'
 
 displayBodyweight' :: IO ()
 displayBodyweight' =

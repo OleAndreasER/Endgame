@@ -17,7 +17,7 @@ module File.Profile
 
 import Profile.Profile
     ( Profile
-    , profile 
+    , profile
     , program
     , stats
     , logs
@@ -54,7 +54,7 @@ toLog n f = do
   where
     toLog' :: [Log] -> Int -> (Log -> Log) -> [Log]
     toLog' (log:logs) n f
-        | logs == [] = []
+        | null logs  = []
         | n == 0     = f log : logs
         | otherwise  = log : toLog' logs (n-1) f
 
@@ -88,7 +88,7 @@ setStats :: Stats -> IO ()
 setStats stats = encodeFile' stats =<< Path.stats =<< getProfile
 
 setLogs :: [Log] -> IO ()
-setLogs logs = encodeFile' logs =<< Path.logs =<< getProfile 
+setLogs logs = encodeFile' logs =<< Path.logs =<< getProfile
 
 setProgram :: Program -> IO ()
 setProgram program = encodeFile' program =<< Path.program =<< getProfile

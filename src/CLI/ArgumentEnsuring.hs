@@ -24,17 +24,17 @@ readInt str = case readMaybe str :: Maybe Int of
 check :: Show a => (a -> Bool) -> String -> a -> Either String a
 check predicate aboutX x = if predicate x
     then Right x
-    else Left $ "'"++ show x ++"' "++ aboutX 
+    else Left $ "'"++ show x ++"' "++ aboutX
 
 getLog :: [Log] -> Int -> Either String Log
 getLog logs n = if n > length logs
-    then Left ("There are only "++(show $ length logs)++" logs.")
+    then Left ("There are only "++show (length logs)++" logs.")
     else Right $ logs !! (n-1)
 
 ensureWeight :: String -> (Weight -> IO ()) -> IO ()
-ensureWeight str = ensure 
+ensureWeight str = ensure
     $ readFloat str
-    >>= check (>= 0) "can't be negative." 
+    >>= check (>= 0) "can't be negative."
 
 ensureNonNegativeInt :: String -> (Int -> IO ()) -> IO ()
 ensureNonNegativeInt str = ensure
@@ -52,7 +52,7 @@ ensureCycle posStr lenStr f =
     ensurePositiveInt lenStr $ \len ->
     ensure (check (<= len) outOfBounds pos)
     $ \pos' -> f pos' len
-  where 
+  where
     outOfBounds =
         "is larger than '"++lenStr++"'. Meaning it's out of the cycle's bounds."
 
@@ -63,12 +63,12 @@ ensureLog n f = do
 
 ensureIndex :: Int -> [a] -> (a -> IO ()) -> IO ()
 ensureIndex n xs f
-    | n > length xs = 
+    | n > length xs =
         putStrLn $ "'"++ show n ++ "' is too large."
- 
+
     | n <= 0 =
         putStrLn $ "'"++ show n ++ "' must be positive."
-    
+
     | otherwise =
         f $ xs !! (n-1)
 
@@ -85,4 +85,3 @@ ifLift lift f = do
     if liftInProgram program lift
     then f
     else putStrLn $ "'"++lift++"' is not in your program"
-    

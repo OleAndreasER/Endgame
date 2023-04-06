@@ -8,5 +8,5 @@ setup :: IO ()
 setup = do
     appPath' <- appPath
     createDirectoryIfMissing True (appPath'++"/programs")
-    mapM_ (uncurry $ addProgram) programs
+    mapM_ (uncurry addProgram) programs
     

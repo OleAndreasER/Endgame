@@ -28,7 +28,7 @@ import Types.General
 displayLifts :: IO ()
 displayLifts =
     ifProfile $
-    putStrLn =<< format <$> readStats
+    putStrLn . format =<< readStats
 
 toLift :: Lift -> (Stats -> Stats) -> IO ()
 toLift lift f =

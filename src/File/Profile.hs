@@ -4,14 +4,25 @@ module File.Profile
     , toLog
     , readLogs
     , readLog
+    , logCount
     , readProgram
     , readStats
     , setProgram
     , setStats
     , setLogs
-    , addLog
+    , setProfile
+    , readProfile
+    , toProfile
+    , toLogs
     ) where
 
+import Profile.Profile
+    ( Profile
+    , profile
+    , program
+    , stats
+    , logs
+    )
 import Program.Program
     ( Program )
 import Stats.Stats
@@ -37,22 +48,31 @@ toProgram f = readProgram >>= setProgram . f
 toStats :: (Stats -> Stats) -> IO ()
 toStats f = readStats >>= setStats . f
 
+toLogs :: ([Log] -> [Log]) -> IO ()
+toLogs f = readAllLogs >>= setLogs . f
+
 toLog :: Int -> (Log -> Log) -> IO ()
 toLog n f = do
-    logs <- readLogs
+    logs <- readAllLogs
     setLogs $ toLog' logs n f
   where
     toLog' :: [Log] -> Int -> (Log -> Log) -> [Log]
     toLog' (log:logs) n f
-        | logs == [] = []
+        | null logs  = []
         | n == 0     = f log : logs
         | otherwise  = log : toLog' logs (n-1) f
 
 readStats :: IO Stats
 readStats = decodeFile =<< Path.stats =<< getProfile
 
-readLogs :: IO [Log]
-readLogs = decodeFile =<< Path.logs =<< getProfile
+readAllLogs :: IO [Log]
+readAllLogs = decodeFile =<< Path.logs =<< getProfile
+
+readLogs :: Int -> IO [Log]
+readLogs logCount = take logCount <$> readAllLogs
+
+logCount :: IO Int
+logCount = length <$> readAllLogs
 
 (!!?) :: [a] -> Int -> Maybe a
 xs !!? i
@@ -60,7 +80,7 @@ xs !!? i
     | otherwise = Nothing
 
 readLog :: Int -> IO (Maybe Log)
-readLog n = (!!? n) <$> readLogs
+readLog n = (!!? n) <$> readAllLogs
 
 readProgram :: IO Program
 readProgram = decodeFile =<< Path.program =<< getProfile
@@ -72,12 +92,23 @@ setStats :: Stats -> IO ()
 setStats stats = encodeFile' stats =<< Path.stats =<< getProfile
 
 setLogs :: [Log] -> IO ()
-setLogs logs = encodeFile' logs =<< Path.logs =<< getProfile 
+setLogs logs = encodeFile' logs =<< Path.logs =<< getProfile
 
 setProgram :: Program -> IO ()
 setProgram program = encodeFile' program =<< Path.program =<< getProfile
 
-addLog :: Log -> IO ()
-addLog log = do
-    logs <- readLogs
-    setLogs (log:logs)
+setProfile :: Profile -> IO ()
+setProfile profile = do
+    setProgram $ program profile
+    setStats $ stats profile
+    setLogs $ logs profile
+
+readProfile :: IO Profile
+readProfile =
+    profile <$>
+    readProgram <*>
+    readStats <*>
+    readAllLogs
+
+toProfile :: (Profile -> Profile) -> IO ()
+toProfile f = readProfile >>= setProfile . f

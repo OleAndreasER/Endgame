@@ -1,109 +1,146 @@
-module Setup.Programs where
+module Setup.Programs
+    ( programs
+    , standardHalfDays
+    , fiveLiftsHalfDays
+    ) where
 
-import Types.Program
+import Program.Program
+    ( Program
+    , program
+    , lift
+    )
+import Program.LiftInfo
+    ( LiftInfo 
+        (..)
+    )
+import Program.Set
+    ( prSet
+    , workSets
+    )
 
 programs :: [(String, Program)]
-programs = 
+programs =
     [ ("standard-half-days", standardHalfDays)
-    , ("standard-all-days", standardAllDays)
-    , ("pressfocus-half-days", pressfocusHalfDays)
-    , ("norows-half-days", norowsHalfDays)
+    , ("five-lifts-half-days", fiveLiftsHalfDays)
     ]
+
+press :: LiftInfo
+press = LiftInfo
+    { name = "Press"
+    , progression = 1.25
+    , isBodyweight = False
+    }
+
+bench :: LiftInfo
+bench = LiftInfo
+    { name = "Bench"
+    , progression = 1.25
+    , isBodyweight = False
+    }
+
+squat :: LiftInfo
+squat = LiftInfo
+    { name = "Squat"
+    , progression = 2.5
+    , isBodyweight = False
+    }
+    
+deadlift :: LiftInfo
+deadlift = LiftInfo
+    { name = "Deadlift"
+    , progression = 2.5
+    , isBodyweight = False
+    }
+
+chin :: LiftInfo
+chin = LiftInfo
+    { name = "Chin"
+    , progression = 1.25
+    , isBodyweight = True
+    }
+
+row :: LiftInfo
+row = LiftInfo
+    { name = "Row"
+    , progression = 1.25
+    , isBodyweight = False
+    }
 
 
 standardHalfDays :: Program
-standardHalfDays = Program
-    [["Press", "Bench"],
-     ["Squat", "Deadlift", "Squat"],
-     ["Chin", "Row"]]
-     
-    [LiftCycle {lift = "Press",
-                prSession = [Set 3 100 PR, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Bench",
-                prSession = [Set 3 100 PR, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Squat",
-                prSession = [Set 3 100 PR, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Deadlift",
-                prSession = [Set 3 100 PR],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Chin",
-                prSession = [Set 3 100 PR, Set 5 87 Work, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Row",
-                prSession = [Set 3 100 PR, Set 5 87 Work, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]}]
+standardHalfDays = program
+    [ ["Press", "Bench"]
+    , ["Squat", "Deadlift"]
+    , ["Chin", "Row"]
+    ]
+    [ lift press
+        [ prSet "Press" 3 :
+          workSets "Press" 1 5 87
+        , workSets "Press" 3 5 87
+        ]
+    , lift bench
+        [ prSet "Bench" 3 :
+          workSets "Bench" 1 5 87
+        , workSets "Bench" 3 5 87
+        ]
+    , lift squat
+        [ prSet "Squat" 3 :
+          workSets "Squat" 1 5 87
+        , workSets "Squat" 3 5 87
+        ]
+    , lift deadlift
+        [ prSet "Deadlift" 3 : []
+        , workSets "Deadlift" 2 5 87
+        ]
+    , lift chin
+        [ prSet "Chin" 3 :
+          workSets "Chin" 1 5 87
+        , workSets "Chin" 3 5 87
+        ]
+    , lift row
+        [ prSet "Row" 3 :
+          workSets "Row" 1 5 87
+        , workSets "Row" 3 5 87
+        ]
+    ]
 
-pressfocusHalfDays :: Program
-pressfocusHalfDays = Program 
-    [["Press", "Bench", "Press"],
-     ["Squat", "Deadlift", "Squat"],
-     ["Chin", "Row"]]
-     
-    [LiftCycle {lift = "Press",
-                prSession = [Set 3 100 PR, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Bench",
-                prSession = [Set 3 100 PR, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Squat",
-                prSession = [Set 3 100 PR, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Deadlift",
-                prSession = [Set 3 100 PR],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Chin",
-                prSession = [Set 3 100 PR, Set 5 87 Work, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Row",
-                prSession = [Set 3 100 PR, Set 5 87 Work, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]}]
-
-standardAllDays :: Program
-standardAllDays = Program 
-    [["Press", "Bench"],
-     ["Squat", "Deadlift", "Squat"],
-     ["Chin", "Row"]]
-     
-    [LiftCycle {lift = "Press",
-                prSession = [Set 3 100 PR],
-                workSessionCycle = [[Set 5 85 Work, Set 5 85 Work]]},
-     LiftCycle {lift = "Bench",
-                prSession = [Set 3 100 PR],
-                workSessionCycle = [[Set 5 85 Work, Set 5 85 Work]]},
-     LiftCycle {lift = "Squat",
-                prSession = [Set 3 100 PR],
-                workSessionCycle = [[Set 5 85 Work, Set 5 85 Work]]},
-     LiftCycle {lift = "Deadlift",
-                prSession = [Set 3 100 PR],
-                workSessionCycle = [[Set 5 87 Work]]},
-     LiftCycle {lift = "Chin",
-                prSession = [Set 3 100 PR],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Row",
-                prSession = [Set 3 100 PR],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work]]}]
-
-norowsHalfDays :: Program
-norowsHalfDays = Program
-    [["Press", "Bench"],
-     ["Squat", "Deadlift", "Squat"],
-     ["Chin"]]
-     
-    [LiftCycle {lift = "Press",
-                prSession = [Set 3 100 PR, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Bench",
-                prSession = [Set 3 100 PR, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Squat",
-                prSession = [Set 3 100 PR, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Deadlift",
-                prSession = [Set 3 100 PR],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work]]},
-     LiftCycle {lift = "Chin",
-                prSession = [Set 3 100 PR, Set 5 87 Work, Set 5 87 Work],
-                workSessionCycle = [[Set 5 87 Work, Set 5 87 Work, Set 5 87 Work, Set 5 87 Work]]}]
+fiveLiftsHalfDays :: Program
+fiveLiftsHalfDays = program
+    [ ["Press", "Bench"]
+    , ["Squat", "Deadlift"]
+    , ["Chin", "Row"]
+    ]
+    [ lift press
+        [ prSet "Press" 3 :
+          workSets "Bench" 2 7 81
+        , workSets "Press" 2 5 87 <>
+          workSets "Bench" 2 7 81
+        ]
+    , lift bench
+        [ prSet "Bench" 3 :
+          workSets "Press" 2 7 81
+        , workSets "Bench" 2 5 87 <>
+          workSets "Press" 2 7 81
+        ]
+    , lift squat
+        [ prSet "Squat" 3 :
+          workSets "Squat" 1 5 87
+        , workSets "Squat" 3 5 87
+        ]
+    , lift deadlift
+        [ prSet "Deadlift" 3 : []
+        , workSets "Deadlift" 2 5 87
+        ]
+    , lift chin
+        [ prSet "Chin" 3 :
+          workSets "Row" 2 7 81
+        , workSets "Chin" 2 5 87 <>
+          workSets "Row" 2 7 81
+        ]
+    , lift row
+        [ prSet "Row" 3 :
+          workSets "Chin" 2 7 81
+        , workSets "Row" 2 5 87 <>
+          workSets "Chin" 2 7 81
+        ]
+    ]

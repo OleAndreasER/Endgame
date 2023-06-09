@@ -7,7 +7,7 @@ import Data.List
 import Log.Log
     ( Log
     , label
-    , sessions 
+    , sessions
     )
 import Log.Session
     ( Session )
@@ -21,11 +21,11 @@ import Log.Set
 format :: Log -> String
 format log =
     label log ++ "\n" ++
-    init (concat $ formatSession <$> sessions log)
+    init (concatMap formatSession (sessions log))
 
 formatSession :: Session -> String
 formatSession session =
-    concat (formatSetGroup <$> group session)
+    concatMap formatSetGroup (group session)
 
 formatSetGroup :: [Set] -> String
 formatSetGroup sets =

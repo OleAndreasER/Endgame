@@ -2,7 +2,7 @@
 
 module Program.Program
     ( Program
-        ( liftGroupCycles )
+    , liftGroupCycles
     , program
     , lift
     , liftCycle
@@ -10,6 +10,9 @@ module Program.Program
     , isBodyweight
     , prSession
     , liftList
+    , hasLift
+    , setProgression
+    , toggleBodyweight
     ) where
 
 import Types.General
@@ -77,3 +80,20 @@ prSession lift program = LiftCycle.prSession <$> liftCycle lift program
 
 liftList :: Program -> [Lift]
 liftList = liftsInOrder
+
+hasLift :: Lift -> Program -> Bool
+hasLift lift program = lift `elem` liftsInOrder program
+
+toProgression :: (Weight -> Weight) -> Lift -> Program -> Program
+toProgression f lift program = program
+    { progressionMap = Map.adjust f lift $ progressionMap program }
+
+setProgression :: Lift -> Weight -> Program -> Program
+setProgression lift weight = toProgression (const weight) lift
+
+toIsBodyweight :: (Bool -> Bool) -> Lift -> Program -> Program
+toIsBodyweight f lift program = program
+    { isBodyweightMap = Map.adjust f lift $ isBodyweightMap program }
+
+toggleBodyweight :: Lift -> Program -> Program
+toggleBodyweight = toIsBodyweight not

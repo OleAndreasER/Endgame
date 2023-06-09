@@ -2,14 +2,15 @@
 
 module Stats.LiftStats
     ( LiftStats
-        ( pr
-        , cyclePosition
-        , cycleLength
-        )
+    , pr
+    , cyclePosition
+    , cycleLength
     , newLiftStats
     , addWork
     , setPr
+    , increasePr
     , setCycle
+    , advanceCycle
     ) where
 
 import Data.Binary
@@ -37,8 +38,18 @@ setPr :: Weight -> LiftStats -> LiftStats
 setPr newPr liftStats = liftStats
     { pr = newPr }
 
+increasePr :: Weight -> LiftStats -> LiftStats
+increasePr increase liftStats =
+    setPr (pr liftStats + increase) liftStats
+
 setCycle :: Int -> Int -> LiftStats -> LiftStats
 setCycle pos len liftStats = liftStats 
     { cyclePosition = pos
     , cycleLength = len
     }
+
+advanceCycle :: LiftStats -> LiftStats
+advanceCycle liftStats = setCycle
+    ((cyclePosition liftStats + 1) `mod` cycleLength liftStats)
+    (cycleLength liftStats)
+    liftStats

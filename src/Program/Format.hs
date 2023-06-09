@@ -32,7 +32,7 @@ import Data.List
 format :: Program -> String
 format program =
     init $ unlines $
-    (formatLiftGroupCycles $ liftGroupCycles program) :
+    formatLiftGroupCycles (liftGroupCycles program) :
     "Lift cycles:" :
     (formatLift program <$> liftList program)
 
@@ -45,16 +45,16 @@ formatLiftGroupCycles cycles =
 formatLiftGroupCycle :: LiftGroupCycle -> String
 formatLiftGroupCycle cycle =
     "-> " ++
-    (unwords $ (++ " ->") <$> cycle)
+    unwords ((++ " ->") <$> cycle)
 
 formatLift :: Program -> Lift -> String
 formatLift program lift =
     init $ unlines $
-    (init $ unwords $ [lift, progressionStr, maybeBodyweight]) :
-    (formatSession =<< (fromJust $ liftCycle lift program))
+    init (unwords [lift, progressionStr, maybeBodyweight]) :
+    (formatSession =<< fromJust (liftCycle lift program))
   where
     progressionStr =
-        "(+" ++ (show $ fromJust $ progression lift program) ++ "kg)"
+        "(+" ++ show (fromJust $ progression lift program) ++ "kg)"
     maybeBodyweight = if fromJust $ isBodyweight lift program
         then "(Bodyweight) "
         else ""
@@ -69,12 +69,12 @@ formatSession session =
 
 formatSetGroup :: [Set] -> String
 formatSetGroup sets =
-    (lift set) ++ " " ++
-    (show $ length sets) ++ "x" ++
-    (show $ reps set) ++ " " ++
+    lift set ++ " " ++
+    show (length sets) ++ "x" ++
+    show (reps set) ++ " " ++
     maybePercent
   where
     set = head sets
     maybePercent = case setType set of
         PR   -> "PR"
-        Work -> (show $ percent set) ++ "%"
+        Work -> show (percent set) ++ "%"

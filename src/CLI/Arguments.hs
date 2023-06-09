@@ -7,14 +7,9 @@ import CLI.Endgame.NextLog
 import CLI.Endgame.Log
     ( displayLogs
     , displayLog
-    , failLiftInLog
-    , removeLog
     )
 import CLI.Endgame.Help
-    ( displayHelp
-    , displayLiftsHelp
-    , displayProgramHelp
-    )
+    ( displayHelp )
 import CLI.Endgame.Add
     ( addNextLog )
 import CLI.Endgame.Bodyweight
@@ -22,94 +17,81 @@ import CLI.Endgame.Bodyweight
     , setBodyweight
     )
 import CLI.Endgame.Profile
-    ( createNewProfile
+    ( createProfile
     , switchToProfile
     )
 import CLI.Endgame.Program
-    ( displayProgram
-    , displayLiftGroupCycle
-    , editLiftGroupCycle
-    , displayProgramLift
-    , editProgramLift
+    ( displayProfileProgram
+    , setProgression
+    , toggleBodyweight
     ) 
 import CLI.Endgame.Lifts
     ( displayLifts
-    , setPR
-    , setProgression
+    , setPr
     , setCycle
-    , toggleBodyweight
     )
-import CLI.Endgame.Convert
-    ( convertProfile )
 import CLI.ArgumentEnsuring
     ( ensurePositiveInt
     , ensureWeight
     , ensureCycle
     )
+import CLI.Endgame.Remove (removeLog)
 
 handleArguments :: [String] -> IO ()
 
+--HELP
 handleArguments ["help"] = displayHelp
 
-handleArguments ["lifts", "help"] = displayLiftsHelp
+--PROFILE
+handleArguments ["new", "profile"] = createProfile
 
-handleArguments ["program", "help"] = displayProgramHelp
+handleArguments ["profile", profileName] = switchToProfile profileName
 
-handleArguments ["next"] = displayNextLog
-
-handleArguments ["next", nStr] = ensurePositiveInt nStr displayNextLogs
-    
+--LOGS
 handleArguments ["logs", nStr] = ensurePositiveInt nStr displayLogs
 
 handleArguments ["logs"] = displayLogs 1
-
-handleArguments ["add"] = addNextLog
-    
-handleArguments ["lifts"] = displayLifts
-
-handleArguments ["lifts", "pr", lift, weightStr] =
-    ensureWeight weightStr $ setPR lift
-
-handleArguments ["lifts", "progression", lift, weightStr] =
-    ensureWeight weightStr $ setProgression lift
-    
-handleArguments ["lifts", "cycle", lift, posStr, lenStr] =
-    ensureCycle posStr lenStr $ \pos len ->
-    setCycle lift (pos-1) len
-
-handleArguments ["lifts", "toggle-bodyweight", lift] = toggleBodyweight lift
-
-handleArguments ["bw"] = displayBodyweight
-
-handleArguments ["bw", bodyweightStr] = ensureWeight bodyweightStr setBodyweight
-
-handleArguments ["profile", "new"] = createNewProfile
-
-handleArguments ["profile", profile] = switchToProfile profile
 
 handleArguments ["log", nStr] = ensurePositiveInt nStr displayLog
 
 handleArguments ["log"] = displayLog 1
 
-handleArguments ["log", nStr, "fail", lift] = ensurePositiveInt nStr $ failLiftInLog lift
+handleArguments ["remove", "log", nStr] =
+   ensurePositiveInt nStr removeLog
 
-handleArguments ["log", nStr, "remove"] = ensurePositiveInt nStr removeLog
+handleArguments ["remove", "log"] = removeLog 1
 
-handleArguments ["program"] = displayProgram
+--LIFTS
+handleArguments ["lifts"] = displayLifts
 
-handleArguments ["program", "lift-group-cycle", nStr] =
-    ensurePositiveInt nStr displayLiftGroupCycle
+handleArguments ["pr", lift, weightStr] =
+    ensureWeight weightStr $ setPr lift
 
-handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
-    ensurePositiveInt nStr editLiftGroupCycle
+handleArguments ["cycle", lift, posStr, lenStr] =
+    ensureCycle posStr lenStr $ \pos len ->
+    setCycle lift (pos-1) len
 
-handleArguments ["program", "lift", lift] = displayProgramLift lift
+handleArguments ["bodyweight"] = displayBodyweight
 
-handleArguments ["program", "lift", lift, "edit"] = editProgramLift lift
+handleArguments ["bodyweight", bodyweightStr] = ensureWeight bodyweightStr setBodyweight
 
---SCARY:
-handleArguments ["convert"] = convertProfile
+--PROGRAM
+handleArguments ["program"] = displayProfileProgram
+    
+handleArguments ["progression", lift, weightStr] =
+    ensureWeight weightStr $ setProgression lift
+
+handleArguments ["toggle", "bodyweight", lift] = toggleBodyweight lift
+
+--NEXT
+handleArguments ["next"] = displayNextLog
+
+handleArguments ["next", nStr] = ensurePositiveInt nStr displayNextLogs
+    
+--ADD
+handleArguments ["add"] = addNextLog
 
 handleArguments _ = putStrLn invalidArgumentResponse
 
+invalidArgumentResponse :: String
 invalidArgumentResponse = "Try 'endgame help'"

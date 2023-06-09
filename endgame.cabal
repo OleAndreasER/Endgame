@@ -28,9 +28,7 @@ executable endgame
 
     -- Modules included in this executable, other than Main.
     other-modules:
-        Setup.Setup,
         Setup.Programs,
-        Setup.NewPrograms,
         CLI.Endgame.NextLog,
         CLI.Endgame.Log,
         CLI.Endgame.Help,
@@ -39,38 +37,24 @@ executable endgame
         CLI.Endgame.Profile,
         CLI.Endgame.Program,
         CLI.Endgame.Lifts,
-        CLI.Endgame.Convert,
+        CLI.Endgame.Remove,
         CLI.Arguments,
-        CLI.LogFormat,
-        CLI.ProgramFormat,
-        CLI.StatsFormat,
-        CLI.SetupStats,
         CLI.ArgumentEnsuring,
-        CLI.SelectProgram,
         CLI.CreateProfile,
-        CLI.CreateProgram,
-        CLI.Edit.LiftGroupCycle,
-        CLI.Edit.LiftCycle,
         CLI.Input.Input,
         CLI.Input.Defaulted,
         CLI.Input.Readers,
         Types.General,
-        Types.Program,
-        Types.Log,
-        Types.Stats,
-        Advance.Cycles,
-        Advance.PRs,
-        CurrentLog,
         Date,
-        NextLogs,
-        FileHandling,
-        FirstStatsOfProgram,
         File.Path,
         File.Profile,
         File.ProfileManagement,
-        Convert.Program,
-        Convert.Stats,
-        Convert.Log,
+        Profile.Profile,
+        Profile.NextLog,
+        Profile.NextLifts,
+        Profile.Advance.Lifts,
+        Profile.Advance.Prs,
+        Profile.Advance.SetTypes,
         Program.Program,
         Program.LiftGroupCycle,
         Program.LiftCycle,
@@ -134,5 +118,6 @@ test-suite test
         LogFormatTest
         ProgramFormatTest
         StatsFormatTest
+        AdvanceCycleTest
 
     default-language: Haskell2010

@@ -2,7 +2,9 @@ module File.Path
     ( stats
     , program
     , logs
+    , profile
     , currentProfile
+    , profilesFolder
     ) where
 
 import System.Directory 
@@ -27,3 +29,6 @@ logs profileName = profile profileName <&> (++ "/logs.txt")
 
 currentProfile :: IO FilePath
 currentProfile = endgame <&> (++ "/profile.txt")
+
+profilesFolder :: IO FilePath
+profilesFolder = endgame <&> (++ "/profiles")

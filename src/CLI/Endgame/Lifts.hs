@@ -1,56 +1,45 @@
 module CLI.Endgame.Lifts
     ( displayLifts
-    , setPR
-    , setProgression
+    , setPr
     , setCycle
-    , toggleBodyweight
     ) where
 
-import Types.General
-    ( Weight
-    , Lift
-    )
-import CLI.StatsFormat
-    ( formatStats
-    )
-import FileHandling
-    ( readStats
-    , setStats
-    )
-import CLI.Endgame.Log
-    ( updateLifts -- temp location
-    )
-import qualified Types.Stats as Stats
-    ( setPR
-    , setProgression
-    , setCycle
-    , toggleBodyweight
-    )
 import CLI.ArgumentEnsuring
-    ( ifProfile
+    ( ifProfile )
+import File.Profile
+    ( readStats
+    , toStats
+    )
+import Stats.Format
+    ( format )
+import Stats.Stats
+    ( Stats
+    , hasLift
+    )
+import qualified Stats.Stats as Stats
+    ( setPr
+    , setCycle
+    )
+import Types.General
+    ( Lift
+    , Weight
     )
 
 displayLifts :: IO ()
-displayLifts = 
+displayLifts =
     ifProfile $
-    readStats >>= putStrLn . formatStats
+    putStrLn . format =<< readStats
 
-setPR :: Lift -> Weight -> IO ()
-setPR lift weight =
+toLift :: Lift -> (Stats -> Stats) -> IO ()
+toLift lift f =
     ifProfile $
-    updateLifts lift $ Stats.setPR weight
+    hasLift lift <$> readStats >>= \hasLift' ->
+    if hasLift'
+    then toStats f >> displayLifts
+    else putStrLn ("You don't do " ++ lift ++ ".")
 
-setProgression :: Lift -> Weight -> IO ()
-setProgression lift weight =  
-    ifProfile $
-    updateLifts lift $ Stats.setProgression weight
-    
+setPr :: Lift -> Weight -> IO ()
+setPr lift weight = toLift lift (Stats.setPr weight lift)
+
 setCycle :: Lift -> Int -> Int -> IO ()
-setCycle lift pos len =
-    ifProfile $
-    updateLifts lift $ Stats.setCycle pos len
-
-toggleBodyweight :: Lift -> IO ()
-toggleBodyweight lift =
-    ifProfile $
-    updateLifts lift Stats.toggleBodyweight
+setCycle lift pos len = toLift lift (Stats.setCycle pos len lift)

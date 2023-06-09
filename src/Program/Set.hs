@@ -16,6 +16,7 @@ module Program.Set
 import GHC.Generics
     (Generic)
 import Data.Binary
+    ( Binary )
 import Types.General
     ( Lift
     , Reps

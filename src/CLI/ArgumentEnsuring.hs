@@ -1,10 +1,9 @@
 module CLI.ArgumentEnsuring where
 
-import Types.General
-import Types.Log
-import Types.Program
-import FileHandling
+import Types.General ( Weight )
 import Text.Read (readMaybe)
+import File.ProfileManagement ( profileIsSelected )
+import File.Profile ( readProgram )
 
 --Converting and then ensuring valid arguments.
 
@@ -24,17 +23,12 @@ readInt str = case readMaybe str :: Maybe Int of
 check :: Show a => (a -> Bool) -> String -> a -> Either String a
 check predicate aboutX x = if predicate x
     then Right x
-    else Left $ "'"++ show x ++"' "++ aboutX 
-
-getLog :: [Log] -> Int -> Either String Log
-getLog logs n = if n > length logs
-    then Left ("There are only "++(show $ length logs)++" logs.")
-    else Right $ logs !! (n-1)
+    else Left $ "'"++ show x ++"' "++ aboutX
 
 ensureWeight :: String -> (Weight -> IO ()) -> IO ()
-ensureWeight str = ensure 
+ensureWeight str = ensure
     $ readFloat str
-    >>= check (>= 0) "can't be negative." 
+    >>= check (>= 0) "can't be negative."
 
 ensureNonNegativeInt :: String -> (Int -> IO ()) -> IO ()
 ensureNonNegativeInt str = ensure
@@ -52,23 +46,18 @@ ensureCycle posStr lenStr f =
     ensurePositiveInt lenStr $ \len ->
     ensure (check (<= len) outOfBounds pos)
     $ \pos' -> f pos' len
-  where 
+  where
     outOfBounds =
         "is larger than '"++lenStr++"'. Meaning it's out of the cycle's bounds."
 
-ensureLog :: Int -> (Log -> IO ()) -> IO ()
-ensureLog n f = do
-    logs <- readLogs
-    ensure (check (> 0) "must be positive." n >>= getLog logs) f
-
 ensureIndex :: Int -> [a] -> (a -> IO ()) -> IO ()
 ensureIndex n xs f
-    | n > length xs = 
+    | n > length xs =
         putStrLn $ "'"++ show n ++ "' is too large."
- 
+
     | n <= 0 =
         putStrLn $ "'"++ show n ++ "' must be positive."
-    
+
     | otherwise =
         f $ xs !! (n-1)
 
@@ -78,11 +67,3 @@ ifProfile f = do
     if profileIsSelected'
     then f
     else putStrLn "You must create a profile first."
-
-ifLift :: String -> IO() -> IO ()
-ifLift lift f = do
-    program <- readProgram
-    if liftInProgram program lift
-    then f
-    else putStrLn $ "'"++lift++"' is not in your program"
-    

@@ -1,5 +1,5 @@
 module File.ProfileManagement
-    ( setProfile
+    ( setCurrentProfile
     , getProfiles
     , getProfile
     , profileIsSelected
@@ -7,15 +7,17 @@ module File.ProfileManagement
     ) where
 
 import qualified File.Path as Path
-    ( currentProfile )
+    ( currentProfile
+    , profilesFolder
+    )
 import System.Directory 
     ( listDirectory
     , doesFileExist
     , doesDirectoryExist
     )
 
-setProfile :: String -> IO ()
-setProfile profileName = do
+setCurrentProfile :: String -> IO ()
+setCurrentProfile profileName = do
     profilePath <- Path.currentProfile
     writeFile profilePath profileName
 
@@ -23,7 +25,7 @@ getProfiles :: IO [String]
 getProfiles = do
     folderExists <- profilesFolderExists
     if folderExists 
-    then listDirectory =<< Path.currentProfile
+    then listDirectory =<< Path.profilesFolder
     else pure []
 
 getProfile :: IO String
@@ -33,4 +35,4 @@ profileIsSelected :: IO Bool
 profileIsSelected = doesFileExist =<< Path.currentProfile
 
 profilesFolderExists :: IO Bool
-profilesFolderExists = doesDirectoryExist =<< Path.currentProfile
+profilesFolderExists = doesDirectoryExist =<< Path.profilesFolder

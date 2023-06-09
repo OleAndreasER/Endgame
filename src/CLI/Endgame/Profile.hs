@@ -1,31 +1,31 @@
 module CLI.Endgame.Profile
-    ( createNewProfile
+    ( createProfile
     , switchToProfile
     ) where
 
-import FileHandling
+import File.ProfileManagement
     ( getProfiles
-    , setProfile
+    , setCurrentProfile
     )
-import CLI.CreateProfile
-    ( createProfile
-    )
+import qualified CLI.CreateProfile as CLI
+    ( createProfile )
 
-createNewProfile :: IO ()
-createNewProfile = do
+createProfile :: IO ()
+createProfile = do
     putStrLn "Profile name:"
-    name <- getLine
-    isProfile <- elem name <$> getProfiles
-    if isProfile
-    then putStrLn $ "There is already a profile named '"++name++"'."
-    else createProfile name
+    profileName <- getLine
+    isTaken <- elem profileName <$> getProfiles
+    if isTaken
+    then putStrLn $
+        "There is already a profile named '" ++ profileName ++ "'."
+    else CLI.createProfile profileName
 
 switchToProfile :: String -> IO ()
-switchToProfile profile = do
-    isProfile <- elem profile <$> getProfiles
-    if isProfile
+switchToProfile profileName = do
+    profileExists <- elem profileName <$> getProfiles
+    if profileExists
     then do
-        setProfile profile
-        putStrLn $ "Profile: "++profile
+        setCurrentProfile profileName
+        putStrLn $ "Profile: " ++ profileName
     else
-        putStrLn $ "There is no profile called '"++profile++"'."
+        putStrLn $ "There is no profile called '" ++ profileName ++ "'."

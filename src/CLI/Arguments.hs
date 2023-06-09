@@ -89,9 +89,6 @@ handleArguments ["progression", lift, weightStr] =
 
 handleArguments ["toggle-bodyweight", lift] = toggleBodyweight lift
 
---SCARY:
-handleArguments ["convert"] = convertProfile
-
 handleArguments ["next"] = displayNextLog
 
 handleArguments ["next", nStr] = ensurePositiveInt nStr displayNextLogs
@@ -105,8 +102,6 @@ invalidArgumentResponse = "Try 'endgame help'"
 
 {-
 handleArguments ["log", nStr, "fail", lift] = ensurePositiveInt nStr $ failLiftInLog lift
-
-handleArguments ["log", nStr, "remove"] = ensurePositiveInt nStr removeLog
 
 handleArguments ["program", "lift-group-cycle", nStr] =
     ensurePositiveInt nStr displayLiftGroupCycle

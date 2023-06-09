@@ -1,4 +1,4 @@
-module AdvanceCycle
+module AdvanceCycleTest
     ( testAdvanceCycle
     ) where
 import Test.Hspec ( it, shouldBe, Spec )

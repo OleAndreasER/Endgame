@@ -7,10 +7,7 @@ module CLI.Endgame.Program
 import CLI.ArgumentEnsuring
     ( ifProfile
     , ensureIndex
-    , ifLift
     )
-import CLI.ProgramFormat
-    ( formatProgram )
 import File.Profile
     ( readProgram
     , toProgram

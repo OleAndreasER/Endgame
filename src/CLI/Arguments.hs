@@ -7,8 +7,6 @@ import CLI.Endgame.NextLog
 import CLI.Endgame.Log
     ( displayLogs
     , displayLog
-    --, failLiftInLog
-    --, removeLog
     )
 import CLI.Endgame.Help
     ( displayHelp
@@ -35,8 +33,6 @@ import CLI.Endgame.Lifts
     , setPr
     , setCycle
     )
-import CLI.Endgame.Convert
-    ( convertProfile )
 import CLI.ArgumentEnsuring
     ( ensurePositiveInt
     , ensureWeight

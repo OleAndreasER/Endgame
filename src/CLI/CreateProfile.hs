@@ -30,7 +30,7 @@ import Data.Foldable
     ( foldrM )
 import CLI.Input.Input
     ( getWeight )
-import Setup.NewPrograms
+import Setup.Programs
     ( programs )
 import Data.Maybe
     ( fromJust )

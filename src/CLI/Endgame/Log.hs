@@ -7,34 +7,9 @@ module CLI.Endgame.Log
     ) where
 
 import CLI.ArgumentEnsuring
-    ( ifProfile
-    , ensureLog
-    )
-import CLI.LogFormat
-    ( formatLog )
-import CLI.StatsFormat
-    ( formatStats )
-import qualified Types.Log as Log
-    ( failLift )
-import Types.Log
-    ( SetType (Work, PR)
-    , liftSetType
-    )
+    ( ifProfile )
 import Types.General
     ( Lift )
-import qualified Types.Stats as Stats
-    ( addWork )
-import Types.Stats
-    ( LiftStats
-    , addProgressions
-    , liftIsInStats
-    , toLiftStats
-    )
-import Advance.Cycles
-    ( regressCycles )
-import Advance.PRs
-    ( regressPRs )
--- New:
 import Log.Format
     ( format )
 import File.Profile

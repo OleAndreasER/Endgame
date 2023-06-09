@@ -7,7 +7,7 @@ import StatsFormatTest
     ( testStatsFormat )
 import ProgramFormatTest
     ( testProgramFormat )
-import AdvanceCycle
+import AdvanceCycleTest
     ( testAdvanceCycle )
 
 main :: IO ()

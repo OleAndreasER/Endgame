@@ -9,10 +9,7 @@ import CLI.Endgame.Log
     , displayLog
     )
 import CLI.Endgame.Help
-    ( displayHelp
-    , displayLiftsHelp
-    , displayProgramHelp
-    )
+    ( displayHelp )
 import CLI.Endgame.Add
     ( addNextLog )
 import CLI.Endgame.Bodyweight
@@ -42,16 +39,15 @@ import CLI.Endgame.Remove (removeLog)
 
 handleArguments :: [String] -> IO ()
 
+--HELP
 handleArguments ["help"] = displayHelp
 
-handleArguments ["program", "help"] = displayProgramHelp
-
+--PROFILE
 handleArguments ["new", "profile"] = createProfile
 
 handleArguments ["profile", profileName] = switchToProfile profileName
 
-handleArguments ["lifts", "help"] = displayLiftsHelp
-
+--LOGS
 handleArguments ["logs", nStr] = ensurePositiveInt nStr displayLogs
 
 handleArguments ["logs"] = displayLogs 1
@@ -65,6 +61,7 @@ handleArguments ["remove", "log", nStr] =
 
 handleArguments ["remove", "log"] = removeLog 1
 
+--LIFTS
 handleArguments ["lifts"] = displayLifts
 
 handleArguments ["pr", lift, weightStr] =
@@ -74,38 +71,27 @@ handleArguments ["cycle", lift, posStr, lenStr] =
     ensureCycle posStr lenStr $ \pos len ->
     setCycle lift (pos-1) len
 
-handleArguments ["bw"] = displayBodyweight
+handleArguments ["bodyweight"] = displayBodyweight
 
-handleArguments ["bw", bodyweightStr] = ensureWeight bodyweightStr setBodyweight
+handleArguments ["bodyweight", bodyweightStr] = ensureWeight bodyweightStr setBodyweight
 
+--PROGRAM
 handleArguments ["program"] = displayProfileProgram
     
 handleArguments ["progression", lift, weightStr] =
     ensureWeight weightStr $ setProgression lift
 
-handleArguments ["toggle-bodyweight", lift] = toggleBodyweight lift
+handleArguments ["toggle", "bodyweight", lift] = toggleBodyweight lift
 
+--NEXT
 handleArguments ["next"] = displayNextLog
 
 handleArguments ["next", nStr] = ensurePositiveInt nStr displayNextLogs
     
+--ADD
 handleArguments ["add"] = addNextLog
 
 handleArguments _ = putStrLn invalidArgumentResponse
 
 invalidArgumentResponse :: String
 invalidArgumentResponse = "Try 'endgame help'"
-
-{-
-handleArguments ["log", nStr, "fail", lift] = ensurePositiveInt nStr $ failLiftInLog lift
-
-handleArguments ["program", "lift-group-cycle", nStr] =
-    ensurePositiveInt nStr displayLiftGroupCycle
-
-handleArguments ["program", "lift-group-cycle", nStr, "edit"] =
-    ensurePositiveInt nStr editLiftGroupCycle
-
-handleArguments ["program", "lift", lift] = displayProgramLift lift
-
-handleArguments ["program", "lift", lift, "edit"] = editProgramLift lift
--}

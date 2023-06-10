@@ -13,8 +13,13 @@ removeLog n = ifProfile $ do
     case maybeLog of
         Nothing -> do
             logCount' <- logCount
-            putStrLn ("There are only "++ show logCount' ++ " logs.")
+            putStrLn $ notEnoughLogs logCount'
         Just log -> do
             toLogs (delete log)
             putStrLn "Removed log:"
             putStrLn $ format log
+
+notEnoughLogs :: Int -> String
+notEnoughLogs 0 = "There are no logs."
+notEnoughLogs 1 = "There is only 1 log."
+notEnoughLogs logCount = "There are only " ++ show logCount ++ " logs."

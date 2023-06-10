@@ -6,9 +6,11 @@ displayHelp :: IO ()
 displayHelp = putStrLn
     "Get started by creating a profile:\n\
     \  endgame new profile\n\n\
+    \List your profiles:\n\
+    \  endgame profiles\n\n\
     \Switch profile:\n\
     \  endgame profile {name}\n\n\
-    \View your first workout:\n\
+    \View your next workout:\n\
     \  endgame next\n\
     \  endgame next {n}\n\n\
     \Add it to your logs:\n\

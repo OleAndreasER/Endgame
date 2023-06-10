@@ -1,6 +1,7 @@
 module CLI.Endgame.Profile
     ( createProfile
     , switchToProfile
+    , displayProfiles
     ) where
 
 import File.ProfileManagement
@@ -9,6 +10,7 @@ import File.ProfileManagement
     )
 import qualified CLI.CreateProfile as CLI
     ( createProfile )
+import Data.List (intercalate)
 
 createProfile :: IO ()
 createProfile = do
@@ -29,3 +31,13 @@ switchToProfile profileName = do
         putStrLn $ "Profile: " ++ profileName
     else
         putStrLn $ "There is no profile called '" ++ profileName ++ "'."
+
+displayProfiles :: IO ()
+displayProfiles = do
+    profiles <- getProfiles
+    if null profiles
+        then putStrLn "There are no profiles."
+        else do
+            let profileList = (" - " ++) <$> profiles
+            putStrLn "Profiles:"
+            putStrLn $ unlines profileList

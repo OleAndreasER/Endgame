@@ -43,8 +43,7 @@ toggleBodyweight lift =
 
 toLift :: Lift -> (Program -> Program) -> IO ()
 toLift lift f =
-    ifProfile $
-    hasLift lift <$> readProgram >>= \hasLift' ->
+    ifProfile (readProgram >>= (\hasLift' ->
     if hasLift'
     then toProgram f >> displayProfileProgram'
-    else putStrLn ("You don't do " ++ lift ++ ".")
+    else putStrLn ("You don't do " ++ lift ++ ".")) . hasLift lift)

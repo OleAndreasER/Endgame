@@ -1,8 +1,9 @@
 module Date (dateStr) where
 
-import Data.Time.Clock
+import Data.Time.Clock ( UTCTime(utctDay), getCurrentTime )
 import Data.Time.Calendar
-import Data.List
+    ( Year, MonthOfYear, DayOfMonth, toGregorian )
+import Data.List ( intercalate )
 
 dateStr :: IO String
 dateStr = format <$> date

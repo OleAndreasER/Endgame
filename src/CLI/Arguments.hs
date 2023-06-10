@@ -19,6 +19,7 @@ import CLI.Endgame.Bodyweight
 import CLI.Endgame.Profile
     ( createProfile
     , switchToProfile
+    , displayProfiles
     )
 import CLI.Endgame.Program
     ( displayProfileProgram
@@ -46,6 +47,8 @@ handleArguments ["help"] = displayHelp
 handleArguments ["new", "profile"] = createProfile
 
 handleArguments ["profile", profileName] = switchToProfile profileName
+
+handleArguments ["profiles"] = displayProfiles
 
 --LOGS
 handleArguments ["logs", nStr] = ensurePositiveInt nStr displayLogs

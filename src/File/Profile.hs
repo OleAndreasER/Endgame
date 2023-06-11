@@ -58,7 +58,7 @@ toLog n f = do
   where
     toLog' :: [Log] -> Int -> (Log -> Log) -> [Log]
     toLog' (log:logs) n f
-        | null logs  = []
+        | null logs  = [log]
         | n == 0     = f log : logs
         | otherwise  = log : toLog' logs (n-1) f
 

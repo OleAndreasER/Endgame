@@ -2,7 +2,7 @@ module Log.Session
     ( Session
     , session
     , bodyweightSession
-    , failPR
+    , failPr
     , hasSuccessfulPr
     ) where
 
@@ -28,9 +28,9 @@ bodyweightSession :: Weight -> Weight -> Weight -> Program.Session -> Session
 bodyweightSession bodyweight progression pr programSession =
     bodyweightSet bodyweight progression pr <$> programSession
 
-failPR :: Session -> Session
-failPR (prSet : workSets) =
-    Set.fail prSet : workSets
+failPr :: Session -> Maybe Session
+failPr (prSet : workSets) =
+    (: workSets) <$> Set.fail prSet
 
 hasSuccessfulPr :: Session -> Bool
 hasSuccessfulPr (maybePrSet : _) = PR True == setType maybePrSet

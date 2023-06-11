@@ -67,11 +67,12 @@ workSets :: Lift -> Int -> Reps -> Weight -> [Set]
 workSets lift sets reps weight =
     replicate sets (Set lift reps weight Work)
 
-fail :: Set -> Set
-fail (Set lift reps weight setType) =
-    Set lift reps weight $ case setType of
-        Work         -> Work
-        PR succeeded -> PR (not succeeded)
+fail :: Set -> Maybe Set
+fail set = case setType set of
+    Work         -> Nothing
+    PR succeeded -> Just set
+        { setType = PR (not succeeded) }
+
 
 roundTo :: Float -> Float -> Float
 roundTo multiple n = multiple * multiples

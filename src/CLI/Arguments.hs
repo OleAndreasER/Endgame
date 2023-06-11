@@ -37,6 +37,7 @@ import CLI.ArgumentEnsuring
     , ensureCycle
     )
 import CLI.Endgame.Remove (removeLog)
+import CLI.Endgame.Fail (failLift)
 
 handleArguments :: [String] -> IO ()
 
@@ -63,6 +64,8 @@ handleArguments ["remove", "log", nStr] =
    ensurePositiveInt nStr removeLog
 
 handleArguments ["remove", "log"] = removeLog 1
+
+handleArguments ["fail", lift] = failLift lift
 
 --LIFTS
 handleArguments ["lifts"] = displayLifts

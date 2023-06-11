@@ -20,6 +20,7 @@ module Stats.Stats
     , cyclePosition
     , pr
     , timeForPr
+    , toCycle
     ) where
 
 import Data.Maybe
@@ -29,7 +30,7 @@ import Data.Binary ( Binary )
 import GHC.Generics
     ( Generic )
 import Stats.LiftStats
-    ( LiftStats )
+    ( LiftStats (cycleLength) )
 import qualified Stats.LiftStats as LiftStats
     ( newLiftStats
     , setPr
@@ -141,3 +142,11 @@ pr :: Lift -> Stats -> Maybe Weight
 pr lift stats = 
     LiftStats.pr <$>
     liftStats lift stats
+
+toCycle :: (Int -> Int -> (Int, Int)) -> Lift -> Stats -> Maybe Stats
+toCycle f lift stats = do
+    liftStats' <- liftStats lift stats
+    position <- cyclePosition lift stats
+    let length = cycleLength liftStats'
+    let (newPosition, newLength) = f position length
+    pure $ setCycle newPosition newLength lift stats

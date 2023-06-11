@@ -24,6 +24,8 @@ displayHelp = putStrLn
     \Remove log:\n\
     \  endgame remove log\n\
     \  endgame remove log {n}\n\n\
+    \Mark lift as failed in most recent log:\n\
+    \  endgame fail {lift}\n\n\
     \View your lifts:\n\
     \  endgame lifts\n\n\
     \Set the PR or cycle of a lift:\n\

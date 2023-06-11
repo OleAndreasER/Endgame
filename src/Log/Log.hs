@@ -7,7 +7,7 @@ module Log.Log
     , session
     , liftSession
     , did
-    , failPR
+    , failPr
     , wasPr
     , lifts
     , sessions
@@ -27,7 +27,7 @@ import Log.Session
     , hasSuccessfulPr
     )
 import qualified Log.Session as Session
-    ( failPR )
+    ( failPr )
 import Types.General
     ( Lift )
 
@@ -63,8 +63,12 @@ wasPr :: Log -> Lift -> Bool
 wasPr log lift =
     Just True == (hasSuccessfulPr <$> session lift log)
 
-failPR :: Lift -> Log -> Log
-failPR = toSession Session.failPR
+failPr :: Lift -> Log -> Maybe Log
+failPr lift log
+    | did lift log = do
+        failedSession <- Session.failPr =<< session lift log
+        pure $ toSession (const failedSession) lift log
+    | otherwise    = Nothing
 
 lifts :: Log -> [Lift]
 lifts = liftsInOrder

@@ -38,6 +38,7 @@ executable endgame
         CLI.Endgame.Program,
         CLI.Endgame.Lifts,
         CLI.Endgame.Remove,
+        CLI.Endgame.Fail,
         CLI.Arguments,
         CLI.ArgumentEnsuring,
         CLI.CreateProfile,

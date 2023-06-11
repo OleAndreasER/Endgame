@@ -1,4 +1,4 @@
-# endgame
+# Endgame
 
 This is a command line tool for logging training sessions and keeping track of progress for training programs of my training system.
 

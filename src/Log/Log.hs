@@ -30,6 +30,7 @@ import qualified Log.Session as Session
     ( failPr )
 import Types.General
     ( Lift )
+import Data.Aeson (ToJSON, FromJSON)
 
 data Log = Log 
     { label :: String
@@ -38,6 +39,8 @@ data Log = Log
     } deriving (Generic, Show, Read, Eq)
 
 instance Binary Log
+instance ToJSON Log
+instance FromJSON Log
 
 log :: String -> [(Lift, Session)] -> Log
 log label sessions = Log

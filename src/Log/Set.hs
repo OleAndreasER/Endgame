@@ -30,11 +30,14 @@ import qualified Program.Set as Program
     , setType
     , SetType (..)
     )
+import Data.Aeson (ToJSON, FromJSON)
 
 data SetType = Work | PR Bool
     deriving (Generic, Show, Read, Eq)
 
 instance Binary SetType
+instance ToJSON SetType
+instance FromJSON SetType
 
 data Set = Set
     { lift :: Lift
@@ -44,6 +47,8 @@ data Set = Set
     } deriving (Generic, Show, Read, Eq)
 
 instance Binary Set
+instance ToJSON Set
+instance FromJSON Set
 
 set :: Weight -> Weight -> Program.Set -> Set
 set = bodyweightSet 0

@@ -1,6 +1,4 @@
-# endgame
-
-Currently work in progress, but it is usable.
+# Endgame
 
 This is a command line tool for logging training sessions and keeping track of progress for training programs of my training system.
 
@@ -10,7 +8,7 @@ https://docs.google.com/spreadsheets/d/1g6xDTQft2-0h3Wt40cRFH2FReqLqTT1ss9uBJtXs
 
 "endgame help" for commands.
 
-"endgame profile new" for getting started.  
+"endgame new profile" for getting started.  
 
 ## Demo  
 

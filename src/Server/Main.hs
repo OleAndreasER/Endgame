@@ -9,8 +9,9 @@ import Web.Spock.Config
 import Data.Aeson (ToJSON, FromJSON)
 import Data.Monoid ((<>))
 import Data.Text (Text, pack)
-import File.Profile (readLog, readLogs)
+import File.Profile (readLog, readLogs, readProfile)
 import Control.Monad.IO.Class (liftIO)
+import Profile.NextLog (nextLog)
 
 type Api = SpockM () () () ()
 
@@ -24,8 +25,11 @@ startServer = do
 app :: Api
 app = prehook corsHeader $ do
   get "log" $ do
-    log <- liftIO $ readLogs 10
+    log <- liftIO $ readLogs 200
     json log
+  get "next" $ do
+    nextLog' <- liftIO $ nextLog <$> readProfile
+    json nextLog'
 
 corsHeader = do
     context <- getContext

@@ -1,5 +1,6 @@
 /dist-newstyle
 /endgame-profiles/*
 TODO
-profile.txt
-.gitignore
+api.db
+api.db-shm
+api.db-wal

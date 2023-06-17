@@ -19,6 +19,7 @@ import Log.Set
     )
 import Log.Format
     ( format )
+import Data.Maybe (fromJust)
 
 testLogFormat :: Spec
 testLogFormat =
@@ -28,7 +29,7 @@ testLogFormat =
 testLog :: Log
 testLog = log "1/1/2023"
     [ liftSession "Bench" $
-        fail (prSet "Bench" 3 100) :
+        (fromJust $ fail (prSet "Bench" 3 100)) :
         workSets "Press" 2 7 50
     , liftSession "Squat" $
         workSets "Squat" 3 5 135

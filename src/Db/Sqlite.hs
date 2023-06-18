@@ -14,6 +14,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Db.Sqlite
     ( main
+    , createTables
     ) where
 
 import Database.Persist.Sqlite
@@ -31,16 +32,12 @@ Profile
     deriving Show
 |]
 
-main :: IO ()
-main = runSqlite ":memory:" $ do
+createTables :: IO ()
+createTables = runSqlite "endgame.db" $ do
     runMigration migrateAll
 
-    oleId <- insert $ User "Ole"
-    insert $ Profile "trondheim1" oleId
-    insert $ Profile "trondheim2" oleId
-
+main :: IO ()
+main = runSqlite "endgame.db" $ do
+    (Entity oleId ole : _) <- selectList [] [LimitTo 1]
     profiles <- selectList [ProfileUserId ==. oleId] []
-    liftIO $ print $ length (profiles :: [Entity Profile])
-
-
-
+    liftIO $ mapM_ print ((\ (Entity profileId profile) -> profile) <$> profiles)

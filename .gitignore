@@ -2,5 +2,4 @@
 /endgame-profiles/*
 TODO
 api.db
-api.db-shm
-api.db-wal
+endgame.db

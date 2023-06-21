@@ -121,6 +121,7 @@ executable endgame
         Stats.LiftStats,
         Stats.Format,
         Db.Schema,
+        Db.FromSchema,
         Db.Sqlite
 
     build-depends:

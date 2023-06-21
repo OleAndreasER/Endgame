@@ -16,16 +16,22 @@ module Db.Schema
     , Lift
     , LogSets
     , ProgramSets
+    , ProgramSession
+    , ProgramLiftCycle
+    , Program
+    , ProgramLiftInLiftGroup
     , migrateAll
     ) where
 
 import Database.Persist.TH
+import File.Profile (toProgram)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Profile
-    userId String
+    userId String Maybe
     name String
     bodyweight Double
+    program ProgramId
     deriving Show
 Lift
     profile ProfileId
@@ -44,10 +50,30 @@ LogSets
     weight Double
     isPr Bool
     prWasSuccessful Bool
+    deriving Show
 ProgramSets
     lift LiftId
     sets Int
     reps Int
     percent Double
     isPr Bool
+    index Int
+    session ProgramSessionId
+    deriving Show
+ProgramSession
+    ProgramLiftCycle
+    index Int
+    deriving Show
+ProgramLiftCycle
+    lift LiftId
+    program ProgramId
+    deriving Show
+Program
+    name String  
+    deriving Show
+ProgramLiftInLiftGroup
+    lift LiftId
+    cycleIndex Int
+    liftGroupNumber Int
+    deriving Show
 |]

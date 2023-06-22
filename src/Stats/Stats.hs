@@ -50,6 +50,7 @@ import Program.Program
     , liftGroupCycles
     , liftList
     )
+import Data.Aeson (FromJSON, ToJSON)
 
 data Stats = Stats
     { liftGroupPositions :: [Int]
@@ -59,6 +60,8 @@ data Stats = Stats
     } deriving (Generic, Show, Eq, Read)
 
 instance Binary Stats
+instance ToJSON Stats
+instance FromJSON Stats
 
 fromProgram :: Program -> Stats
 fromProgram program = Stats

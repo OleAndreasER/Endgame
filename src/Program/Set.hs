@@ -22,6 +22,7 @@ import Types.General
     , Reps
     , Percent
     )
+import Data.Aeson (ToJSON, FromJSON)
 
 data Set = Set
     { lift :: Lift
@@ -31,11 +32,15 @@ data Set = Set
     } deriving (Show, Read, Eq, Generic)
 
 instance Binary Set
+instance ToJSON Set
+instance FromJSON Set
 
 data SetType = PR | Work
     deriving (Show, Read, Eq, Generic)
 
 instance Binary SetType
+instance ToJSON SetType
+instance FromJSON SetType
 
 prSet :: Lift -> Reps -> Set
 prSet lift reps = Set lift reps 100 PR

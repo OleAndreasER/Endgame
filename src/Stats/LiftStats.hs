@@ -18,6 +18,7 @@ import GHC.Generics
     ( Generic )
 import Types.General
     ( Weight )
+import Data.Aeson (FromJSON, ToJSON)
 
 data LiftStats = LiftStats
     { pr :: Weight
@@ -26,6 +27,8 @@ data LiftStats = LiftStats
     } deriving (Generic, Show, Eq, Read)
 
 instance Binary LiftStats
+instance ToJSON LiftStats
+instance FromJSON LiftStats
 
 newLiftStats :: LiftStats
 newLiftStats = LiftStats 0 0 1

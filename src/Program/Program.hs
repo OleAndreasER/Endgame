@@ -35,6 +35,7 @@ import qualified Data.Map as Map
 import Data.Binary
 import GHC.Generics
     (Generic)
+import Data.Aeson (FromJSON, ToJSON)
 
 data Program = Program
     { liftGroupCycles :: [LiftGroupCycle]
@@ -45,6 +46,8 @@ data Program = Program
     } deriving (Show, Read, Eq, Generic)
 
 instance Binary Program
+instance ToJSON Program
+instance FromJSON Program
 
 program :: [LiftGroupCycle]
         -> [(LiftInfo.LiftInfo, LiftCycle)]

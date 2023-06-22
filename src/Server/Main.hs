@@ -9,7 +9,7 @@ import Web.Spock.Config
 import Data.Aeson hiding (json)
 import Data.Monoid ((<>))
 import Data.Text (Text, pack)
-import File.Profile (readLog, readLogs, readProfile)
+import File.Profile (readLog, readLogs, readProfile, readStats, readProgram)
 import Control.Monad.IO.Class (liftIO)
 import Profile.NextLog (nextLog, nextLogs)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
@@ -34,6 +34,12 @@ app = prehook corsHeader $ do
   get ("log" <//> "next" <//> var) $ \logCount -> do
     nextLogs' <- liftIO $ take logCount . nextLogs <$> readProfile
     json nextLogs'
+  get "stats" $ do
+    stats <- liftIO readStats
+    json stats
+  get "program" $ do
+    program <- liftIO readProgram
+    json program
 
 corsHeader = do
     context <- getContext

@@ -15,6 +15,7 @@ import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust)
+import File.ProfileManagement (getProfile, getProfiles)
 
 type Api = SpockM () () () ()
 
@@ -47,6 +48,12 @@ app = prehook corsHeader $ do
   get "program" $ do
     program <- liftIO readProgram
     json program
+  get ("profiles" <//> "active") $ do
+    profileName <- liftIO getProfile
+    json profileName
+  get "profiles" $ do
+    profileNames <- liftIO getProfiles
+    json profileNames
 
 corsHeader = do
     context <- getContext

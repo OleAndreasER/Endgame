@@ -2,6 +2,7 @@ module Setup.Programs
     ( programs
     , standardHalfDays
     , fiveLiftsHalfDays
+    , noRowHalfDays
     ) where
 
 import Program.Program
@@ -22,6 +23,7 @@ programs :: [(String, Program)]
 programs =
     [ ("standard-half-days", standardHalfDays)
     , ("five-lifts-half-days", fiveLiftsHalfDays)
+    , ("no-row-half-days", noRowHalfDays)
     ]
 
 press :: LiftInfo
@@ -101,6 +103,34 @@ standardHalfDays = program
         [ prSet "Row" 3 :
           workSets "Row" 1 5 87
         , workSets "Row" 3 5 87
+        ]
+    ]
+
+noRowHalfDays :: Program
+noRowHalfDays = program
+    [ ["Press", "Bench"]
+    , ["Squat", "Deadlift"]
+    , ["Chin"]
+    ]
+    [ lift press
+        [ prSet "Press" 3 : []
+        , workSets "Press" 3 5 87
+        ]
+    , lift bench
+        [ prSet "Bench" 3 : []
+        , workSets "Bench" 3 5 87
+        ]
+    , lift squat
+        [ prSet "Squat" 3 : []
+        , workSets "Squat" 3 5 87
+        ]
+    , lift deadlift
+        [ prSet "Deadlift" 3 : []
+        , workSets "Deadlift" 2 5 87
+        ]
+    , lift chin
+        [ prSet "Chin" 3 : []
+        , workSets "Chin" 4 5 85
         ]
     ]
 

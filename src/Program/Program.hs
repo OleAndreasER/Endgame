@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Program.Program
     ( Program
@@ -36,6 +37,7 @@ import Data.Binary
 import GHC.Generics
     (Generic)
 import Data.Aeson (FromJSON, ToJSON)
+import Database.Persist.TH (derivePersistField)
 
 data Program = Program
     { liftGroupCycles :: [LiftGroupCycle]
@@ -48,6 +50,7 @@ data Program = Program
 instance Binary Program
 instance ToJSON Program
 instance FromJSON Program
+derivePersistField "Program"
 
 program :: [LiftGroupCycle]
         -> [(LiftInfo.LiftInfo, LiftCycle)]

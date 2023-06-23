@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Stats.Stats
     ( Stats
@@ -51,6 +52,7 @@ import Program.Program
     , liftList
     )
 import Data.Aeson (FromJSON, ToJSON)
+import Database.Persist.TH (derivePersistField)
 
 data Stats = Stats
     { liftGroupPositions :: [Int]
@@ -62,6 +64,7 @@ data Stats = Stats
 instance Binary Stats
 instance ToJSON Stats
 instance FromJSON Stats
+derivePersistField "Stats"
 
 fromProgram :: Program -> Stats
 fromProgram program = Stats

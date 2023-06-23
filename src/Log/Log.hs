@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Log.Log
     ( Log
@@ -31,6 +32,7 @@ import qualified Log.Session as Session
 import Types.General
     ( Lift )
 import Data.Aeson (ToJSON, FromJSON)
+import Database.Persist.TH (derivePersistField)
 
 data Log = Log 
     { label :: String
@@ -41,6 +43,7 @@ data Log = Log
 instance Binary Log
 instance ToJSON Log
 instance FromJSON Log
+derivePersistField "Log"
 
 log :: String -> [(Lift, Session)] -> Log
 log label sessions = Log

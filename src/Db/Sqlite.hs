@@ -13,9 +13,17 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
 module Db.Sqlite
-    ( main
+    ( getProgram
+    , getStats
+    , getLogs
+    , setProgram
+    , setStats
+    , setLogs
+    , insertNewProfile
+    , activeProfileToDb
     , createTables
     , printProfile
+    , toDb
     ) where
 
 import Database.Persist.Sqlite
@@ -30,13 +38,14 @@ import Stats.Stats (Stats)
 import qualified Stats.Format as Stats (format)
 import Log.Log (Log)
 import Control.Monad.Trans.Reader (ReaderT)
+import Profile.Profile (newProfile)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 ActiveProfile
     ownerUserId String
     profile ProfileId
 Profile
-    name String
+    profileName String
     ownerUserId String Maybe
     program Program
     stats Stats
@@ -47,23 +56,35 @@ createTables :: IO ()
 createTables = runSqlite "endgame.db" $ do
     runMigration migrateAll
 
-main :: IO ()
-main = runSqlite "endgame.db" $ do
+activeProfileToDb :: Maybe String -> String -> IO ()
+activeProfileToDb owner profileName = runSqlite "endgame.db" $ do
     profile <- liftIO readProfile
     profileId <- insert $ Profile
-        "Trondheim renaissance" 
-        Nothing
+        profileName
+        owner
         (Profile.program profile)
         (Profile.stats profile)
         (Profile.logs profile)
     pure ()
+
 
 printProfile :: Maybe String -> IO ()
 printProfile owner = runSqlite "endgame.db" $ do
     program <- getProgram owner
     liftIO $ putStrLn $ Program.format program
     stats <- getStats owner
-    liftIO $ putStrLn $ Stats.format stats 
+    liftIO $ putStrLn $ Stats.format stats
+
+toDb f = runSqlite "endgame.db" f
+
+insertNewProfile owner profileName program = insert $ Profile
+    profileName
+    owner
+    (Profile.program profile)
+    (Profile.stats profile)
+    (Profile.logs profile)
+  where
+    profile = newProfile program
 
 getProgram owner = do
     (Entity _ (Profile _ _ program _ _) ) : _ <- selectList [ProfileOwnerUserId ==. owner] [LimitTo 1]
@@ -72,7 +93,16 @@ getProgram owner = do
 getStats owner = do
     (Entity _ (Profile _ _ _ stats _) ) : _ <- selectList [ProfileOwnerUserId ==. owner] [LimitTo 1]
     pure stats
-    
+
 getLogs owner = do
     (Entity _ (Profile _ _ _ _ logs) ) : _ <- selectList [ProfileOwnerUserId ==. owner] [LimitTo 1]
     pure logs
+
+setProgram owner newProgram =
+    updateWhere [ProfileOwnerUserId ==. owner] [ProfileProgram =. newProgram]
+
+setStats owner newStats =
+    updateWhere [ProfileOwnerUserId ==. owner] [ProfileStats =. newStats]
+
+setLogs owner newLogs =
+    updateWhere [ProfileOwnerUserId ==. owner] [ProfileLogs =. newLogs]

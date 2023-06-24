@@ -1,4 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE TypeFamilies #-}
 module Server.Main
     ( startServer
     ) where
@@ -9,50 +11,56 @@ import Web.Spock.Config
 import Data.Aeson hiding (json)
 import Data.Monoid ((<>))
 import Data.Text (Text, pack)
-import File.Profile (readLog, readLogs, readProfile, readStats, readProgram, toProfile)
+import File.Profile (readLog, readLogs, readProfile, readStats, readProgram)
 import Control.Monad.IO.Class (liftIO)
 import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust)
-import File.ProfileManagement (getProfile, getProfiles)
+import Db.Sqlite (getLogs, toProfile, getLog, getProfile, getProgram, getStats)
+import Log.Log (Log)
+import Database.Persist.Sqlite (createSqlitePool, SqlBackend, SqlPersistT, runSqlConn)
 
-type Api = SpockM () () () ()
+type Api = SpockM SqlBackend () () ()
 
-type ApiAction a = SpockAction () () () a
+type ApiAction a = SpockAction SqlBackend () () a
 
 startServer :: IO ()
 startServer = do
-  spockConfig <- defaultSpockCfg () PCNoDatabase ()
+  pool <- runStdoutLoggingT $ createSqlitePool "endgame.db" 5
+  spockConfig <- defaultSpockCfg () (PCPool pool) ()
   runSpock 8080 (spock spockConfig app)
 
 app :: Api
 app = prehook corsHeader $ do
-  get "log" $ do
-    log <- liftIO $ readLogs 200
+  get ("log" <//> var) $ \userId -> do
+    log <- runSQL $ getLogs $ Just userId
     json log
-  post "log" $ do
+  post ("log" <//> var) $ \userId -> do
     dateStr' <- liftIO dateStr
-    liftIO $ toProfile (addLog dateStr')
-    addedLog <- liftIO (fromJust <$> readLog 0)
+    runSQL $ toProfile userId (addLog dateStr')
+    addedLog <- runSQL $ getLog userId 0
     json addedLog
-  get ("log" <//> "next") $ do
-    nextLog' <- liftIO $ nextLog <$> readProfile
+  get ("log" <//> "next" <//> var) $ \userId -> do
+    nextLog' <- runSQL $ nextLog <$> getProfile (Just userId)
     json nextLog'
-  get ("log" <//> "next" <//> var) $ \logCount -> do
-    nextLogs' <- liftIO $ take logCount . nextLogs <$> readProfile
+  get ("log" <//> "next" <//> var <//> var) $ \userId logCount -> do
+    nextLogs' <- runSQL $ take logCount . nextLogs
+      <$> getProfile (Just userId)
     json nextLogs'
-  get "stats" $ do
-    stats <- liftIO readStats
+  get ("stats" <//> var) $ \userId -> do
+    stats <- runSQL $ getStats $ Just userId
     json stats
-  get "program" $ do
-    program <- liftIO readProgram
+  get ("program" <//> var) $ \userId -> do
+    program <- runSQL $ getProgram $ Just userId
     json program
-  get ("profiles" <//> "active") $ do
-    profileName <- liftIO getProfile
+  get ("profiles" <//> var <//> "active") $ \userId -> do
+    let x = userId :: String
+    let profileName = ("N/A" :: String)
     json profileName
-  get "profiles" $ do
-    profileNames <- liftIO getProfiles
+  get ("profiles" <//> var) $ \userId -> do
+    let x = userId :: String
+    let profileNames = [] :: [String]
     json profileNames
 
 corsHeader = do
@@ -67,3 +75,8 @@ errorJson code message =
     [ "result" .= String "failure"
     , "error" .= object ["code" .= code, "message" .= message]
     ]
+
+runSQL
+  :: (HasSpock m, SpockConn m ~ SqlBackend)
+  => SqlPersistT (LoggingT IO) a -> m a
+runSQL action = runQuery $ \conn -> runStdoutLoggingT $ runSqlConn action conn

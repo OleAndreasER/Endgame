@@ -45,8 +45,8 @@ import Control.Monad.Logger (LoggingT)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 ActiveProfile
-    ownerUserId String
-    profile ProfileId
+    ownerUserId String Maybe
+    profile ProfileId Maybe
 Profile
     profileName String
     ownerUserId String Maybe
@@ -138,3 +138,16 @@ toProfile :: Maybe String
 toProfile owner f = do
     profile <- getProfile owner
     setProfile owner $ f profile
+
+setActiveProfile :: Maybe String -> String -> SqlPersistT (LoggingT IO) ()
+setActiveProfile user profileName = do
+    (Entity profileId _ ) : _ <- selectList
+        [ ProfileProfileName ==. profileName
+        , ProfileOwnerUserId ==. user
+        ] [LimitTo 1]
+    updateWhere
+        [ActiveProfileOwnerUserId ==. user]
+        [ActiveProfileProfile =. Just profileId]
+
+newUser :: Maybe String -> SqlPersistT (LoggingT IO) (Key ActiveProfile)
+newUser user = insert $ ActiveProfile user Nothing

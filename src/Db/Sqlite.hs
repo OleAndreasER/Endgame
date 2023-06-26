@@ -27,6 +27,10 @@ module Db.Sqlite
     , activeProfileToDb
     , createTables
     , toDb
+    , setActiveProfile
+    , newUser
+    , getProfileName
+    , getProfileNames
     ) where
 
 import Database.Persist.Sqlite
@@ -151,3 +155,26 @@ setActiveProfile user profileName = do
 
 newUser :: Maybe String -> SqlPersistT (LoggingT IO) (Key ActiveProfile)
 newUser user = insert $ ActiveProfile user Nothing
+
+getActiveProfileId :: Maybe String -> SqlPersistT (LoggingT IO) (Maybe ProfileId)
+getActiveProfileId user = do
+    (Entity _ (ActiveProfile _ profileId)) : _ <- selectList
+        [ ActiveProfileOwnerUserId ==. user
+        ] [LimitTo 1]
+    pure profileId
+
+getProfileName :: Maybe String -> SqlPersistT (LoggingT IO) (Maybe String)
+getProfileName owner = do
+    maybeProfileId <- getActiveProfileId owner
+    case maybeProfileId of
+        Nothing -> pure Nothing
+        Just profileId -> do
+            profile <- get profileId
+            case profile of
+                Nothing -> pure Nothing
+                Just (Profile name _ _ _ _) -> pure (Just name)
+
+getProfileNames :: Maybe String -> SqlPersistT (LoggingT IO) [String]
+getProfileNames owner = do
+    profiles <- selectList [ProfileOwnerUserId ==. owner] []
+    pure ((\(Entity _ (Profile name _ _ _ _)) -> name) <$> profiles)

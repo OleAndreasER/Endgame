@@ -17,7 +17,7 @@ import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust)
-import Db.Sqlite (getLogs, toProfile, getLog, getProfile, getProgram, getStats)
+import Db.Sqlite (getLogs, toProfile, getLog, getProfile, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames)
 import Log.Log (Log)
 import Database.Persist.Sqlite (createSqlitePool, SqlBackend, SqlPersistT, runSqlConn)
 
@@ -55,12 +55,10 @@ app = prehook corsHeader $ do
     program <- runSQL $ getProgram $ Just userId
     json program
   get ("profiles" <//> var <//> "active") $ \userId -> do
-    let x = userId :: String
-    let profileName = ("N/A" :: String)
+    profileName <- runSQL $ getProfileName $ Just userId
     json profileName
   get ("profiles" <//> var) $ \userId -> do
-    let x = userId :: String
-    let profileNames = [] :: [String]
+    profileNames <- runSQL $ getProfileNames $ Just userId
     json profileNames
 
 corsHeader = do

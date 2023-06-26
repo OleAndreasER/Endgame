@@ -1,5 +1,6 @@
 /dist-newstyle
 /endgame-profiles/*
 TODO
-api.db
 endgame.db
+endgame.db-shm
+endgame.db-wal

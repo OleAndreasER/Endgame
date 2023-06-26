@@ -46,6 +46,7 @@ import qualified Stats.Format as Stats (format)
 import Log.Log (Log)
 import Profile.Profile (newProfile, profile)
 import Control.Monad.Logger (LoggingT)
+import Data.Maybe (fromJust)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 ActiveProfile
@@ -88,22 +89,26 @@ insertNewProfile owner profileName program = insert $ Profile
 
 getProgram :: Maybe String -> SqlPersistT (LoggingT IO) Program
 getProgram owner = do
-    (Entity _ (Profile _ _ program _ _) ) : _ <- selectList [ProfileOwnerUserId ==. owner] [LimitTo 1]
+    profileId <- fromJust <$> getActiveProfileId owner
+    Profile _ _ program _ _ <- fromJust <$> get profileId
     pure program
 
 getStats :: Maybe String -> SqlPersistT (LoggingT IO) Stats
 getStats owner = do
-    (Entity _ (Profile _ _ _ stats _) ) : _ <- selectList [ProfileOwnerUserId ==. owner] [LimitTo 1]
+    profileId <- fromJust <$> getActiveProfileId owner
+    Profile _ _ _ stats _ <- fromJust <$> get profileId
     pure stats
 
 getLogs :: Maybe String -> SqlPersistT (LoggingT IO) [Log]
 getLogs owner = do
-    (Entity _ (Profile _ _ _ _ logs) ) : _ <- selectList [ProfileOwnerUserId ==. owner] [LimitTo 1]
+    profileId <- fromJust <$> getActiveProfileId owner
+    Profile _ _ _ _ logs <- fromJust <$> get profileId
     pure logs
 
 getProfile :: Maybe String -> SqlPersistT (LoggingT IO) Profile.Profile
 getProfile owner = do
-    (Entity _ (Profile _ _ program stats logs) ) : _ <- selectList [ProfileOwnerUserId ==. owner] [LimitTo 1]
+    profileId <- fromJust <$> getActiveProfileId owner
+    Profile _ _ program stats logs <- fromJust <$> get profileId
     pure $ profile program stats logs
 
 (!!?) :: [a] -> Int -> Maybe a
@@ -117,20 +122,24 @@ getLog owner n = do
     pure $ logs !!? n
 
 setProgram :: Maybe String -> Program -> SqlPersistT (LoggingT IO) ()
-setProgram owner newProgram =
-    updateWhere [ProfileOwnerUserId ==. owner] [ProfileProgram =. newProgram]
+setProgram owner newProgram = do
+    profileId <- fromJust <$> getActiveProfileId owner
+    update profileId [ProfileProgram =. newProgram]
 
 setStats :: Maybe String -> Stats -> SqlPersistT (LoggingT IO) ()
-setStats owner newStats =
-    updateWhere [ProfileOwnerUserId ==. owner] [ProfileStats =. newStats]
+setStats owner newStats = do
+    profileId <- fromJust <$> getActiveProfileId owner
+    update profileId [ProfileStats =. newStats]
 
 setLogs :: Maybe String -> [Log] -> SqlPersistT (LoggingT IO) ()
-setLogs owner newLogs =
-    updateWhere [ProfileOwnerUserId ==. owner] [ProfileLogs =. newLogs]
+setLogs owner newLogs = do
+    profileId <- fromJust <$> getActiveProfileId owner
+    update profileId [ProfileLogs =. newLogs]
 
 setProfile :: Maybe String -> Profile.Profile -> SqlPersistT (LoggingT IO) ()
-setProfile owner newProfile =
-    updateWhere [ProfileOwnerUserId ==. owner]
+setProfile owner newProfile = do
+    profileId <- fromJust <$> getActiveProfileId owner
+    update profileId
         [ ProfileLogs =. Profile.logs newProfile
         , ProfileStats =. Profile.stats newProfile
         , ProfileProgram =. Profile.program newProfile

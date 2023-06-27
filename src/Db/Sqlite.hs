@@ -26,7 +26,6 @@ module Db.Sqlite
     , insertNewProfile
     , activeProfileToDb
     , createTables
-    , toDb
     , setActiveProfile
     , newUser
     , getProfileName
@@ -75,8 +74,7 @@ activeProfileToDb owner profileName = runSqlite "endgame.db" $ do
         (Profile.logs profile)
     pure ()
 
-toDb f = runSqlite "endgame.db" f
-
+insertNewProfile :: Maybe String -> String -> Program -> SqlPersistT (LoggingT IO) (Key Profile)
 insertNewProfile owner profileName program = insert $ Profile
     profileName
     owner

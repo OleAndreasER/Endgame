@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use newtype instead of data" #-}
 module Server.Main
     ( startServer
     ) where
@@ -20,6 +22,7 @@ import Data.Maybe (fromJust)
 import Db.Sqlite (getLogs, toProfile, getLog, getProfile, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames)
 import Log.Log (Log)
 import Database.Persist.Sqlite (createSqlitePool, SqlBackend, SqlPersistT, runSqlConn)
+import Server.RequestTypes (ActiveProfileRequest(ActiveProfileRequest))
 
 type Api = SpockM SqlBackend () () ()
 
@@ -33,13 +36,14 @@ startServer = do
 
 app :: Api
 app = prehook corsHeader $ do
+  hookAny OPTIONS $ const $ pure () --So that corsHeader is prehooked on any OPTIONS request.
   get ("log" <//> var) $ \userId -> do
     log <- runSQL $ getLogs $ Just userId
     json log
   post ("log" <//> var) $ \userId -> do
     dateStr' <- liftIO dateStr
-    runSQL $ toProfile userId (addLog dateStr')
-    addedLog <- runSQL $ getLog userId 0
+    runSQL $ toProfile (Just userId) (addLog dateStr')
+    addedLog <- runSQL $ getLog (Just userId) 0
     json addedLog
   get ("log" <//> "next" <//> var) $ \userId -> do
     nextLog' <- runSQL $ nextLog <$> getProfile (Just userId)
@@ -54,6 +58,10 @@ app = prehook corsHeader $ do
   get ("program" <//> var) $ \userId -> do
     program <- runSQL $ getProgram $ Just userId
     json program
+  put ("profiles" <//> var <//> "active") $ \userId -> do
+    ActiveProfileRequest profileName <- jsonBody' :: ApiAction ActiveProfileRequest
+    runSQL $ setActiveProfile (Just userId) profileName
+    json ("OK" :: String)
   get ("profiles" <//> var <//> "active") $ \userId -> do
     profileName <- runSQL $ getProfileName $ Just userId
     json profileName
@@ -63,7 +71,10 @@ app = prehook corsHeader $ do
 
 corsHeader = do
     context <- getContext
-    setHeader "Access-Control-Allow-Origin" "*"
+    setHeader "Access-Control-Allow-Origin" "http://localhost:3000"
+    setHeader "Access-Control-Allow-Credentials" "true"
+    setHeader "Access-Control-Allow-Headers" "Content-Type, Authorization"
+    setHeader "Access-Control-Allow-Methods" "*"
     pure context
 
 errorJson :: Int -> Text -> ApiAction ()

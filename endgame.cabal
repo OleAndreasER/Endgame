@@ -28,6 +28,7 @@ executable endgame-server
 
     other-modules:
         Server.Main,
+        Server.RequestTypes,
         Setup.Programs,
         Types.General,
         Date,

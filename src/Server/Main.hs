@@ -19,8 +19,9 @@ import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust)
-import Db.Sqlite (getLogs, toProfile, getLog, getProfile, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames)
+import Db.Sqlite (getLogs, toProfile, getLog, getProfile, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats)
 import Log.Log (Log)
+import Stats.Stats (Stats)
 import Database.Persist.Sqlite (createSqlitePool, SqlBackend, SqlPersistT, runSqlConn)
 import Server.RequestTypes (ActiveProfileRequest(ActiveProfileRequest))
 
@@ -55,6 +56,10 @@ app = prehook corsHeader $ do
   get ("stats" <//> var) $ \userId -> do
     stats <- runSQL $ getStats $ Just userId
     json stats
+  put ("stats" <//> var) $ \userId -> do
+    stats <- jsonBody' :: ApiAction Stats
+    runSQL $ setStats (Just userId) stats
+    json ("OK" :: String)
   get ("program" <//> var) $ \userId -> do
     program <- runSQL $ getProgram $ Just userId
     json program

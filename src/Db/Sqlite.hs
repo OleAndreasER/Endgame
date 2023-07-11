@@ -21,6 +21,7 @@ module Db.Sqlite
     , setProgram
     , setStats
     , setLogs
+    , setLog
     , setProfile
     , toProfile
     , insertNewProfile
@@ -46,6 +47,7 @@ import Log.Log (Log)
 import Profile.Profile (newProfile, profile)
 import Control.Monad.Logger (LoggingT)
 import Data.Maybe (fromJust)
+import Data.List.Tools (setAt)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 ActiveProfile
@@ -133,6 +135,11 @@ setLogs :: Maybe String -> [Log] -> SqlPersistT (LoggingT IO) ()
 setLogs owner newLogs = do
     profileId <- fromJust <$> getActiveProfileId owner
     update profileId [ProfileLogs =. newLogs]
+
+setLog :: Maybe String -> Int -> Log -> SqlPersistT (LoggingT IO) ()
+setLog owner i newLog = do
+    logs <- getLogs owner
+    setLogs owner $ setAt logs i newLog
 
 setProfile :: Maybe String -> Profile.Profile -> SqlPersistT (LoggingT IO) ()
 setProfile owner newProfile = do

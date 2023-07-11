@@ -19,7 +19,7 @@ import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust)
-import Db.Sqlite (getLogs, toProfile, getLog, getProfile, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats)
+import Db.Sqlite (getLogs, toProfile, getLog, getProfile, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog)
 import Log.Log (Log)
 import Stats.Stats (Stats)
 import Database.Persist.Sqlite (createSqlitePool, SqlBackend, SqlPersistT, runSqlConn)
@@ -47,11 +47,13 @@ app = prehook corsHeader $ do
     runSQL $ toProfile (Just userId) (addLog dateStr')
     addedLog <- runSQL $ getLog (Just userId) 0
     json addedLog
-  put ("log" <//> var <//> var) $ \n userId -> do
-    log <- jsonBody' :: ApiAction LogRequest
-    liftIO $ print (n :: Int, userId :: String)
-    liftIO $ putStrLn $ Log.format (fromJust (toLog log))
-    json ("OK" :: String)
+  put ("log" <//> var <//> var) $ \i userId -> do
+    logRequest <- jsonBody' :: ApiAction LogRequest
+    case toLog logRequest of
+      Nothing -> errorJson 400 "Invalid log entry."
+      Just log -> do
+        runSQL $ setLog (Just userId) i log
+        json ("OK" :: String)
   get ("log" <//> "next" <//> var) $ \userId -> do
     nextLog' <- runSQL $ nextLog <$> getProfile (Just userId)
     json nextLog'

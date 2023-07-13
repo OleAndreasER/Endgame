@@ -19,7 +19,7 @@ import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust)
-import Db.Sqlite (getLogs, toProfile, getLog, getProfile, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog)
+import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs)
 import Log.Log (Log)
 import Stats.Stats (Stats)
 import Database.Persist.Sqlite (createSqlitePool, SqlBackend, SqlPersistT, runSqlConn)
@@ -40,12 +40,13 @@ app :: Api
 app = prehook corsHeader $ do
   hookAny OPTIONS $ const $ pure () --So that corsHeader is prehooked on any OPTIONS request.
   get ("log" <//> var) $ \userId -> do
-    log <- runSQL $ getLogs $ Just userId
+    logs <- runSQL $ getLogs $ Just userId
+    json logs
+  get ("log" <//> var <//> var) $ \i userId -> do
+    log <- runSQL $ getLog (Just userId) i
     json log
   post ("log" <//> var) $ \userId -> do
-    dateStr' <- liftIO dateStr
-    runSQL $ toProfile (Just userId) (addLog dateStr')
-    addedLog <- runSQL $ getLog (Just userId) 0
+    addedLog <- runSQL $ addAndGetNextLog (Just userId)
     json addedLog
   put ("log" <//> var <//> var) $ \i userId -> do
     logRequest <- jsonBody' :: ApiAction LogRequest
@@ -55,11 +56,10 @@ app = prehook corsHeader $ do
         runSQL $ setLog (Just userId) i log
         json ("OK" :: String)
   get ("log" <//> "next" <//> var) $ \userId -> do
-    nextLog' <- runSQL $ nextLog <$> getProfile (Just userId)
+    nextLog' <- runSQL $ getNextLog (Just userId)
     json nextLog'
   get ("log" <//> "next" <//> var <//> var) $ \userId logCount -> do
-    nextLogs' <- runSQL $ take logCount . nextLogs
-      <$> getProfile (Just userId)
+    nextLogs' <- runSQL $ getNextLogs (Just userId) logCount
     json nextLogs'
   get ("stats" <//> var) $ \userId -> do
     stats <- runSQL $ getStats $ Just userId

@@ -17,13 +17,12 @@ module Db.Sqlite
     , getStats
     , getLogs
     , getLog
-    , getProfile
     , setProgram
     , setStats
-    , setLogs
     , setLog
-    , setProfile
-    , toProfile
+    , addAndGetNextLog
+    , getNextLog
+    , getNextLogs
     , insertNewProfile
     , activeProfileToDb
     , createTables
@@ -31,23 +30,26 @@ module Db.Sqlite
     , newUser
     , getProfileName
     , getProfileNames
+    , insertLog
     ) where
 
 import Database.Persist.Sqlite
 import Database.Persist
 import Database.Persist.TH
-import File.Profile (readProfile) 
+import File.Profile (readProfile)
 import Control.Monad.IO.Class (MonadIO(liftIO))
 import qualified Profile.Profile as Profile
 import Program.Program as Program (Program)
 import qualified Program.Format as Program (format)
 import Stats.Stats (Stats)
 import qualified Stats.Format as Stats (format)
-import Log.Log (Log)
+import qualified Log.Log as Log (Log)
 import Profile.Profile (newProfile, profile)
 import Control.Monad.Logger (LoggingT)
 import Data.Maybe (fromJust)
 import Data.List.Tools (setAt)
+import Profile.NextLog (nextLog, nextLogs, addLog)
+import Date (dateStr)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 ActiveProfile
@@ -58,7 +60,9 @@ Profile
     ownerUserId String Maybe
     program Program
     stats Stats
-    logs [Log]
+Log
+    profile ProfileId
+    log Log.Log
 |]
 
 createTables :: IO ()
@@ -73,7 +77,6 @@ activeProfileToDb owner profileName = runSqlite "endgame.db" $ do
         owner
         (Profile.program profile)
         (Profile.stats profile)
-        (Profile.logs profile)
     pure ()
 
 insertNewProfile :: Maybe String -> String -> Program -> SqlPersistT (LoggingT IO) (Key Profile)
@@ -82,44 +85,57 @@ insertNewProfile owner profileName program = insert $ Profile
     owner
     (Profile.program profile)
     (Profile.stats profile)
-    (Profile.logs profile)
   where
     profile = newProfile program
-
 
 getProgram :: Maybe String -> SqlPersistT (LoggingT IO) Program
 getProgram owner = do
     profileId <- fromJust <$> getActiveProfileId owner
-    Profile _ _ program _ _ <- fromJust <$> get profileId
+    Profile _ _ program _ <- fromJust <$> get profileId
     pure program
 
 getStats :: Maybe String -> SqlPersistT (LoggingT IO) Stats
 getStats owner = do
     profileId <- fromJust <$> getActiveProfileId owner
-    Profile _ _ _ stats _ <- fromJust <$> get profileId
+    Profile _ _ _ stats <- fromJust <$> get profileId
     pure stats
 
-getLogs :: Maybe String -> SqlPersistT (LoggingT IO) [Log]
+getLogs :: Maybe String -> SqlPersistT (LoggingT IO) [Log.Log]
 getLogs owner = do
     profileId <- fromJust <$> getActiveProfileId owner
-    Profile _ _ _ _ logs <- fromJust <$> get profileId
-    pure logs
-
-getProfile :: Maybe String -> SqlPersistT (LoggingT IO) Profile.Profile
-getProfile owner = do
-    profileId <- fromJust <$> getActiveProfileId owner
-    Profile _ _ program stats logs <- fromJust <$> get profileId
-    pure $ profile program stats logs
+    logRecords <- selectList
+        [ LogProfile ==. profileId 
+        ] [Desc LogId]
+    pure ((\(Entity _ (Log _ log)) -> log) <$> logRecords)
 
 (!!?) :: [a] -> Int -> Maybe a
 xs !!? i
     | (i > -1) && (length xs > i) = Just (xs !! i)
     | otherwise = Nothing
 
-getLog :: Maybe String -> Int -> SqlPersistT (LoggingT IO) (Maybe Log)
-getLog owner n = do
-    logs <- getLogs owner
-    pure $ logs !!? n
+getLog :: Maybe String -> Int -> SqlPersistT (LoggingT IO) (Maybe Log.Log)
+getLog owner n
+    | n >= 0 = do
+        profileId <- fromJust <$> getActiveProfileId owner
+        maybeLogRecord <- selectFirst
+            [ LogProfile ==. profileId ]
+            [ Desc LogId
+            , OffsetBy n
+            ]
+        pure ((\(Entity _ (Log _ log)) -> log) <$> maybeLogRecord)
+    | otherwise = pure Nothing
+
+getLogId :: Maybe String -> Int -> SqlPersistT (LoggingT IO) (Maybe (Key Log))
+getLogId owner n
+    | n >= 0 = do
+        profileId <- fromJust <$> getActiveProfileId owner
+        maybeLogRecord <- selectFirst
+            [ LogProfile ==. profileId ]
+            [ Desc LogId
+            , OffsetBy n
+            ]
+        pure ((\(Entity key _) -> key) <$> maybeLogRecord)
+    | otherwise = pure Nothing
 
 setProgram :: Maybe String -> Program -> SqlPersistT (LoggingT IO) ()
 setProgram owner newProgram = do
@@ -131,31 +147,13 @@ setStats owner newStats = do
     profileId <- fromJust <$> getActiveProfileId owner
     update profileId [ProfileStats =. newStats]
 
-setLogs :: Maybe String -> [Log] -> SqlPersistT (LoggingT IO) ()
-setLogs owner newLogs = do
+setLog :: Maybe String -> Int -> Log.Log -> SqlPersistT (LoggingT IO) ()
+setLog owner n newLog = do
     profileId <- fromJust <$> getActiveProfileId owner
-    update profileId [ProfileLogs =. newLogs]
-
-setLog :: Maybe String -> Int -> Log -> SqlPersistT (LoggingT IO) ()
-setLog owner i newLog = do
-    logs <- getLogs owner
-    setLogs owner $ setAt logs i newLog
-
-setProfile :: Maybe String -> Profile.Profile -> SqlPersistT (LoggingT IO) ()
-setProfile owner newProfile = do
-    profileId <- fromJust <$> getActiveProfileId owner
-    update profileId
-        [ ProfileLogs =. Profile.logs newProfile
-        , ProfileStats =. Profile.stats newProfile
-        , ProfileProgram =. Profile.program newProfile
-        ]
-
-toProfile :: Maybe String
-    -> (Profile.Profile -> Profile.Profile)
-    -> SqlPersistT (LoggingT IO) ()
-toProfile owner f = do
-    profile <- getProfile owner
-    setProfile owner $ f profile
+    maybeLogId <- getLogId owner n
+    case maybeLogId of
+        Nothing -> pure ()
+        Just logId -> replace logId (Log profileId newLog)
 
 setActiveProfile :: Maybe String -> String -> SqlPersistT (LoggingT IO) ()
 setActiveProfile user profileName = do
@@ -186,9 +184,39 @@ getProfileName owner = do
             profile <- get profileId
             case profile of
                 Nothing -> pure Nothing
-                Just (Profile name _ _ _ _) -> pure (Just name)
+                Just (Profile name _ _ _) -> pure (Just name)
 
 getProfileNames :: Maybe String -> SqlPersistT (LoggingT IO) [String]
 getProfileNames owner = do
     profiles <- selectList [ProfileOwnerUserId ==. owner] []
-    pure ((\(Entity _ (Profile name _ _ _ _)) -> name) <$> profiles)
+    pure ((\(Entity _ (Profile name _ _ _)) -> name) <$> profiles)
+
+insertLog :: Maybe String -> Log.Log -> SqlPersistT (LoggingT IO) (Key Log)
+insertLog owner log = do
+    profileId <- fromJust <$> getActiveProfileId owner
+    insert $ Log profileId log
+
+-- Previous logs are not used to find next logs.
+-- Program is never altered either.
+addAndGetNextLog :: Maybe String -> SqlPersistT (LoggingT IO) Log.Log
+addAndGetNextLog owner = do
+    stats <- getStats owner
+    program <- getProgram owner
+    date <- liftIO dateStr
+    let newProfile = addLog date $ profile program stats []
+    setStats owner $ Profile.stats newProfile
+    let addedLog : _ = Profile.logs newProfile
+    insertLog owner addedLog
+    pure addedLog
+
+getNextLog :: Maybe String -> SqlPersistT (LoggingT IO) Log.Log
+getNextLog owner = do
+    stats <- getStats owner
+    program <- getProgram owner
+    pure $ nextLog $ profile program stats []
+
+getNextLogs :: Maybe String -> Int -> SqlPersistT (LoggingT IO) [Log.Log]
+getNextLogs owner n = do
+    stats <- getStats owner
+    program <- getProgram owner
+    pure $ take n $ nextLogs $ profile program stats []

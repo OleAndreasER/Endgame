@@ -31,6 +31,7 @@ module Db.Sqlite
     , getProfileName
     , getProfileNames
     , insertLog
+    , undoLog
     ) where
 
 import Database.Persist.Sqlite
@@ -43,6 +44,7 @@ import Program.Program as Program (Program)
 import qualified Program.Format as Program (format)
 import Stats.Stats (Stats)
 import qualified Stats.Format as Stats (format)
+import qualified Stats.Stats as Stats (undoLog)
 import qualified Log.Log as Log (Log)
 import Profile.Profile (newProfile, profile)
 import Control.Monad.Logger (LoggingT)
@@ -220,3 +222,15 @@ getNextLogs owner n = do
     stats <- getStats owner
     program <- getProgram owner
     pure $ take n $ nextLogs $ profile program stats []
+
+undoLog :: Maybe String -> SqlPersistT (LoggingT IO) ()
+undoLog owner = do
+    maybeLogId <- getLogId owner 0
+    case maybeLogId of
+        Nothing -> pure ()
+        Just logId -> do
+            Log _ log <- fromJust <$> get logId
+            stats <- getStats owner
+            setStats owner $ Stats.undoLog log stats
+            delete logId
+

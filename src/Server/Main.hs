@@ -19,7 +19,7 @@ import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust)
-import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs)
+import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog)
 import Log.Log (Log)
 import Stats.Stats (Stats)
 import Database.Persist.Sqlite (createSqlitePool, SqlBackend, SqlPersistT, runSqlConn)
@@ -48,6 +48,9 @@ app = prehook corsHeader $ do
   post ("log" <//> var) $ \userId -> do
     addedLog <- runSQL $ addAndGetNextLog (Just userId)
     json addedLog
+  delete ("log" <//> var) $ \userId -> do
+    runSQL $ undoLog $ Just userId
+    json ("OK" :: String)
   put ("log" <//> var <//> var) $ \i userId -> do
     logRequest <- jsonBody' :: ApiAction LogRequest
     case toLog logRequest of

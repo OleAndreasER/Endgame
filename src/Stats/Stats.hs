@@ -22,6 +22,7 @@ module Stats.Stats
     , pr
     , timeForPr
     , toCycle
+    , undoLog
     ) where
 
 import Data.Maybe
@@ -53,6 +54,7 @@ import Program.Program
     )
 import Data.Aeson (FromJSON, ToJSON)
 import Database.Persist.TH (derivePersistField)
+import Log.Log (Log, lifts)
 
 data Stats = Stats
     { liftGroupPositions :: [Int]
@@ -156,3 +158,10 @@ toCycle f lift stats = do
     let length = cycleLength liftStats'
     let (newPosition, newLength) = f position length
     pure $ setCycle newPosition newLength lift stats
+
+undoLog :: Log -> Stats -> Stats
+undoLog log stats = 
+    foldr decrementCyclePosition stats $ lifts log
+  where
+    decrementCyclePosition :: Lift -> Stats -> Stats
+    decrementCyclePosition lift stats = fromJust $ toCycle (\position length -> ((position - 1) `mod` length, length)) lift stats

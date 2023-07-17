@@ -231,6 +231,6 @@ undoLog owner = do
         Just logId -> do
             Log _ log <- fromJust <$> get logId
             stats <- getStats owner
-            setStats owner $ Stats.undoLog log stats
+            program <- getProgram owner
+            setStats owner $ Stats.undoLog program log stats
             delete logId
-

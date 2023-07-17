@@ -26,7 +26,7 @@ module Stats.Stats
     ) where
 
 import Data.Maybe
-    ( fromJust )
+    ( fromJust, maybeToList, fromMaybe )
 import qualified Data.Map as Map
 import Data.Binary ( Binary )
 import GHC.Generics
@@ -50,11 +50,14 @@ import qualified Program.Program as Program
 import Program.Program
     ( Program
     , liftGroupCycles
-    , liftList
+    , liftList, progression
     )
 import Data.Aeson (FromJSON, ToJSON)
 import Database.Persist.TH (derivePersistField)
-import Log.Log (Log, lifts)
+import Log.Log (Log, lifts, session)
+import Log.Set (SetType (..))
+import Data.Foldable (foldrM)
+import Log.Session (liftPrs)
 
 data Stats = Stats
     { liftGroupPositions :: [Int]
@@ -89,6 +92,11 @@ toLiftStats f lift stats = stats
 
 setPr :: Weight -> Lift -> Stats -> Stats
 setPr weight = toLiftStats (LiftStats.setPr weight)
+
+toPr :: (Weight -> Weight) -> Lift -> Stats -> Stats
+toPr f lift stats = fromMaybe stats $ do
+    pr' <- pr lift stats
+    pure $ setPr pr' lift stats
 
 setCycle :: Int -> Int -> Lift -> Stats -> Stats
 setCycle pos len = toLiftStats (LiftStats.setCycle pos len)
@@ -147,7 +155,7 @@ timeForPr :: Stats -> Lift -> Bool
 timeForPr stats lift = Just 0 == cyclePosition lift stats
 
 pr :: Lift -> Stats -> Maybe Weight
-pr lift stats = 
+pr lift stats =
     LiftStats.pr <$>
     liftStats lift stats
 
@@ -159,9 +167,45 @@ toCycle f lift stats = do
     let (newPosition, newLength) = f position length
     pure $ setCycle newPosition newLength lift stats
 
-undoLog :: Log -> Stats -> Stats
-undoLog log stats = 
+undoLiftCycles :: Log -> Stats -> Stats
+undoLiftCycles log stats =
     foldr decrementCyclePosition stats $ lifts log
   where
     decrementCyclePosition :: Lift -> Stats -> Stats
-    decrementCyclePosition lift stats = fromJust $ toCycle (\position length -> ((position - 1) `mod` length, length)) lift stats
+    decrementCyclePosition lift stats =
+        fromMaybe stats $
+        toCycle (\position length ->
+            ((position - 1) `mod` length, length)) lift stats
+
+undoLiftGroupCycles :: Program -> Stats -> Stats
+undoLiftGroupCycles program stats =
+    stats { liftGroupPositions = decrementCyclePosition <$> cycles }
+ where
+    cycles :: [(Int, Int)]
+    cycles = zip
+        (liftGroupPositions stats)
+        (length <$> liftGroupCycles program)
+    decrementCyclePosition :: (Int, Int) -> Int
+    decrementCyclePosition (position, length) = (position - 1) `mod` length
+
+undoPrs :: Program -> Log -> Stats -> Stats
+undoPrs program log stats =
+    foldr adjustPr stats liftPrs'
+  where
+    liftPrs' :: [(Lift, SetType)]
+    liftPrs' = do
+        maybeSession <- ($ log) . session <$> lifts log
+        session <- maybeToList maybeSession
+        liftPrs session
+    adjustPr :: (Lift, SetType) -> Stats -> Stats
+    adjustPr (lift, setType) = toPr (+ increase lift setType) lift
+    increase :: Lift -> SetType -> Weight
+    increase _ Work = 0
+    increase lift (PR True) = -(fromMaybe 0 $ progression lift program)
+    increase lift (PR False) = fromMaybe 0 $ progression lift program
+
+undoLog :: Program -> Log -> Stats -> Stats
+undoLog program log stats =
+    undoLiftCycles log $
+    undoLiftGroupCycles program $
+    undoPrs program log stats

@@ -4,19 +4,21 @@ module Log.Session
     , bodyweightSession
     , failPr
     , hasSuccessfulPr
+    , liftPrs
     ) where
 
 import Log.Set as Set
-    ( Set (setType)
+    ( Set (lift)
     , SetType (..)
     , fail
     , set
     , bodyweightSet
+    , setType
     )
 import qualified Program.Session as Program
     ( Session )
 import Types.General
-    ( Weight )
+    ( Weight, Lift )
 
 type Session = [Set]
 
@@ -34,3 +36,11 @@ failPr (prSet : workSets) =
 
 hasSuccessfulPr :: Session -> Bool
 hasSuccessfulPr (maybePrSet : _) = PR True == setType maybePrSet
+
+liftPrs :: Session -> [(Lift, SetType)]
+liftPrs session = liftPr =<< session
+  where
+    liftPr :: Set -> [(Lift, SetType)]
+    liftPr set = case setType set of
+        Work -> []
+        pr   -> [(lift set, pr)]

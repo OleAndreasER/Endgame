@@ -11,13 +11,14 @@ module Log.Log
     , failPr
     , wasPr
     , lifts
+    , liftPrs
     , sessions
-    ) where 
+    ) where
 
 import Prelude hiding
     ( log )
 import Data.Maybe
-    ( fromJust )
+    ( fromJust, maybeToList )
 import GHC.Generics
     ( Generic )
 import Data.Binary
@@ -27,14 +28,14 @@ import Log.Session
     ( Session
     , hasSuccessfulPr
     )
-import qualified Log.Session as Session
-    ( failPr )
+import qualified Log.Session as Session ( liftPrs, failPr )
 import Types.General
     ( Lift )
 import Data.Aeson (ToJSON, FromJSON)
 import Database.Persist.TH (derivePersistField)
+import Log.Set (SetType)
 
-data Log = Log 
+data Log = Log
     { label :: String
     , sessionMap :: Map.Map Lift Session
     , liftsInOrder :: [Lift]
@@ -83,3 +84,9 @@ sessions :: Log -> [Session]
 sessions log =
     (\lift -> fromJust $ session lift log) <$>
     liftsInOrder log
+
+liftPrs :: Log -> [(Lift, SetType)]
+liftPrs log = do
+    maybeSession <- ($ log) . session <$> lifts log
+    session <- maybeToList maybeSession
+    Session.liftPrs session

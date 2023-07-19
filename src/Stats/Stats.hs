@@ -54,10 +54,9 @@ import Program.Program
     )
 import Data.Aeson (FromJSON, ToJSON)
 import Database.Persist.TH (derivePersistField)
-import Log.Log (Log, lifts, session)
+import Log.Log (Log, lifts, session, liftPrs)
 import Log.Set (SetType (..))
 import Data.Foldable (foldrM)
-import Log.Session (liftPrs)
 
 data Stats = Stats
     { liftGroupPositions :: [Int]
@@ -92,11 +91,6 @@ toLiftStats f lift stats = stats
 
 setPr :: Weight -> Lift -> Stats -> Stats
 setPr weight = toLiftStats (LiftStats.setPr weight)
-
-toPr :: (Weight -> Weight) -> Lift -> Stats -> Stats
-toPr f lift stats = fromMaybe stats $ do
-    pr' <- pr lift stats
-    pure $ setPr pr' lift stats
 
 setCycle :: Int -> Int -> Lift -> Stats -> Stats
 setCycle pos len = toLiftStats (LiftStats.setCycle pos len)
@@ -169,13 +163,22 @@ toCycle f lift stats = do
 
 undoLiftCycles :: Log -> Stats -> Stats
 undoLiftCycles log stats =
-    foldr decrementCyclePosition stats $ lifts log
+    foldr decrementCyclePosition (undoCycleLengthAdds stats) $ lifts log
   where
     decrementCyclePosition :: Lift -> Stats -> Stats
     decrementCyclePosition lift stats =
         fromMaybe stats $
         toCycle (\position length ->
             ((position - 1) `mod` length, length)) lift stats
+    undoCycleLengthAdds :: Stats -> Stats
+    undoCycleLengthAdds stats = foldr maybeUndoLength stats $ liftPrs log
+    maybeUndoLength :: (Lift, SetType) -> Stats -> Stats
+    maybeUndoLength (lift, PR False) stats = fromMaybe stats $
+        toCycle (\pos len ->
+            let newLen = max 1 (len-1)
+            in (pos `mod` newLen, newLen)) lift stats
+    maybeUndoLength _ stats = stats
+
 
 undoLiftGroupCycles :: Program -> Stats -> Stats
 undoLiftGroupCycles program stats =
@@ -190,15 +193,11 @@ undoLiftGroupCycles program stats =
 
 undoPrs :: Program -> Log -> Stats -> Stats
 undoPrs program log stats =
-    foldr adjustPr stats liftPrs'
+    foldr adjustPr stats $ liftPrs log
   where
-    liftPrs' :: [(Lift, SetType)]
-    liftPrs' = do
-        maybeSession <- ($ log) . session <$> lifts log
-        session <- maybeToList maybeSession
-        liftPrs session
     adjustPr :: (Lift, SetType) -> Stats -> Stats
-    adjustPr (lift, setType) = toPr (+ increase lift setType) lift
+    adjustPr (lift, setType) = setPr
+        (increase lift setType + fromMaybe 0 (pr lift stats)) lift
     increase :: Lift -> SetType -> Weight
     increase _ Work = 0
     increase lift (PR True) = -(fromMaybe 0 $ progression lift program)
@@ -209,3 +208,4 @@ undoLog program log stats =
     undoLiftCycles log $
     undoLiftGroupCycles program $
     undoPrs program log stats
+

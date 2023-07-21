@@ -32,6 +32,8 @@ module Db.Sqlite
     , getProfileNames
     , insertLog
     , undoLog
+    , initializePresetPrograms
+    , getAvailablePrograms
     ) where
 
 import Database.Persist.Sqlite
@@ -48,10 +50,13 @@ import qualified Stats.Stats as Stats (undoLog)
 import qualified Log.Log as Log (Log)
 import Profile.Profile (newProfile, profile)
 import Control.Monad.Logger (LoggingT)
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, fromMaybe, isJust)
 import Data.List.Tools (setAt)
 import Profile.NextLog (nextLog, nextLogs, addLog)
 import Date (dateStr)
+import Setup.Programs (programs)
+import Control.Monad (forM_)
+import Server.ResponseTypes (ProgramResponse (..))
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 ActiveProfile
@@ -65,11 +70,27 @@ Profile
 Log
     profile ProfileId
     log Log.Log
+PresetProgram
+    name String
+    program Program
+    ownerUserId String Maybe
 |]
 
 createTables :: IO ()
 createTables = runSqlite "endgame.db" $ do
     runMigration migrateAll
+
+initializePresetPrograms :: IO ()
+initializePresetPrograms =
+    runSqlite "endgame.db" $
+    forM_ programs $ \(name, program) -> do
+        maybeProgram <- selectFirst
+            [ PresetProgramName ==. name
+            , PresetProgramOwnerUserId ==. Nothing
+            ] []
+        case maybeProgram of
+            Just _ -> pure ()
+            Nothing -> insert_ $ PresetProgram name program Nothing
 
 activeProfileToDb :: Maybe String -> String -> IO ()
 activeProfileToDb owner profileName = runSqlite "endgame.db" $ do
@@ -106,7 +127,7 @@ getLogs :: Maybe String -> SqlPersistT (LoggingT IO) [Log.Log]
 getLogs owner = do
     profileId <- fromJust <$> getActiveProfileId owner
     logRecords <- selectList
-        [ LogProfile ==. profileId 
+        [ LogProfile ==. profileId
         ] [Desc LogId]
     pure ((\(Entity _ (Log _ log)) -> log) <$> logRecords)
 
@@ -234,3 +255,25 @@ undoLog owner = do
             program <- getProgram owner
             setStats owner $ Stats.undoLog program log stats
             delete logId
+
+getPrograms :: Maybe String -> SqlPersistT (LoggingT IO) [PresetProgram]
+getPrograms owner = do
+    programEntities <- selectList
+        [ PresetProgramOwnerUserId ==. owner ]
+        [ Asc PresetProgramName ]
+    pure $ (\(Entity _ program) -> program) <$> programEntities
+
+getAvailablePrograms :: Maybe String -> SqlPersistT (LoggingT IO) [ProgramResponse]
+getAvailablePrograms owner = do
+    premadePrograms <- getPrograms Nothing
+    ownerPrograms <- getPrograms owner
+    let programs = premadePrograms ++ ownerPrograms
+    pure $ toProgramResponse <$> programs
+  where
+    toProgramResponse :: PresetProgram -> ProgramResponse
+    toProgramResponse (PresetProgram name program owner) =
+        ProgramResponse
+            { name = name
+            , program = program
+            , wasMadeByUser = isJust owner
+            }

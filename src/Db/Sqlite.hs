@@ -34,6 +34,7 @@ module Db.Sqlite
     , undoLog
     , initializePresetPrograms
     , getAvailablePrograms
+    , createNewProfile
     ) where
 
 import Database.Persist.Sqlite
@@ -277,3 +278,17 @@ getAvailablePrograms owner = do
             , program = program
             , wasMadeByUser = isJust owner
             }
+
+createNewProfile :: Maybe String -> String -> Program -> SqlPersistT (LoggingT IO) ()
+createNewProfile owner profileName program = do
+    let profile = newProfile program
+    profileAlreadyExists <- exists
+        [ ProfileProfileName ==. profileName
+        , ProfileOwnerUserId ==. owner
+        ]
+    if profileAlreadyExists || null profileName then pure ()
+        else insert_ $ Profile
+            profileName
+            owner
+            (Profile.program profile)
+            (Profile.stats profile)

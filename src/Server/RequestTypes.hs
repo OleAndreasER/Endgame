@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use newtype instead of data" #-}
 module Server.RequestTypes
-    ( ActiveProfileRequest (..)
+    ( ProfileRequest (..)
     , LogRequest (..)
     , SetsRequest (..)
     , toLog
@@ -14,12 +14,12 @@ import Log.Session (Session)
 import Prelude hiding (log, fail)
 import Log.Set (Set(Set), prSet, fail, workSets)
 
-data ActiveProfileRequest = ActiveProfileRequest
+data ProfileRequest = ProfileRequest
     { profileName :: String
     } deriving (Show, Generic)
 
-instance ToJSON ActiveProfileRequest
-instance FromJSON ActiveProfileRequest
+instance ToJSON ProfileRequest
+instance FromJSON ProfileRequest
 
 data LogRequest = LogRequest
     { label :: String

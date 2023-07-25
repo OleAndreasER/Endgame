@@ -35,6 +35,8 @@ module Db.Sqlite
     , initializePresetPrograms
     , getAvailablePrograms
     , createNewProfile
+    , deleteTrainingProfile
+    , renameTrainingProfile
     ) where
 
 import Database.Persist.Sqlite
@@ -292,3 +294,18 @@ createNewProfile owner profileName program = do
             owner
             (Profile.program profile)
             (Profile.stats profile)
+
+deleteTrainingProfile :: Maybe String -> String -> SqlPersistT (LoggingT IO) ()
+deleteTrainingProfile owner profileName =
+    deleteWhere
+        [ ProfileProfileName ==. profileName
+        , ProfileOwnerUserId ==. owner
+        ]
+
+renameTrainingProfile :: Maybe String -> String -> String -> SqlPersistT (LoggingT IO) ()
+renameTrainingProfile owner oldName newName =
+    updateWhere
+        [ ProfileProfileName ==. oldName
+        , ProfileOwnerUserId ==. owner
+        ]
+        [ ProfileProfileName =. newName ]

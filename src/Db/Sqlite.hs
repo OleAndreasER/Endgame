@@ -60,6 +60,7 @@ import Date (dateStr)
 import Setup.Programs (programs)
 import Control.Monad (forM_)
 import Server.ResponseTypes (ProgramResponse (..))
+import Relude (whenJust)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 ActiveProfile
@@ -177,9 +178,8 @@ setLog :: Maybe String -> Int -> Log.Log -> SqlPersistT (LoggingT IO) ()
 setLog owner n newLog = do
     profileId <- fromJust <$> getActiveProfileId owner
     maybeLogId <- getLogId owner n
-    case maybeLogId of
-        Nothing -> pure ()
-        Just logId -> replace logId (Log profileId newLog)
+    whenJust maybeLogId $ \logId ->
+        replace logId (Log profileId newLog)
 
 setActiveProfile :: Maybe String -> String -> SqlPersistT (LoggingT IO) ()
 setActiveProfile user profileName = do
@@ -250,14 +250,12 @@ getNextLogs owner n = do
 undoLog :: Maybe String -> SqlPersistT (LoggingT IO) ()
 undoLog owner = do
     maybeLogId <- getLogId owner 0
-    case maybeLogId of
-        Nothing -> pure ()
-        Just logId -> do
-            Log _ log <- fromJust <$> get logId
-            stats <- getStats owner
-            program <- getProgram owner
-            setStats owner $ Stats.undoLog program log stats
-            delete logId
+    whenJust maybeLogId $ \logId -> do
+        Log _ log <- fromJust <$> get logId
+        stats <- getStats owner
+        program <- getProgram owner
+        setStats owner $ Stats.undoLog program log stats
+        delete logId
 
 getPrograms :: Maybe String -> SqlPersistT (LoggingT IO) [PresetProgram]
 getPrograms owner = do
@@ -296,11 +294,19 @@ createNewProfile owner profileName program = do
             (Profile.stats profile)
 
 deleteTrainingProfile :: Maybe String -> String -> SqlPersistT (LoggingT IO) ()
-deleteTrainingProfile owner profileName =
-    deleteWhere
+deleteTrainingProfile owner profileName = do
+    maybeProfileId <- selectFirst
         [ ProfileProfileName ==. profileName
         , ProfileOwnerUserId ==. owner
-        ]
+        ] []
+    whenJust maybeProfileId $ \(Entity profileId _) -> do
+        deleteWhere [ LogProfile ==. profileId ]
+        updateWhere
+            [ ActiveProfileOwnerUserId ==. owner
+            , ActiveProfileProfile ==. Just profileId
+            ]
+            [ ActiveProfileProfile =. Nothing]
+        delete profileId
 
 renameTrainingProfile :: Maybe String -> String -> String -> SqlPersistT (LoggingT IO) ()
 renameTrainingProfile owner oldName newName =

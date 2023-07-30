@@ -30,6 +30,7 @@ executable endgame-server
         Server.Main,
         Server.RequestTypes,
         Server.ResponseTypes,
+        Server.Password,
         Setup.Programs,
         Types.General,
         Date,
@@ -73,7 +74,8 @@ executable endgame-server
         monad-logger,
         persistent,
         persistent-sqlite,
-        persistent-template
+        persistent-template,
+        password
 
     hs-source-dirs:   endgame-server, src
     default-language: Haskell2010
@@ -123,7 +125,8 @@ executable endgame
         Stats.Stats,
         Stats.LiftStats,
         Stats.Format,
-        Db.Sqlite
+        Db.Sqlite,
+        Server.ResponseTypes
 
     build-depends:
         base ^>=4.16.0.0,
@@ -139,7 +142,8 @@ executable endgame
         monad-logger,
         persistent,
         persistent-sqlite,
-        persistent-template
+        persistent-template,
+        password
 
     hs-source-dirs:   endgame, src
     default-language: Haskell2010

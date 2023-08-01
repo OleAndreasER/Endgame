@@ -19,13 +19,14 @@ import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust)
-import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog, getAvailablePrograms, createNewProfile, deleteTrainingProfile, renameTrainingProfile)
+import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog, getAvailablePrograms, createNewProfile, deleteTrainingProfile, renameTrainingProfile, login, signUp)
 import Log.Log (Log)
 import Stats.Stats (Stats)
 import Program.Program (Program)
 import Database.Persist.Sqlite (createSqlitePool, SqlBackend, SqlPersistT, runSqlConn)
-import Server.RequestTypes (ProfileRequest(ProfileRequest), LogRequest(LogRequest), toLog)
+import Server.RequestTypes.RequestTypes (ProfileRequest(ProfileRequest), LogRequest(LogRequest), toLog, SignUpRequest (SignUpRequest))
 import qualified Log.Format as Log
+import Server.RequestTypes.LoginRequest (LoginRequest(LoginRequest))
 
 type Api = SpockM SqlBackend () () ()
 
@@ -78,10 +79,6 @@ app = prehook corsHeader $ do
   get ("programs" <//> var) $ \userId -> do
     programs <- runSQL $ getAvailablePrograms $ Just userId
     json programs
-  put ("user" <//> var <//> "active-training-profile") $ \userId -> do
-    ProfileRequest profileName <- jsonBody' :: ApiAction ProfileRequest
-    runSQL $ setActiveProfile (Just userId) profileName
-    json ("OK" :: String)
   get ("profiles" <//> var <//> "active") $ \userId -> do
     profileName <- runSQL $ getProfileName $ Just userId
     json profileName
@@ -98,6 +95,17 @@ app = prehook corsHeader $ do
   put ("profiles" <//> var <//> var) $ \userId profileName -> do
     ProfileRequest newProfileName <- jsonBody' :: ApiAction ProfileRequest
     runSQL $ renameTrainingProfile (Just userId) profileName newProfileName
+    json ("OK" :: String)
+  post "users" $ do
+    SignUpRequest username email password <- jsonBody' :: ApiAction SignUpRequest
+    runSQL $ signUp username email password
+    json username
+  post ("users" <//> "login") $ do
+    LoginRequest email password <- jsonBody' :: ApiAction LoginRequest
+    runSQL $ login email password
+  put ("users" <//> var <//> "active-training-profile") $ \userId -> do
+    ProfileRequest profileName <- jsonBody' :: ApiAction ProfileRequest
+    runSQL $ setActiveProfile (Just userId) profileName
     json ("OK" :: String)
 
 corsHeader = do

@@ -37,6 +37,8 @@ module Db.Sqlite
     , createNewProfile
     , deleteTrainingProfile
     , renameTrainingProfile
+    , signUp
+    , login
     ) where
 
 import Database.Persist.Sqlite
@@ -61,6 +63,8 @@ import Setup.Programs (programs)
 import Control.Monad (forM_)
 import Server.ResponseTypes (ProgramResponse (..))
 import Relude (whenJust)
+import Data.Password.Bcrypt (PasswordHash, Bcrypt)
+import Data.Text (Text)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 ActiveProfile
@@ -315,3 +319,11 @@ renameTrainingProfile owner oldName newName =
         , ProfileOwnerUserId ==. owner
         ]
         [ ProfileProfileName =. newName ]
+
+signUp :: String -> String -> Text -> SqlPersistT (LoggingT IO) ()
+signUp username email password = do
+    pure ()
+
+login :: String -> Text -> SqlPersistT (LoggingT IO) ()
+login email password = do
+    pure ()

@@ -1,10 +1,11 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use newtype instead of data" #-}
-module Server.RequestTypes
+module Server.RequestTypes.RequestTypes
     ( ProfileRequest (..)
     , LogRequest (..)
     , SetsRequest (..)
+    , SignUpRequest (..)
     , toLog
     ) where
 import GHC.Generics (Generic)
@@ -13,6 +14,16 @@ import Log.Log (Log, log)
 import Log.Session (Session)
 import Prelude hiding (log, fail)
 import Log.Set (Set(Set), prSet, fail, workSets)
+import Data.Text (Text)
+
+data SignUpRequest = SignUpRequest
+    { username :: String
+    , email :: String
+    , password :: Text
+    } deriving (Show, Generic)
+
+instance ToJSON SignUpRequest
+instance FromJSON SignUpRequest
 
 data ProfileRequest = ProfileRequest
     { profileName :: String

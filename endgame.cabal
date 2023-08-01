@@ -28,7 +28,8 @@ executable endgame-server
 
     other-modules:
         Server.Main,
-        Server.RequestTypes,
+        Server.RequestTypes.RequestTypes,
+        Server.RequestTypes.LoginRequest
         Server.ResponseTypes,
         Server.Password,
         Setup.Programs,

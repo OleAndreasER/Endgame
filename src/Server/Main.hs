@@ -98,11 +98,12 @@ app = prehook corsHeader $ do
     json ("OK" :: String)
   post "users" $ do
     SignUpRequest username email password <- jsonBody' :: ApiAction SignUpRequest
-    runSQL $ signUp username email password
-    json username
+    userId <- runSQL $ signUp username email password
+    json userId
   post ("users" <//> "login") $ do
     LoginRequest email password <- jsonBody' :: ApiAction LoginRequest
-    runSQL $ login email password
+    isUser <- runSQL $ login email password
+    json isUser
   put ("users" <//> var <//> "active-training-profile") $ \userId -> do
     ProfileRequest profileName <- jsonBody' :: ApiAction ProfileRequest
     runSQL $ setActiveProfile (Just userId) profileName

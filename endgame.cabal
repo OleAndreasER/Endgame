@@ -127,7 +127,8 @@ executable endgame
         Stats.LiftStats,
         Stats.Format,
         Db.Sqlite,
-        Server.ResponseTypes
+        Server.ResponseTypes,
+        Server.Password
 
     build-depends:
         base ^>=4.16.0.0,

@@ -65,8 +65,19 @@ import Server.ResponseTypes (ProgramResponse (..))
 import Relude (whenJust)
 import Data.Password.Bcrypt (PasswordHash, Bcrypt)
 import Data.Text (Text)
+import Server.Password (hash, equalsHash)
+
+type PasswordHashBcrypt = PasswordHash Bcrypt
+derivePersistField "PasswordHashBcrypt"
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
+User
+    name String
+    email String
+    password (PasswordHash Bcrypt)
+    UniqueUserName name
+    UniqueUserPassword password
+    UniqueUserEmail email
 ActiveProfile
     ownerUserId String Maybe
     profile ProfileId Maybe
@@ -83,6 +94,7 @@ PresetProgram
     program Program
     ownerUserId String Maybe
 |]
+
 
 createTables :: IO ()
 createTables = runSqlite "endgame.db" $ do
@@ -320,10 +332,16 @@ renameTrainingProfile owner oldName newName =
         ]
         [ ProfileProfileName =. newName ]
 
-signUp :: String -> String -> Text -> SqlPersistT (LoggingT IO) ()
+signUp :: String -> String -> Text -> SqlPersistT (LoggingT IO) (Maybe (Key User))
 signUp username email password = do
-    pure ()
+    hashedPassword <- liftIO $ hash password
+    insertUnique $ User username email hashedPassword
 
-login :: String -> Text -> SqlPersistT (LoggingT IO) ()
+login :: String -> Text -> SqlPersistT (LoggingT IO) Bool
 login email password = do
-    pure ()
+    maybeUser <- selectFirst [ UserEmail ==. email ] []
+    case maybeUser of
+        Nothing -> pure False
+        Just (Entity _ (User _ _ passwordHash)) ->
+            pure $ equalsHash password passwordHash
+

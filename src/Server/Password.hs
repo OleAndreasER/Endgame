@@ -4,13 +4,13 @@ module Server.Password
     ) where
 
 import Data.Password.Bcrypt
-import Data.Text (pack, unpack)
+import Data.Text (pack, unpack, Text)
 
-hash :: String -> IO (PasswordHash Bcrypt)
+hash :: Text -> IO (PasswordHash Bcrypt)
 hash password =
-    hashPassword $ mkPassword $ pack password
+    hashPassword $ mkPassword password
 
-equalsHash :: String -> PasswordHash Bcrypt -> Bool
+equalsHash :: Text -> PasswordHash Bcrypt -> Bool
 equalsHash password hash =
     PasswordCheckSuccess == checkPassword
-        (mkPassword $ pack password) hash
+        (mkPassword password) hash

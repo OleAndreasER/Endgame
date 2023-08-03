@@ -79,9 +79,11 @@ User
     UniqueUserPassword password
     UniqueUserEmail email
 ActiveProfile
+    userId UserId Maybe
     ownerUserId String Maybe
     profile ProfileId Maybe
 Profile
+    userId UserId Maybe
     profileName String
     ownerUserId String Maybe
     program Program
@@ -90,6 +92,7 @@ Log
     profile ProfileId
     log Log.Log
 PresetProgram
+    userId UserId Maybe
     name String
     program Program
     ownerUserId String Maybe
@@ -110,12 +113,13 @@ initializePresetPrograms =
             ] []
         case maybeProgram of
             Just _ -> pure ()
-            Nothing -> insert_ $ PresetProgram name program Nothing
+            Nothing -> insert_ $ PresetProgram Nothing name program Nothing
 
 activeProfileToDb :: Maybe String -> String -> IO ()
 activeProfileToDb owner profileName = runSqlite "endgame.db" $ do
     profile <- liftIO readProfile
     profileId <- insert $ Profile
+        Nothing
         profileName
         owner
         (Profile.program profile)
@@ -124,6 +128,7 @@ activeProfileToDb owner profileName = runSqlite "endgame.db" $ do
 
 insertNewProfile :: Maybe String -> String -> Program -> SqlPersistT (LoggingT IO) (Key Profile)
 insertNewProfile owner profileName program = insert $ Profile
+    Nothing
     profileName
     owner
     (Profile.program profile)
@@ -134,13 +139,13 @@ insertNewProfile owner profileName program = insert $ Profile
 getProgram :: Maybe String -> SqlPersistT (LoggingT IO) Program
 getProgram owner = do
     profileId <- fromJust <$> getActiveProfileId owner
-    Profile _ _ program _ <- fromJust <$> get profileId
+    Profile _ _ _ program _ <- fromJust <$> get profileId
     pure program
 
 getStats :: Maybe String -> SqlPersistT (LoggingT IO) Stats
 getStats owner = do
     profileId <- fromJust <$> getActiveProfileId owner
-    Profile _ _ _ stats <- fromJust <$> get profileId
+    Profile _ _ _ _ stats <- fromJust <$> get profileId
     pure stats
 
 getLogs :: Maybe String -> SqlPersistT (LoggingT IO) [Log.Log]
@@ -208,11 +213,11 @@ setActiveProfile user profileName = do
         [ActiveProfileProfile =. Just profileId]
 
 newUser :: Maybe String -> SqlPersistT (LoggingT IO) (Key ActiveProfile)
-newUser user = insert $ ActiveProfile user Nothing
+newUser user = insert $ ActiveProfile Nothing user Nothing
 
 getActiveProfileId :: Maybe String -> SqlPersistT (LoggingT IO) (Maybe ProfileId)
 getActiveProfileId user = do
-    (Entity _ (ActiveProfile _ profileId)) : _ <- selectList
+    (Entity _ (ActiveProfile _ _ profileId)) : _ <- selectList
         [ ActiveProfileOwnerUserId ==. user
         ] [LimitTo 1]
     pure profileId
@@ -226,12 +231,12 @@ getProfileName owner = do
             profile <- get profileId
             case profile of
                 Nothing -> pure Nothing
-                Just (Profile name _ _ _) -> pure (Just name)
+                Just (Profile _ name _ _ _) -> pure (Just name)
 
 getProfileNames :: Maybe String -> SqlPersistT (LoggingT IO) [String]
 getProfileNames owner = do
     profiles <- selectList [ProfileOwnerUserId ==. owner] []
-    pure ((\(Entity _ (Profile name _ _ _)) -> name) <$> profiles)
+    pure ((\(Entity _ (Profile _ name _ _ _)) -> name) <$> profiles)
 
 insertLog :: Maybe String -> Log.Log -> SqlPersistT (LoggingT IO) (Key Log)
 insertLog owner log = do
@@ -288,7 +293,7 @@ getAvailablePrograms owner = do
     pure $ toProgramResponse <$> programs
   where
     toProgramResponse :: PresetProgram -> ProgramResponse
-    toProgramResponse (PresetProgram name program owner) =
+    toProgramResponse (PresetProgram _ name program owner) =
         ProgramResponse
             { name = name
             , program = program
@@ -304,6 +309,7 @@ createNewProfile owner profileName program = do
         ]
     if profileAlreadyExists || null profileName then pure ()
         else insert_ $ Profile
+            Nothing
             profileName
             owner
             (Profile.program profile)

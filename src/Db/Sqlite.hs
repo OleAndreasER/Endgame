@@ -39,6 +39,9 @@ module Db.Sqlite
     , renameTrainingProfile
     , signUp
     , login
+    , getUserId
+    , getUsername
+    , UID
     ) where
 
 import Database.Persist.Sqlite
@@ -67,10 +70,14 @@ import Data.Password.Bcrypt (PasswordHash, Bcrypt)
 import Data.Text (Text)
 import Server.Password (hash, equalsHash)
 
+
 type PasswordHashBcrypt = PasswordHash Bcrypt
 derivePersistField "PasswordHashBcrypt"
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
+UserSession
+    sessionId Text
+    userId UserId
 User
     name String
     email String
@@ -98,6 +105,7 @@ PresetProgram
     ownerUserId String Maybe
 |]
 
+type UID = Key User
 
 createTables :: IO ()
 createTables = runSqlite "endgame.db" $ do
@@ -343,11 +351,37 @@ signUp username email password = do
     hashedPassword <- liftIO $ hash password
     insertUnique $ User username email hashedPassword
 
-login :: String -> Text -> SqlPersistT (LoggingT IO) Bool
-login email password = do
+login :: String -> Text -> Text -> SqlPersistT (LoggingT IO) Bool
+login email password sessionId = do
     maybeUser <- selectFirst [ UserEmail ==. email ] []
     case maybeUser of
         Nothing -> pure False
-        Just (Entity _ (User _ _ passwordHash)) ->
-            pure $ equalsHash password passwordHash
+        Just (Entity userId (User _ _ passwordHash)) -> do
+            let isCorrectPassword = equalsHash password passwordHash
+            if isCorrectPassword
+                then do
+                    insert_ $ UserSession sessionId userId
+                    pure True
+                else pure False
 
+getUserId :: Text -> SqlPersistT (LoggingT IO) (Maybe (Key User))
+getUserId sessionId = do
+    maybeSession <- selectFirst
+        [ UserSessionSessionId ==. sessionId ] []
+    pure $ case maybeSession of
+        Nothing -> Nothing
+        Just (Entity _ (UserSession _ userId)) -> Just userId
+
+getUser :: Text ->  SqlPersistT (LoggingT IO) (Maybe User)
+getUser sessionId = do
+    maybeUserId <- getUserId sessionId
+    case maybeUserId of
+        Nothing -> pure Nothing
+        Just userId -> get userId
+
+getUsername :: Text -> SqlPersistT (LoggingT IO) (Maybe String)
+getUsername sessionId = do
+    maybeUser <- getUser sessionId
+    pure $ case maybeUser of
+        Nothing -> Nothing
+        Just (User name _ _) -> Just name

@@ -19,14 +19,15 @@ import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust)
-import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog, getAvailablePrograms, createNewProfile, deleteTrainingProfile, renameTrainingProfile, login, signUp)
+import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog, getAvailablePrograms, createNewProfile, deleteTrainingProfile, renameTrainingProfile, login, signUp, getUsername, UID, getUserId)
 import Log.Log (Log)
 import Stats.Stats (Stats)
 import Program.Program (Program)
-import Database.Persist.Sqlite (createSqlitePool, SqlBackend, SqlPersistT, runSqlConn)
+import Database.Persist.Sqlite (createSqlitePool, SqlBackend, SqlPersistT, runSqlConn, PersistEntity (Key))
 import Server.RequestTypes.RequestTypes (ProfileRequest(ProfileRequest), LogRequest(LogRequest), toLog, SignUpRequest (SignUpRequest))
 import qualified Log.Format as Log
 import Server.RequestTypes.LoginRequest (LoginRequest(LoginRequest))
+import Relude (whenJust)
 
 type Api = SpockM SqlBackend () () ()
 
@@ -41,6 +42,7 @@ startServer = do
 app :: Api
 app = prehook corsHeader $ do
   hookAny OPTIONS $ const $ pure () --So that corsHeader is prehooked on any OPTIONS request.
+
   get ("log" <//> var) $ \userId -> do
     logs <- runSQL $ getLogs $ Just userId
     json logs
@@ -99,11 +101,17 @@ app = prehook corsHeader $ do
   post "users" $ do
     SignUpRequest username email password <- jsonBody' :: ApiAction SignUpRequest
     userId <- runSQL $ signUp username email password
+    sessionId <- getSessionId
     json userId
   post ("users" <//> "login") $ do
     LoginRequest email password <- jsonBody' :: ApiAction LoginRequest
-    isUser <- runSQL $ login email password
-    json isUser
+    sessionId <- getSessionId
+    isUser <- runSQL $ login email password sessionId
+    if isUser
+      then do
+        setCookie "session" sessionId defaultCookieSettings
+        json ("Logged in" :: String)
+      else json ("No such user" :: String)
   put ("users" <//> var <//> "active-training-profile") $ \userId -> do
     ProfileRequest profileName <- jsonBody' :: ApiAction ProfileRequest
     runSQL $ setActiveProfile (Just userId) profileName
@@ -111,11 +119,22 @@ app = prehook corsHeader $ do
 
 corsHeader = do
     context <- getContext
-    setHeader "Access-Control-Allow-Origin" "*"
+    setHeader "Access-Control-Allow-Origin" "http://localhost:3000"
     setHeader "Access-Control-Allow-Credentials" "true"
     setHeader "Access-Control-Allow-Headers" "Content-Type, Authorization"
     setHeader "Access-Control-Allow-Methods" "*"
     pure context
+
+requireUser :: (UID -> ApiAction ()) -> ApiAction ()
+requireUser action = do
+  maybeSessionId <- cookie "session"
+  case maybeSessionId of
+      Nothing -> errorJson 401 "Unauthorized"
+      Just sessionId -> do
+        maybeUserId <- runSQL $ getUserId sessionId
+        case maybeUserId of
+          Nothing -> errorJson 401 "Unauthorized"
+          Just userId -> action userId
 
 errorJson :: Int -> Text -> ApiAction ()
 errorJson code message =

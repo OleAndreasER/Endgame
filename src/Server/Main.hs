@@ -19,7 +19,7 @@ import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust)
-import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog, getAvailablePrograms, createNewProfile, deleteTrainingProfile, renameTrainingProfile, login, signUp, getUsername, UID, getUserId)
+import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog, getAvailablePrograms, createNewProfile, deleteTrainingProfile, renameTrainingProfile, login, signUp, UID, getUserId)
 import Log.Log (Log)
 import Stats.Stats (Stats)
 import Program.Program (Program)
@@ -43,58 +43,58 @@ app :: Api
 app = prehook corsHeader $ do
   hookAny OPTIONS $ const $ pure () --So that corsHeader is prehooked on any OPTIONS request.
 
-  get ("log" <//> var) $ \userId -> do
+  get "log" $ requireUser $ \userId -> do
     logs <- runSQL $ getLogs $ Just userId
     json logs
-  get ("log" <//> var <//> var) $ \i userId -> do
+  get ("log" <//> var) $ \i -> requireUser $ \userId -> do
     log <- runSQL $ getLog (Just userId) i
     json log
-  post ("log" <//> var) $ \userId -> do
+  post "log" $ requireUser $ \userId -> do
     addedLog <- runSQL $ addAndGetNextLog (Just userId)
     json addedLog
-  delete ("log" <//> var) $ \userId -> do
+  delete "log" $ requireUser $ \userId -> do
     runSQL $ undoLog $ Just userId
     json ("OK" :: String)
-  put ("log" <//> var <//> var) $ \i userId -> do
+  put ("log" <//> var) $ \i -> requireUser $ \userId -> do
     logRequest <- jsonBody' :: ApiAction LogRequest
     case toLog logRequest of
       Nothing -> errorJson 400 "Invalid log entry."
       Just log -> do
         runSQL $ setLog (Just userId) i log
         json ("OK" :: String)
-  get ("log" <//> "next" <//> var) $ \userId -> do
+  get ("log" <//> "next") $ requireUser $ \userId -> do
     nextLog' <- runSQL $ getNextLog (Just userId)
     json nextLog'
-  get ("log" <//> "next" <//> var <//> var) $ \userId logCount -> do
+  get ("log" <//> "next" <//> var) $ \logCount -> requireUser $ \userId -> do
     nextLogs' <- runSQL $ getNextLogs (Just userId) logCount
     json nextLogs'
-  get ("stats" <//> var) $ \userId -> do
+  get "stats" $ requireUser $ \userId -> do
     stats <- runSQL $ getStats $ Just userId
     json stats
-  put ("stats" <//> var) $ \userId -> do
+  put "stats" $ requireUser $ \userId -> do
     stats <- jsonBody' :: ApiAction Stats
     runSQL $ setStats (Just userId) stats
     json ("OK" :: String)
-  get ("program" <//> var) $ \userId -> do
+  get "program" $ requireUser $ \userId -> do
     program <- runSQL $ getProgram $ Just userId
     json program
-  get ("programs" <//> var) $ \userId -> do
+  get "programs" $ requireUser $ \userId -> do
     programs <- runSQL $ getAvailablePrograms $ Just userId
     json programs
-  get ("profiles" <//> var <//> "active") $ \userId -> do
+  get ("profiles" <//> "active") $ requireUser $ \userId -> do
     profileName <- runSQL $ getProfileName $ Just userId
     json profileName
-  get ("profiles" <//> var) $ \userId -> do
+  get "profiles" $ requireUser $ \userId -> do
     profileNames <- runSQL $ getProfileNames $ Just userId
     json profileNames
-  post ("profiles" <//> var <//> var) $ \userId profileName -> do
+  post ("profiles" <//> var) $ \profileName -> requireUser $ \userId -> do
     program <- jsonBody' :: ApiAction Program
     runSQL $ createNewProfile (Just userId) profileName program
     json ("OK" :: String)
-  delete ("profiles" <//> var <//> var) $ \userId profileName -> do
+  delete ("profiles" <//> var) $ \profileName -> requireUser $ \userId -> do
     runSQL $ deleteTrainingProfile (Just userId) profileName
     json ("OK" :: String)
-  put ("profiles" <//> var <//> var) $ \userId profileName -> do
+  put ("profiles" <//> var) $ \profileName -> requireUser $ \userId -> do
     ProfileRequest newProfileName <- jsonBody' :: ApiAction ProfileRequest
     runSQL $ renameTrainingProfile (Just userId) profileName newProfileName
     json ("OK" :: String)
@@ -112,17 +112,18 @@ app = prehook corsHeader $ do
         setCookie "session" sessionId defaultCookieSettings
         json ("Logged in" :: String)
       else json ("No such user" :: String)
-  put ("users" <//> var <//> "active-training-profile") $ \userId -> do
+  put ("users" <//> "active-training-profile") $ requireUser $ \userId -> do
     ProfileRequest profileName <- jsonBody' :: ApiAction ProfileRequest
     runSQL $ setActiveProfile (Just userId) profileName
     json ("OK" :: String)
 
+corsHeader :: ApiAction ()
 corsHeader = do
     context <- getContext
     setHeader "Access-Control-Allow-Origin" "http://localhost:3000"
     setHeader "Access-Control-Allow-Credentials" "true"
     setHeader "Access-Control-Allow-Headers" "Content-Type, Authorization"
-    setHeader "Access-Control-Allow-Methods" "*"
+    setHeader "Access-Control-Allow-Methods" "POST, PUT, GET, DELETE, OPTIONS"
     pure context
 
 requireUser :: (UID -> ApiAction ()) -> ApiAction ()

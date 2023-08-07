@@ -82,7 +82,6 @@ User
     email String
     password (PasswordHash Bcrypt)
     UniqueUserName name
-    UniqueUserPassword password
     UniqueUserEmail email
 ActiveProfile
     userId UserId Maybe

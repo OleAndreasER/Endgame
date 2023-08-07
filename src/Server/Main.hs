@@ -18,7 +18,7 @@ import Control.Monad.IO.Class (liftIO)
 import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, isJust)
 import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog, getAvailablePrograms, createNewProfile, deleteTrainingProfile, renameTrainingProfile, login, signUp, UID, getUserId)
 import Log.Log (Log)
 import Stats.Stats (Stats)
@@ -101,21 +101,34 @@ app = prehook corsHeader $ do
   post "users" $ do
     SignUpRequest username email password <- jsonBody' :: ApiAction SignUpRequest
     userId <- runSQL $ signUp username email password
-    sessionId <- getSessionId
-    json userId
+    if isJust userId then do
+      sessionId <- getSessionId
+      runSQL $ login email password sessionId
+      setCookie "session" sessionId authCookieSettings
+      json ("Signed in" :: String)
+      else errorJson 401 "Unavailable"
   post ("users" <//> "login") $ do
     LoginRequest email password <- jsonBody' :: ApiAction LoginRequest
     sessionId <- getSessionId
     isUser <- runSQL $ login email password sessionId
     if isUser
       then do
-        setCookie "session" sessionId defaultCookieSettings
+        setCookie "session" sessionId authCookieSettings
         json ("Logged in" :: String)
       else json ("No such user" :: String)
   put ("users" <//> "active-training-profile") $ requireUser $ \userId -> do
     ProfileRequest profileName <- jsonBody' :: ApiAction ProfileRequest
     runSQL $ setActiveProfile (Just userId) profileName
     json ("OK" :: String)
+
+authCookieSettings :: CookieSettings
+authCookieSettings = CookieSettings
+  { cs_EOL = CookieValidFor 31556926 --1 year
+  , cs_HTTPOnly = True
+  , cs_domain = Nothing
+  , cs_path = Just "/"
+  , cs_secure = False
+  }
 
 corsHeader :: ApiAction ()
 corsHeader = do

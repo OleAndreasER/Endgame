@@ -19,7 +19,7 @@ import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust, isJust)
-import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog, getAvailablePrograms, createNewProfile, deleteTrainingProfile, renameTrainingProfile, login, signUp, UID, getUserId)
+import Db.Sqlite (getLogs, getLog, getProgram, getStats, newUser, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog, getAvailablePrograms, createNewProfile, deleteTrainingProfile, renameTrainingProfile, login, signUp, UID, getUserId, getUsername, logOut)
 import Log.Log (Log)
 import Stats.Stats (Stats)
 import Program.Program (Program)
@@ -116,10 +116,17 @@ app = prehook corsHeader $ do
         setCookie "session" sessionId authCookieSettings
         json ("Logged in" :: String)
       else json ("No such user" :: String)
+  delete ("users" <//> "login") $ requireUser $ \userId -> do
+    runSQL $ logOut userId
+    deleteCookie "session"
+    json ("Logged out" :: String)
   put ("users" <//> "active-training-profile") $ requireUser $ \userId -> do
     ProfileRequest profileName <- jsonBody' :: ApiAction ProfileRequest
     runSQL $ setActiveProfile (Just userId) profileName
     json ("OK" :: String)
+  get ("users" <//> "name") $ requireUser $ \userId -> do
+    name <- runSQL $ getUsername userId
+    json name
 
 authCookieSettings :: CookieSettings
 authCookieSettings = CookieSettings

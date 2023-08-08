@@ -40,6 +40,8 @@ module Db.Sqlite
     , signUp
     , login
     , getUserId
+    , getUsername
+    , logOut
     , UID
     ) where
 
@@ -104,6 +106,7 @@ PresetProgram
 |]
 
 type UID = Key User
+type Sqlite a = SqlPersistT (LoggingT IO) a
 
 createTables :: IO ()
 createTables = runSqlite "endgame.db" $ do
@@ -132,7 +135,7 @@ activeProfileToDb userId profileName = runSqlite "endgame.db" $ do
         (Profile.stats profile)
     pure ()
 
-insertNewProfile :: Maybe UID -> String -> Program -> SqlPersistT (LoggingT IO) (Key Profile)
+insertNewProfile :: Maybe UID -> String -> Program -> Sqlite (Key Profile)
 insertNewProfile userId profileName program = insert $ Profile
     userId
     profileName
@@ -142,19 +145,19 @@ insertNewProfile userId profileName program = insert $ Profile
   where
     profile = newProfile program
 
-getProgram :: Maybe UID -> SqlPersistT (LoggingT IO) Program
+getProgram :: Maybe UID -> Sqlite Program
 getProgram userId = do
     profileId <- fromJust <$> getActiveProfileId userId
     Profile _ _ _ program _ <- fromJust <$> get profileId
     pure program
 
-getStats :: Maybe UID -> SqlPersistT (LoggingT IO) Stats
+getStats :: Maybe UID -> Sqlite Stats
 getStats userId = do
     profileId <- fromJust <$> getActiveProfileId userId
     Profile _ _ _ _ stats <- fromJust <$> get profileId
     pure stats
 
-getLogs :: Maybe UID -> SqlPersistT (LoggingT IO) [Log.Log]
+getLogs :: Maybe UID -> Sqlite [Log.Log]
 getLogs userId = do
     profileId <- fromJust <$> getActiveProfileId userId
     logRecords <- selectList
@@ -167,7 +170,7 @@ xs !!? i
     | (i > -1) && (length xs > i) = Just (xs !! i)
     | otherwise = Nothing
 
-getLog :: Maybe UID -> Int -> SqlPersistT (LoggingT IO) (Maybe Log.Log)
+getLog :: Maybe UID -> Int -> Sqlite (Maybe Log.Log)
 getLog userId n
     | n >= 0 = do
         profileId <- fromJust <$> getActiveProfileId userId
@@ -179,7 +182,7 @@ getLog userId n
         pure ((\(Entity _ (Log _ log)) -> log) <$> maybeLogRecord)
     | otherwise = pure Nothing
 
-getLogId :: Maybe UID -> Int -> SqlPersistT (LoggingT IO) (Maybe (Key Log))
+getLogId :: Maybe UID -> Int -> Sqlite (Maybe (Key Log))
 getLogId userId n
     | n >= 0 = do
         profileId <- fromJust <$> getActiveProfileId userId
@@ -191,24 +194,24 @@ getLogId userId n
         pure ((\(Entity key _) -> key) <$> maybeLogRecord)
     | otherwise = pure Nothing
 
-setProgram :: Maybe UID -> Program -> SqlPersistT (LoggingT IO) ()
+setProgram :: Maybe UID -> Program -> Sqlite ()
 setProgram userId newProgram = do
     profileId <- fromJust <$> getActiveProfileId userId
     update profileId [ProfileProgram =. newProgram]
 
-setStats :: Maybe UID -> Stats -> SqlPersistT (LoggingT IO) ()
+setStats :: Maybe UID -> Stats -> Sqlite ()
 setStats userId newStats = do
     profileId <- fromJust <$> getActiveProfileId userId
     update profileId [ProfileStats =. newStats]
 
-setLog :: Maybe UID -> Int -> Log.Log -> SqlPersistT (LoggingT IO) ()
+setLog :: Maybe UID -> Int -> Log.Log -> Sqlite ()
 setLog userId n newLog = do
     profileId <- fromJust <$> getActiveProfileId userId
     maybeLogId <- getLogId userId n
     whenJust maybeLogId $ \logId ->
         replace logId (Log profileId newLog)
 
-setActiveProfile :: Maybe UID -> String -> SqlPersistT (LoggingT IO) ()
+setActiveProfile :: Maybe UID -> String -> Sqlite ()
 setActiveProfile userId profileName = do
     (Entity profileId _ ) : _ <- selectList
         [ ProfileProfileName ==. profileName
@@ -218,17 +221,17 @@ setActiveProfile userId profileName = do
         [ActiveProfileUserId ==. userId]
         [ActiveProfileProfile =. Just profileId]
 
-newUser :: Maybe UID -> SqlPersistT (LoggingT IO) (Key ActiveProfile)
+newUser :: Maybe UID -> Sqlite (Key ActiveProfile)
 newUser userId = insert $ ActiveProfile userId Nothing Nothing
 
-getActiveProfileId :: Maybe UID -> SqlPersistT (LoggingT IO) (Maybe ProfileId)
+getActiveProfileId :: Maybe UID -> Sqlite (Maybe ProfileId)
 getActiveProfileId userId = do
     (Entity _ (ActiveProfile _ _ profileId)) : _ <- selectList
         [ ActiveProfileUserId ==. userId
         ] [LimitTo 1]
     pure profileId
 
-getProfileName :: Maybe UID -> SqlPersistT (LoggingT IO) (Maybe String)
+getProfileName :: Maybe UID -> Sqlite (Maybe String)
 getProfileName userId = do
     maybeProfileId <- getActiveProfileId userId
     case maybeProfileId of
@@ -239,19 +242,19 @@ getProfileName userId = do
                 Nothing -> pure Nothing
                 Just (Profile _ name _ _ _) -> pure (Just name)
 
-getProfileNames :: Maybe UID -> SqlPersistT (LoggingT IO) [String]
+getProfileNames :: Maybe UID -> Sqlite [String]
 getProfileNames userId = do
     profiles <- selectList [ProfileUserId ==. userId] []
     pure ((\(Entity _ (Profile _ name _ _ _)) -> name) <$> profiles)
 
-insertLog :: Maybe UID -> Log.Log -> SqlPersistT (LoggingT IO) (Key Log)
+insertLog :: Maybe UID -> Log.Log -> Sqlite (Key Log)
 insertLog userId log = do
     profileId <- fromJust <$> getActiveProfileId userId
     insert $ Log profileId log
 
 -- Previous logs are not used to find next logs.
 -- Program is never altered either.
-addAndGetNextLog :: Maybe UID -> SqlPersistT (LoggingT IO) Log.Log
+addAndGetNextLog :: Maybe UID -> Sqlite Log.Log
 addAndGetNextLog userId = do
     stats <- getStats userId
     program <- getProgram userId
@@ -262,19 +265,19 @@ addAndGetNextLog userId = do
     insertLog userId addedLog
     pure addedLog
 
-getNextLog :: Maybe UID -> SqlPersistT (LoggingT IO) Log.Log
+getNextLog :: Maybe UID -> Sqlite Log.Log
 getNextLog userId = do
     stats <- getStats userId
     program <- getProgram userId
     pure $ nextLog $ profile program stats []
 
-getNextLogs :: Maybe UID -> Int -> SqlPersistT (LoggingT IO) [Log.Log]
+getNextLogs :: Maybe UID -> Int -> Sqlite [Log.Log]
 getNextLogs userId n = do
     stats <- getStats userId
     program <- getProgram userId
     pure $ take n $ nextLogs $ profile program stats []
 
-undoLog :: Maybe UID -> SqlPersistT (LoggingT IO) ()
+undoLog :: Maybe UID -> Sqlite ()
 undoLog userId = do
     maybeLogId <- getLogId userId 0
     whenJust maybeLogId $ \logId -> do
@@ -284,14 +287,14 @@ undoLog userId = do
         setStats userId $ Stats.undoLog program log stats
         delete logId
 
-getPrograms :: Maybe UID -> SqlPersistT (LoggingT IO) [PresetProgram]
+getPrograms :: Maybe UID -> Sqlite [PresetProgram]
 getPrograms userId = do
     programEntities <- selectList
         [ PresetProgramUserId ==. userId ]
         [ Asc PresetProgramName ]
     pure $ (\(Entity _ program) -> program) <$> programEntities
 
-getAvailablePrograms :: Maybe UID -> SqlPersistT (LoggingT IO) [ProgramResponse]
+getAvailablePrograms :: Maybe UID -> Sqlite [ProgramResponse]
 getAvailablePrograms userId = do
     premadePrograms <- getPrograms Nothing
     userPrograms <- getPrograms userId
@@ -306,7 +309,7 @@ getAvailablePrograms userId = do
             , wasMadeByUser = isJust userId
             }
 
-createNewProfile :: Maybe UID -> String -> Program -> SqlPersistT (LoggingT IO) ()
+createNewProfile :: Maybe UID -> String -> Program -> Sqlite ()
 createNewProfile userId profileName program = do
     let profile = newProfile program
     profileAlreadyExists <- exists
@@ -321,7 +324,7 @@ createNewProfile userId profileName program = do
             (Profile.program profile)
             (Profile.stats profile)
 
-deleteTrainingProfile :: Maybe UID -> String -> SqlPersistT (LoggingT IO) ()
+deleteTrainingProfile :: Maybe UID -> String -> Sqlite ()
 deleteTrainingProfile userId profileName = do
     maybeProfileId <- selectFirst
         [ ProfileProfileName ==. profileName
@@ -336,7 +339,7 @@ deleteTrainingProfile userId profileName = do
             [ ActiveProfileProfile =. Nothing]
         delete profileId
 
-renameTrainingProfile :: Maybe UID -> String -> String -> SqlPersistT (LoggingT IO) ()
+renameTrainingProfile :: Maybe UID -> String -> String -> Sqlite ()
 renameTrainingProfile userId oldName newName =
     updateWhere
         [ ProfileProfileName ==. oldName
@@ -344,12 +347,12 @@ renameTrainingProfile userId oldName newName =
         ]
         [ ProfileProfileName =. newName ]
 
-signUp :: String -> String -> Text -> SqlPersistT (LoggingT IO) (Maybe (Key User))
+signUp :: String -> String -> Text -> Sqlite (Maybe (Key User))
 signUp username email password = do
     hashedPassword <- liftIO $ hash password
     insertUnique $ User username email hashedPassword
 
-login :: String -> Text -> Text -> SqlPersistT (LoggingT IO) Bool
+login :: String -> Text -> Text -> Sqlite Bool
 login email password sessionId = do
     maybeUser <- selectFirst [ UserEmail ==. email ] []
     case maybeUser of
@@ -362,10 +365,18 @@ login email password sessionId = do
                     pure True
                 else pure False
 
-getUserId :: Text -> SqlPersistT (LoggingT IO) (Maybe (Key User))
+logOut :: UID -> Sqlite ()
+logOut userId = deleteWhere [ UserSessionUserId ==. userId]
+
+getUserId :: Text -> Sqlite (Maybe (Key User))
 getUserId sessionId = do
     maybeSession <- selectFirst
         [ UserSessionSessionId ==. sessionId ] []
     pure $ case maybeSession of
         Nothing -> Nothing
         Just (Entity _ (UserSession _ userId)) -> Just userId
+
+getUsername :: UID -> Sqlite (Maybe String)
+getUsername userId = do
+    maybeUser <- get userId
+    pure ((\(User name _ _) -> name) <$> maybeUser)

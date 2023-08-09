@@ -27,7 +27,6 @@ module Db.Sqlite
     , activeProfileToDb
     , createTables
     , setActiveProfile
-    , newUser
     , getProfileName
     , getProfileNames
     , insertLog
@@ -216,9 +215,6 @@ setActiveProfile userId profileName = do
         [ActiveProfileUserId ==. userId]
         [ActiveProfileProfile =. Just profileId]
 
-newUser :: Maybe UID -> Sqlite (Key ActiveProfile)
-newUser userId = insert $ ActiveProfile userId Nothing
-
 getActiveProfileId :: Maybe UID -> Sqlite (Maybe ProfileId)
 getActiveProfileId userId = do
     (Entity _ (ActiveProfile _ profileId)) : _ <- selectList
@@ -344,7 +340,9 @@ renameTrainingProfile userId oldName newName =
 signUp :: String -> String -> Text -> Sqlite (Maybe (Key User))
 signUp username email password = do
     hashedPassword <- liftIO $ hash password
-    insertUnique $ User username email hashedPassword
+    maybeUserId <- insertUnique $ User username email hashedPassword
+    whenJust maybeUserId $ \userId -> insert_ $ ActiveProfile (Just userId) Nothing
+    pure maybeUserId
 
 login :: String -> Text -> Text -> Sqlite Bool
 login email password sessionId = do

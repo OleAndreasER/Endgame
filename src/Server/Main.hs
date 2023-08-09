@@ -102,6 +102,7 @@ app = prehook corsHeader $ do
     SignUpRequest username email password <- jsonBody' :: ApiAction SignUpRequest
     userId <- runSQL $ signUp username email password
     if isJust userId then do
+      sessionRegenerateId
       sessionId <- getSessionId
       runSQL $ login email password sessionId
       setCookie "session" sessionId authCookieSettings
@@ -109,6 +110,7 @@ app = prehook corsHeader $ do
       else errorJson 401 "Unavailable"
   post ("users" <//> "login") $ do
     LoginRequest email password <- jsonBody' :: ApiAction LoginRequest
+    sessionRegenerateId
     sessionId <- getSessionId
     isUser <- runSQL $ login email password sessionId
     if isUser

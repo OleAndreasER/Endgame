@@ -78,6 +78,7 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 UserSession
     sessionId Text
     userId UserId
+    UniqueSessionId sessionId
 User
     name String
     email String
@@ -353,8 +354,8 @@ login email password sessionId = do
             let isCorrectPassword = equalsHash password passwordHash
             if isCorrectPassword
                 then do
-                    insert_ $ UserSession sessionId userId
-                    pure True
+                    maybeInserted <- insertUnique_ $ UserSession sessionId userId
+                    pure $ isJust maybeInserted
                 else pure False
 
 logOut :: UID -> Sqlite ()

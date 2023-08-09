@@ -35,7 +35,7 @@ type ApiAction a = SpockAction SqlBackend () () a
 
 startServer :: IO ()
 startServer = do
-  pool <- runStdoutLoggingT $ createSqlitePool "endgame.db" 5
+  pool <- runStdoutLoggingT $ createSqlitePool "endgame.sqlite" 5
   spockConfig <- defaultSpockCfg () (PCPool pool) ()
   runSpock 8080 (spock spockConfig app)
 

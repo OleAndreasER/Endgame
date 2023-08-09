@@ -87,12 +87,10 @@ User
     UniqueUserEmail email
 ActiveProfile
     userId UserId Maybe
-    ownerUserId String Maybe
     profile ProfileId Maybe
 Profile
     userId UserId Maybe
     profileName String
-    ownerUserId String Maybe
     program Program
     stats Stats
 Log
@@ -102,35 +100,33 @@ PresetProgram
     userId UserId Maybe
     name String
     program Program
-    ownerUserId String Maybe
 |]
 
 type UID = Key User
 type Sqlite a = SqlPersistT (LoggingT IO) a
 
 createTables :: IO ()
-createTables = runSqlite "endgame.db" $ do
+createTables = runSqlite "endgame.sqlite" $ do
     runMigration migrateAll
 
 initializePresetPrograms :: IO ()
 initializePresetPrograms =
-    runSqlite "endgame.db" $
+    runSqlite "endgame.sqlite" $
     forM_ programs $ \(name, program) -> do
         maybeProgram <- selectFirst
             [ PresetProgramName ==. name
-            , PresetProgramOwnerUserId ==. Nothing
+            , PresetProgramUserId ==. Nothing
             ] []
         case maybeProgram of
             Just _ -> pure ()
-            Nothing -> insert_ $ PresetProgram Nothing name program Nothing
+            Nothing -> insert_ $ PresetProgram Nothing name program
 
 activeProfileToDb :: Maybe UID -> String -> IO ()
-activeProfileToDb userId profileName = runSqlite "endgame.db" $ do
+activeProfileToDb userId profileName = runSqlite "endgame.sqlite" $ do
     profile <- liftIO readProfile
     profileId <- insert $ Profile
         userId
         profileName
-        Nothing
         (Profile.program profile)
         (Profile.stats profile)
     pure ()
@@ -139,7 +135,6 @@ insertNewProfile :: Maybe UID -> String -> Program -> Sqlite (Key Profile)
 insertNewProfile userId profileName program = insert $ Profile
     userId
     profileName
-    Nothing
     (Profile.program profile)
     (Profile.stats profile)
   where
@@ -148,13 +143,13 @@ insertNewProfile userId profileName program = insert $ Profile
 getProgram :: Maybe UID -> Sqlite Program
 getProgram userId = do
     profileId <- fromJust <$> getActiveProfileId userId
-    Profile _ _ _ program _ <- fromJust <$> get profileId
+    Profile _ _ program _ <- fromJust <$> get profileId
     pure program
 
 getStats :: Maybe UID -> Sqlite Stats
 getStats userId = do
     profileId <- fromJust <$> getActiveProfileId userId
-    Profile _ _ _ _ stats <- fromJust <$> get profileId
+    Profile _ _ _ stats <- fromJust <$> get profileId
     pure stats
 
 getLogs :: Maybe UID -> Sqlite [Log.Log]
@@ -222,11 +217,11 @@ setActiveProfile userId profileName = do
         [ActiveProfileProfile =. Just profileId]
 
 newUser :: Maybe UID -> Sqlite (Key ActiveProfile)
-newUser userId = insert $ ActiveProfile userId Nothing Nothing
+newUser userId = insert $ ActiveProfile userId Nothing
 
 getActiveProfileId :: Maybe UID -> Sqlite (Maybe ProfileId)
 getActiveProfileId userId = do
-    (Entity _ (ActiveProfile _ _ profileId)) : _ <- selectList
+    (Entity _ (ActiveProfile _ profileId)) : _ <- selectList
         [ ActiveProfileUserId ==. userId
         ] [LimitTo 1]
     pure profileId
@@ -240,12 +235,12 @@ getProfileName userId = do
             profile <- get profileId
             case profile of
                 Nothing -> pure Nothing
-                Just (Profile _ name _ _ _) -> pure (Just name)
+                Just (Profile _ name _ _) -> pure (Just name)
 
 getProfileNames :: Maybe UID -> Sqlite [String]
 getProfileNames userId = do
     profiles <- selectList [ProfileUserId ==. userId] []
-    pure ((\(Entity _ (Profile _ name _ _ _)) -> name) <$> profiles)
+    pure ((\(Entity _ (Profile _ name _ _)) -> name) <$> profiles)
 
 insertLog :: Maybe UID -> Log.Log -> Sqlite (Key Log)
 insertLog userId log = do
@@ -302,7 +297,7 @@ getAvailablePrograms userId = do
     pure $ toProgramResponse <$> programs
   where
     toProgramResponse :: PresetProgram -> ProgramResponse
-    toProgramResponse (PresetProgram userId name program Nothing) =
+    toProgramResponse (PresetProgram userId name program) =
         ProgramResponse
             { name = name
             , program = program
@@ -320,7 +315,6 @@ createNewProfile userId profileName program = do
         else insert_ $ Profile
             userId
             profileName
-            Nothing
             (Profile.program profile)
             (Profile.stats profile)
 

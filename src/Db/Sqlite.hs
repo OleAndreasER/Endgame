@@ -358,8 +358,8 @@ login email password sessionId = do
                     pure $ isJust maybeInserted
                 else pure False
 
-logOut :: UID -> Sqlite ()
-logOut userId = deleteWhere [ UserSessionUserId ==. userId]
+logOut :: Text -> Sqlite ()
+logOut sessionId = deleteWhere [ UserSessionSessionId ==. sessionId]
 
 getUserId :: Text -> Sqlite (Maybe (Key User))
 getUserId sessionId = do

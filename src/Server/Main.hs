@@ -118,8 +118,8 @@ app = prehook corsHeader $ do
         setCookie "session" sessionId authCookieSettings
         json ("Logged in" :: String)
       else json ("No such user" :: String)
-  delete ("users" <//> "login") $ requireUser $ \userId -> do
-    runSQL $ logOut userId
+  delete ("users" <//> "login") $ requireSession $ \sessionId -> do
+    runSQL $ logOut sessionId 
     deleteCookie "session"
     json ("Logged out" :: String)
   put ("users" <//> "active-training-profile") $ requireUser $ \userId -> do
@@ -158,6 +158,13 @@ requireUser action = do
         case maybeUserId of
           Nothing -> errorJson 401 "Unauthorized"
           Just userId -> action userId
+
+requireSession :: (Text -> ApiAction ()) -> ApiAction ()
+requireSession action = do
+  maybeSessionId <- cookie "session"
+  case maybeSessionId of
+      Nothing -> errorJson 401 "Unauthorized"
+      Just sessionId -> action sessionId
 
 errorJson :: Int -> Text -> ApiAction ()
 errorJson code message =

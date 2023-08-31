@@ -37,6 +37,7 @@ module Db.Sqlite
     , deleteTrainingProfile
     , renameTrainingProfile
     , signUp
+    , SignUpResult (..)
     , login
     , getUserId
     , getUsername
@@ -68,7 +69,9 @@ import Server.ResponseTypes (ProgramResponse (..))
 import Relude (whenJust)
 import Data.Password.Bcrypt (PasswordHash, Bcrypt)
 import Data.Text (Text)
-import Server.Password (hash, equalsHash)
+import Server.Password (hash, equalsHash, isValidPassword)
+import Text.Email.Validate (isValid)
+import qualified Data.ByteString.UTF8 as BSU
 
 
 type PasswordHashBcrypt = PasswordHash Bcrypt
@@ -338,12 +341,22 @@ renameTrainingProfile userId oldName newName =
         ]
         [ ProfileProfileName =. newName ]
 
-signUp :: String -> String -> Text -> Sqlite (Maybe (Key User))
-signUp username email password = do
-    hashedPassword <- liftIO $ hash password
-    maybeUserId <- insertUnique $ User username email hashedPassword
-    whenJust maybeUserId $ \userId -> insert_ $ ActiveProfile (Just userId) Nothing
-    pure maybeUserId
+data SignUpResult = SignUpSuccess (Key User)
+    | SignUpFailure String
+    deriving (Show, Eq, Read)
+
+signUp :: String -> String -> Text -> Sqlite SignUpResult
+signUp username email password
+    | not $ isValid $ BSU.fromString email = pure $ SignUpFailure "Invalid email"
+    | not $ isValidPassword password = pure $ SignUpFailure "Invalid password"
+    | null username || length username > 15 = pure $ SignUpFailure "Invalid username"
+    | otherwise = do
+        hashedPassword <- liftIO $ hash password
+        maybeUserId <- insertUnique $ User username email hashedPassword
+        whenJust maybeUserId $ \userId -> insert_ $ ActiveProfile (Just userId) Nothing
+        pure $ case maybeUserId of
+            Nothing -> SignUpFailure "User is taken"
+            Just userId -> SignUpSuccess userId
 
 login :: String -> Text -> Text -> Sqlite Bool
 login email password sessionId = do

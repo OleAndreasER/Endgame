@@ -19,7 +19,7 @@ import Profile.NextLog (nextLog, nextLogs, addLog)
 import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
 import Date (dateStr)
 import Data.Maybe (fromJust, isJust)
-import Db.Sqlite (getLogs, getLog, getProgram, getStats, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog, getAvailablePrograms, createNewProfile, deleteTrainingProfile, renameTrainingProfile, login, signUp, UID, getUserId, getUsername, logOut)
+import Db.Sqlite (getLogs, getLog, getProgram, getStats, setActiveProfile, getProfileName, getProfileNames, setStats, setLog, addAndGetNextLog, getNextLog, getNextLogs, undoLog, getAvailablePrograms, createNewProfile, deleteTrainingProfile, renameTrainingProfile, login, signUp, UID, getUserId, getUsername, logOut, SignUpResult (SignUpFailure, SignUpSuccess))
 import Log.Log (Log)
 import Stats.Stats (Stats)
 import Program.Program (Program)
@@ -28,6 +28,7 @@ import Server.RequestTypes.RequestTypes (ProfileRequest(ProfileRequest), LogRequ
 import qualified Log.Format as Log
 import Server.RequestTypes.LoginRequest (LoginRequest(LoginRequest))
 import Relude (whenJust)
+import Network.HTTP.Types (Status, statusCode, status401, status400)
 
 type Api = SpockM SqlBackend () () ()
 
@@ -58,7 +59,7 @@ app = prehook corsHeader $ do
   put ("log" <//> var) $ \i -> requireUser $ \userId -> do
     logRequest <- jsonBody' :: ApiAction LogRequest
     case toLog logRequest of
-      Nothing -> errorJson 400 "Invalid log entry."
+      Nothing -> errorJson status400 "Invalid log entry."
       Just log -> do
         runSQL $ setLog (Just userId) i log
         json ("OK" :: String)
@@ -100,14 +101,15 @@ app = prehook corsHeader $ do
     json ("OK" :: String)
   post "users" $ do
     SignUpRequest username email password <- jsonBody' :: ApiAction SignUpRequest
-    userId <- runSQL $ signUp username email password
-    if isJust userId then do
-      sessionRegenerateId
-      sessionId <- getSessionId
-      runSQL $ login email password sessionId
-      setCookie "session" sessionId authCookieSettings
-      json ("Signed in" :: String)
-      else errorJson 401 "Unavailable"
+    signUpResult <- runSQL $ signUp username email password
+    case signUpResult of
+      SignUpSuccess userId -> do
+        sessionRegenerateId
+        sessionId <- getSessionId
+        runSQL $ login email password sessionId
+        setCookie "session" sessionId authCookieSettings
+        json ("Signed in" :: String)
+      SignUpFailure reason -> errorJson status401 $ pack reason
   post ("users" <//> "login") $ do
     LoginRequest email password <- jsonBody' :: ApiAction LoginRequest
     sessionRegenerateId
@@ -152,26 +154,27 @@ requireUser :: (UID -> ApiAction ()) -> ApiAction ()
 requireUser action = do
   maybeSessionId <- cookie "session"
   case maybeSessionId of
-      Nothing -> errorJson 401 "Unauthorized"
+      Nothing -> errorJson status401 "Unauthorized"
       Just sessionId -> do
         maybeUserId <- runSQL $ getUserId sessionId
         case maybeUserId of
-          Nothing -> errorJson 401 "Unauthorized"
+          Nothing -> errorJson status401 "Unauthorized"
           Just userId -> action userId
 
 requireSession :: (Text -> ApiAction ()) -> ApiAction ()
 requireSession action = do
   maybeSessionId <- cookie "session"
   case maybeSessionId of
-      Nothing -> errorJson 401 "Unauthorized"
+      Nothing -> errorJson status401 "Unauthorized"
       Just sessionId -> action sessionId
 
-errorJson :: Int -> Text -> ApiAction ()
-errorJson code message =
+errorJson :: Status -> Text -> ApiAction ()
+errorJson status message = do
+  setStatus status
   json $
     object
     [ "result" .= String "failure"
-    , "error" .= object ["code" .= code, "message" .= message]
+    , "error" .= object ["code" .= statusCode status, "message" .= message]
     ]
 
 runSQL

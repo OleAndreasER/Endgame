@@ -76,7 +76,10 @@ executable endgame-server
         persistent,
         persistent-sqlite,
         persistent-template,
-        password
+        password,
+        email-validate,
+        utf8-string,
+        http-types
 
     hs-source-dirs:   endgame-server, src
     default-language: Haskell2010
@@ -145,7 +148,9 @@ executable endgame
         persistent,
         persistent-sqlite,
         persistent-template,
-        password
+        password,
+        email-validate,
+        utf8-string
 
     hs-source-dirs:   endgame, src
     default-language: Haskell2010

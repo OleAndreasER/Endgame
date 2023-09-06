@@ -118,8 +118,8 @@ app = prehook corsHeader $ do
     if isUser
       then do
         setCookie "session" sessionId authCookieSettings
-        json ("Logged in" :: String)
-      else json ("No such user" :: String)
+        json True
+      else json False
   delete ("users" <//> "login") $ requireSession $ \sessionId -> do
     runSQL $ logOut sessionId 
     deleteCookie "session"

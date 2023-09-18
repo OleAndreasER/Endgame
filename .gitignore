@@ -1,5 +1,6 @@
 /dist-newstyle
 /endgame-profiles/*
 TODO
+endgame.sqlite
 endgame.sqlite-shm
 endgame.sqlite-wal
